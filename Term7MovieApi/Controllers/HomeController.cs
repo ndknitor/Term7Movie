@@ -4,5 +4,9 @@ namespace Term7MovieApi;
 [Route("/api/[controller]")]
 public class HomeController : Controller
 {
-
+    [HttpPost("hello")]
+    public ActionResult Test(SignInRequest request)
+    {
+        return Ok();
+    }
 }
