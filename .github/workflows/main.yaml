@@ -14,5 +14,5 @@ jobs:
         username: ubuntu
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
-        script: |
-          mkdir ditmemay
+        script: | 
+          echo "Hello dit me may"
