@@ -11,8 +11,8 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
-        username: ubuntu
+        username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: | 
-          echo "Hello diasdasdast me may"
+          echo "Hello diasdaasdasdsdast me may"
