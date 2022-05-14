@@ -22,6 +22,7 @@ jobs:
           dotnet run &> /dev/null &
           cd
           cd Term7Movie/term7movieclient
+          git pull
           npm install
           npm start &> /dev/null &
 
