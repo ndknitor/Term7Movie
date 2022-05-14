@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddHttpContextAccessor();
 
@@ -17,29 +18,28 @@ builder.Services.AddSession(option =>
     option.Cookie.Name = "SessionId";
 });
 builder.Services.AddDistributedMemoryCache();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     builder.WebHost.ConfigureLogging((context, build) =>
-    {
+{
         //build.AddFile(builder.Configuration.GetSection("FileLogging"));
-    });
+});
 }
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Use(async (context, next) =>
 {
     string ip = context.Request.Headers["CF-CONNECTING-IP"].FirstOrDefault();

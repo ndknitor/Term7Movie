@@ -16,8 +16,12 @@ jobs:
         port: 22
         script: | 
           pkill dotnet
+          pkill node
           cd Term7Movie/Term7MovieApi/
           git pull
           dotnet run &> /dev/null &
+          cd
+          cd Term7Movie/term7movieclient
+          npm start &> /dev/null &
 
 
