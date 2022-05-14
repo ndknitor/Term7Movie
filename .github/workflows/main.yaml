@@ -19,11 +19,12 @@ jobs:
           pkill node
           cd Term7Movie/Term7MovieApi/
           git pull
-          dotnet run &> /dev/null &
+          dotnet run -c Release &> /dev/null &
           cd
           cd Term7Movie/term7movieclient
           git pull
           npm install
-          npm start &> /dev/null &
+          echo -ne "\n" | npm run build
+          npm run start:prod &> /dev/null &
 
 
