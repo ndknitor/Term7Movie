@@ -15,4 +15,9 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: | 
-          echo "Hello diasdaasasekhjtoinoerkldasdsaasdssdasdasdasdast me may"
+          pkill dotnet
+          cd Term7Movie/Term7MovieApi/
+          git pull
+          dotnet run &> /dev/null &
+
+
