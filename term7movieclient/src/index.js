@@ -13,7 +13,6 @@ if (module.hot) {
   });
   console.info('✅  Server-side HMR Enabled!');
 }
-
 const port = process.env.PORT || 3000;
 
 export default express()

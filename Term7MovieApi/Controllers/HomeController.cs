@@ -7,6 +7,6 @@ public class HomeController : Controller
     [HttpPost("hello")]
     public ActionResult Test(SignInRequest request)
     {
-        return Ok();
+        return Ok(new {fuck = "Dit me may"});
     }
 }
