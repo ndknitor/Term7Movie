@@ -8,7 +8,7 @@ function App() {
   useEffect(() => {
     axios.get('/api/home/hello').then(res => {
       console.log(res.data);
-      //dsfsdsd
+      console.log('asdasdas');
     });
   }, []);
   return (
