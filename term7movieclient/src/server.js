@@ -3,6 +3,7 @@ import React from 'react';
 import { StaticRouter } from 'react-router-dom/server';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
@@ -42,8 +43,10 @@ export const renderApp = (req, res) => {
 </html>`
   return html;
 }
-
-const server = express();
+const apiProxy = createProxyMiddleware('/api', {
+  target : process.env.API_HOST
+});
+const server = express().use(apiProxy);
 server
   .disable('x-powered-by')
   .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
