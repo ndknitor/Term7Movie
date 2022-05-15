@@ -44,7 +44,7 @@ export const renderApp = (req, res) => {
   return html;
 }
 const apiProxy = createProxyMiddleware('/api', {
-  target : process.env.API_HOST
+  target : 'http://localhost:1024'
 });
 const server = express().use(apiProxy);
 server
