@@ -7,6 +7,6 @@ public class HomeController : Controller
     [HttpGet("hello")]
     public ActionResult Test()
     {
-        return Ok(new {fuck = "Dit me may"});
+        return Ok(new {fuck = "Dit me may con cac"});
     }
 }
