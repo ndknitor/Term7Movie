@@ -1,3 +1,7 @@
+on:
+  push:
+    brarches:
+      '**'
 name: CI/CD for Term7Movie
 jobs:
   Test:
