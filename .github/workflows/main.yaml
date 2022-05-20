@@ -17,9 +17,6 @@ jobs:
         script: | 
           cd Term7Movie/Term7MovieApi/
           git pull
-          dotnet restore
-          dotnet build --no-restore
-          dotnet test --no-build --verbosity normal
           pkill dotnet
           pkill node
           dotnet run -c Release &> /dev/null &
