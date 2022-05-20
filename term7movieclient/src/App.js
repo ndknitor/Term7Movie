@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import Home from './Home';
 import './App.css';
@@ -12,9 +12,11 @@ function App() {
     });
   }, []);
   return (
-    <Routes>
-      <Route path="/" element={<Home></Home>} />
-    </Routes>
+    <BrowserRouter basename='/Term7Movie'>
+      <Routes>
+        <Route path="/" element={<Home></Home>} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
