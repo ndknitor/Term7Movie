@@ -12,6 +12,6 @@ public class Tests
     [Test]
     public void Test1()
     {
-        Assert.That(false);
+        Assert.That(true);
     }
 }
