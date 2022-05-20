@@ -15,10 +15,13 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: | 
-          pkill dotnet
-          pkill node
           cd Term7Movie/Term7MovieApi/
           git pull
+          dotnet restore
+          dotnet build --no-restore
+          dotnet test --no-build --verbosity normal
+          pkill dotnet
+          pkill node
           dotnet run -c Release &> /dev/null &
           cd
           cd Term7Movie/term7movieclient
@@ -26,5 +29,4 @@ jobs:
           npm install
           echo -ne "\n" | npm run build
           npm run start:prod &> /dev/null &
-
-
+          
