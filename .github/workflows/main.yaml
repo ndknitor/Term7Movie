@@ -1,8 +1,4 @@
 name: CI/CD for Term7Movie
-on: 
-  push:
-    branches:
-    - '**'
 jobs:
   Test:
     runs-on: ubuntu-latest
