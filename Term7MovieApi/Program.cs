@@ -16,14 +16,6 @@ builder.Services.AddDbContext<DbContext>(o => o.UseSqlServer(builder.Configurati
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
-{
-    option.Cookie.Name = "Authentication";
-});
-builder.Services.AddSession(option =>
-{
-    option.Cookie.Name = "SessionId";
-});
 builder.Services.AddDistributedRedisCache(option =>
 {
     option.Configuration = builder.Configuration.GetConnectionString("Redis");
