@@ -3,6 +3,10 @@ using Microsoft.Extensions.Caching.Redis;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Term7MovieApi.Entities;
+using Microsoft.AspNetCore.Identity;
+using Term7MovieApi.Repositories.Interfaces;
+using Term7MovieApi.Repositories.Implement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddDbContext<DbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("FCinemaConnection")));
+
+builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedPhoneNumber = false)
+                    .AddRoles<Role>()
+                    .AddRoleManager<RoleManager<Role>>()
+                    .AddUserManager<UserManager<User>>()
+                    .AddSignInManager<SignInManager<User>>()
+                    .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
