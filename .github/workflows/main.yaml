@@ -18,7 +18,7 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal      
-  BuildAndDeploy:
+  Build and deploy:
     name: Build
     runs-on: ubuntu-latest
     needs: [Test]
@@ -32,10 +32,10 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: | 
-          cd Term7Movie/Term7MovieApi/
-          git pull
           pkill dotnet
           pkill node
+          cd Term7Movie/Term7MovieApi/
+          git pull
           dotnet run -c Release &> /dev/null &
           cd
           cd Term7Movie/term7movieclient
