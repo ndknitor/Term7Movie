@@ -19,6 +19,7 @@ namespace Term7MovieApi.Entities
         [Required]
         public int ManagerId { set; get; }
         public User Manager { set; get; }
+        public bool Status { set; get; }
         [JsonIgnore]
         public ICollection<Room> Rooms { set; get; }
     }

@@ -19,6 +19,7 @@ namespace Term7MovieApi.Entities
         public int NumberOfRow { set; get; }
         [Required]
         public int NumberOfColumn { set; get; }
+        public bool Status { set; get; }
         public ICollection<Seat> Seats { set; get; }
         public ICollection<Showtime> Showtimes { set; get; }
     }

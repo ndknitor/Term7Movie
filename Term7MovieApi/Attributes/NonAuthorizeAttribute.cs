@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Filters;
+using Term7MovieApi.Constants;
+using Term7MovieApi.Extensions;
+using Term7MovieApi.Responses;
+
 namespace Term7MovieApi;
 public class NonAuthorizeAttribute : ActionFilterAttribute
 {
@@ -7,7 +11,11 @@ public class NonAuthorizeAttribute : ActionFilterAttribute
         if (context.HttpContext.User.Identity.IsAuthenticated)
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.HttpContext.Response.WriteAsync("{\"message\":\"User already authenticated\"}");
+            var res = new ParentResponse() 
+            { 
+                Message = MessageConstants.MESSAGE_AUTHORIZED 
+            };
+            await context.HttpContext.Response.WriteAsync(res.ToJson());
         }
         else
         {
