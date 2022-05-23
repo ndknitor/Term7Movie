@@ -49,7 +49,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 app.UseStaticFiles();
 
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
