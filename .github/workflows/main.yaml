@@ -33,7 +33,7 @@ jobs:
         port: 22
         script: | 
           pkill dotnet
-          cd Term7Movie/
+          cd Term7Movie/Term7MovieApi
           git checkout master
           git pull
           dotnet run -c Release &> /dev/null &
