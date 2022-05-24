@@ -30,6 +30,10 @@ namespace Term7MovieApi.Entities
             builder.Entity<MovieLanguage>()
                 .HasKey(ml => new { ml.MovieId, ml.LanguageId });
 
+            builder.Entity<RefreshToken>()
+                .HasIndex(r => r.Jti)
+                .IsUnique();
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();

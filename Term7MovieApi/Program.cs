@@ -10,12 +10,14 @@ using Term7MovieApi.Repositories.Implement;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var config = builder.Configuration;
+
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("FCinemaConnection")));
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection")));
 
 builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedPhoneNumber = false)
                     .AddRoles<Role>()

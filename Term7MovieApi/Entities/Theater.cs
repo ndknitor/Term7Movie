@@ -17,7 +17,7 @@ namespace Term7MovieApi.Entities
         public int CompanyId { set; get; }
         public TheaterCompany Company { set; get; }
         [Required]
-        public int ManagerId { set; get; }
+        public long ManagerId { set; get; }
         public User Manager { set; get; }
         public bool Status { set; get; }
         [JsonIgnore]

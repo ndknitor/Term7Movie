@@ -21,12 +21,15 @@ namespace Term7MovieApi.Entities
         [Column(TypeName = "varchar(200)")]
         public string PictureUrl { set; get; }
         public int? Point { set; get; }
-        public int? TheaterId { set; get; }
+        public int? CompanyId { set; get; }
+        public TheaterCompany Company { set; get; }
         [Required]
         public int StatusId { set; get; }
         public UserStatus Status {set; get;}
         public ICollection<UserRole> UserRoles { set; get; }
         [JsonIgnore]
         public ICollection<RefreshToken> RefreshTokens { set; get; }
+        public ICollection<TransactionHistory> TransactionHistories { set; get; }
+        public ICollection<Theater> Theaters { set; get; }
     }
 }
