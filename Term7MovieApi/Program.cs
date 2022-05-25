@@ -19,7 +19,14 @@ builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddDistributedRedisCache(option =>
 {
     option.Configuration = builder.Configuration.GetConnectionString("Redis");
-    
+
+});
+builder.Services.AddCors(option =>
+{
+    option.AddPolicy("Default", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
 });
 
 builder.Services.AddSwaggerGen();
@@ -47,7 +54,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
-app.UseStaticFiles();
+app.UseCors("Default");
 
 app.UseAuthentication();
 app.UseAuthorization();
