@@ -1,7 +1,4 @@
-﻿
-
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Term7MovieApi.Entities
@@ -20,7 +17,6 @@ namespace Term7MovieApi.Entities
         public long ManagerId { set; get; }
         public User Manager { set; get; }
         public bool Status { set; get; }
-        [JsonIgnore]
         public ICollection<Room> Rooms { set; get; }
     }
 }

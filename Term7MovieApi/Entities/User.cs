@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
 
 namespace Term7MovieApi.Entities
 {
@@ -27,9 +26,9 @@ namespace Term7MovieApi.Entities
         public int StatusId { set; get; }
         public UserStatus Status {set; get;}
         public ICollection<UserRole> UserRoles { set; get; }
-        [JsonIgnore]
         public ICollection<RefreshToken> RefreshTokens { set; get; }
         public ICollection<TransactionHistory> TransactionHistories { set; get; }
         public ICollection<Theater> Theaters { set; get; }
+        public ICollection<PromotionCode> PromotionCodes { set; get; }
     }
 }

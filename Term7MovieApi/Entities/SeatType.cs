@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Term7MovieApi.Entities
@@ -11,7 +10,6 @@ namespace Term7MovieApi.Entities
         public string Name { get; set; }
         [Column(TypeName = "money"), Required]
         public decimal BonusPrice { get; set; }
-        [JsonIgnore]
         public ICollection<Seat> Seats { get; set; }
     }
 }

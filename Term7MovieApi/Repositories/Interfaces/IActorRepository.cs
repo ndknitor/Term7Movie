@@ -4,7 +4,7 @@ namespace Term7MovieApi.Repositories.Interfaces
 {
     public interface IActorRepository
     {
-        IEnumerable<Actor> GetAllActor();
+        IEnumerable<Actor> GetAllActor(int movieId);
         Actor GetActorById(int id);
         int CreateActor(Actor actor);
         int CreateActor(Actor[] actors);

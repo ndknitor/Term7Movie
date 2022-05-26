@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,7 +19,6 @@ namespace Term7MovieApi.Entities
         [Required]
         public int SeatTypeId { set; get; }
         public SeatType SeatType { set; get; }
-        [JsonIgnore]
         public ICollection<Ticket> Tickets { set; get; }
     }
 }

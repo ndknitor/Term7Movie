@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Term7MovieApi.Entities
@@ -11,10 +10,8 @@ namespace Term7MovieApi.Entities
         public long SeatId { get; set; }
         public Seat Seat { set; get; }
         public long? TransactionId { get; set; }
-        [JsonIgnore]
         public Transaction Transaction { set; get; }
         public long? ShowTimeId { get; set; }
-        [JsonIgnore]
         public Showtime ShowTime { set; get; }
         [Required]
         public DateTime ShowStartTime { get; set; }
