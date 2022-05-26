@@ -3,10 +3,10 @@ using Microsoft.Extensions.Caching.Redis;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Term7MovieApi.Entities;
+using Term7MovieCore.Entities;
 using Microsoft.AspNetCore.Identity;
-using Term7MovieApi.Repositories.Interfaces;
-using Term7MovieApi.Repositories.Implement;
+using Term7MovieRepository.Repositories.Interfaces;
+using Term7MovieRepository.Repositories.Implement;
 
 var builder = WebApplication.CreateBuilder(args);
 
