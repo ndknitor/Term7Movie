@@ -3,18 +3,67 @@ using Microsoft.Extensions.Caching.Redis;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Term7MovieCore.Entities;
+using Microsoft.AspNetCore.Identity;
+using Term7MovieRepository.Repositories.Interfaces;
+using Term7MovieRepository.Repositories.Implement;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Term7MovieApi.Extensions;
+using Term7MovieApi.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var config = builder.Configuration;
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddDbContext<DbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection"), b => b.MigrationsAssembly("Term7MovieApi")));
+
+builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedPhoneNumber = false)
+                    .AddRoles<Role>()
+                    .AddRoleManager<RoleManager<Role>>()
+                    .AddUserManager<UserManager<User>>()
+                    .AddSignInManager<SignInManager<User>>()
+                    .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
+// inject services from Term7MovieService.Services
+builder.Services.InjectProjectServices();
+
+// create instance for config in appsettings.json
+builder.Services.ConfigureOptions(config);
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    var jwtSection = config.GetSection("Jwt");
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"])),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 
 builder.Services.AddDistributedRedisCache(option =>
 {
@@ -58,6 +107,7 @@ app.UseCors("Default");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Use(async (context, next) =>
 {
