@@ -19,6 +19,8 @@ namespace Term7MovieCore.Entities
         public string TrailerUrl { set; get; }
         [Column(TypeName = "nvarchar(200)")]
         public string Description { set; get; }
+        public long ViewCount { set; get; }
+        public float TotalRating { set; get; }
         [Required]
         public int DirectorId { set; get; }
         public Director Director { set; get; }
@@ -26,5 +28,6 @@ namespace Term7MovieCore.Entities
         public ICollection<MovieLanguage> MovieLanguages { set; get; }
         public ICollection<MovieCategory> MovieCategories { set; get; }
         public ICollection<Showtime> MovieShowtimes { set; get; }
+        public ICollection<MovieRating> MovieRatings { set; get; }
     }
 }

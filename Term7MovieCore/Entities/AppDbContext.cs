@@ -68,6 +68,9 @@ namespace Term7MovieCore.Entities
                 .HasIndex(r => r.Jti)
                 .IsUnique();
 
+            builder.Entity<MovieRating>()
+                .HasKey(mr => new { mr.MovieId, mr.UserId });
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();
