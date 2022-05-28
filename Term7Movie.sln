@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Term7MovieApi", "Term7Movie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Term7MovieUnitTest", "Term7MovieUnitTest\Term7MovieUnitTest.csproj", "{AAA65776-13C9-4FAA-9A78-99723302E0DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Term7MovieCore", "Term7MovieCore\Term7MovieCore.csproj", "{CAD84E94-B67E-480C-A8DC-84B8E176AC87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Term7MovieCore", "Term7MovieCore\Term7MovieCore.csproj", "{CAD84E94-B67E-480C-A8DC-84B8E176AC87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Term7MovieRepository", "Term7MovieRepository\Term7MovieRepository.csproj", "{C01223D7-1540-4DA8-97BD-C16FE2DBAF16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Term7MovieRepository", "Term7MovieRepository\Term7MovieRepository.csproj", "{C01223D7-1540-4DA8-97BD-C16FE2DBAF16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Term7MovieService", "Term7MovieService\Term7MovieService.csproj", "{38E264CC-2566-4844-9221-DC2607AECE86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Term7MovieService", "Term7MovieService\Term7MovieService.csproj", "{38E264CC-2566-4844-9221-DC2607AECE86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

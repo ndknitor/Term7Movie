@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Term7MovieApi.Extensions
+namespace Term7MovieCore.Extensions
 {
     public static class JsonConvertExtension
     {

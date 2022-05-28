@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using Term7MovieApi.Constants;
-using Term7MovieApi.Extensions;
-using Term7MovieApi.Responses;
+using Term7MovieCore.Extensions;
+using Term7MovieCore.Data;
+using Term7MovieCore.Data.Response;
 
 namespace Term7MovieApi;
-public class NonAuthorizeAttribute : ActionFilterAttribute
+public class NonAuthorizedAttribute : ActionFilterAttribute
 {
     public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
     {
@@ -13,7 +13,7 @@ public class NonAuthorizeAttribute : ActionFilterAttribute
             context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
             var res = new ParentResponse() 
             { 
-                Message = MessageConstants.MESSAGE_AUTHORIZED 
+                Message = Constants.MESSAGE_AUTHORIZED 
             };
             await context.HttpContext.Response.WriteAsync(res.ToJson());
         }

@@ -5,10 +5,10 @@ namespace Term7MovieRepository.Repositories.Interfaces
     public interface IRefreshTokenRepository
     {
 
-        RefreshToken GetRefreshTokenByJti(Guid Jti);
-        int CreateRefreshToken(RefreshToken refreshToken);
-        int DeleteRefreshToken(long id);
-        int RevokeRefreshToken(Guid Jti);
+        Task<RefreshToken> GetRefreshTokenByJtiAsync(string jti);
+        Task CreateRefreshTokenAsync(RefreshToken refreshToken);
+        Task DeleteRefreshTokenAsync(long id);
+        Task RevokeRefreshTokenAsync(string jti);
 
     }
 }

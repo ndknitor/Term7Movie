@@ -24,7 +24,8 @@
         IUserRepository UserRepository { get; }
         IPromotionCodeRepository PromotionCodeRepository { get; }
         IPromotionTypeRepository PromotionTypeRepository { get; }
-
+        IUserLoginRepository UserLoginRepository { get; }
+        IRoleRepository RoleRepository { get; }
         bool HasChange();
 
         Task<bool> CompleteAsync();

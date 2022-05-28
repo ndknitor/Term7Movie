@@ -1,36 +1,48 @@
 ﻿using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
+using Microsoft.Data.SqlClient;
+using Dapper;
+using Term7MovieCore.Data.Options;
+using Microsoft.Extensions.Options;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
     public class RefreshTokenRepository : IRefreshTokenRepository
     {
 
-        private AppDbContext _context;
-        public RefreshTokenRepository(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly ConnectionOption _connectionOption;
+        public RefreshTokenRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
+            _connectionOption = connectionOption;
         }
 
-        public RefreshToken GetRefreshTokenByJti(Guid Jti)
+        public async Task<RefreshToken> GetRefreshTokenByJtiAsync(string jti)
         {
             RefreshToken refreshToken = null;
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = 
+                    " SELECT Id, Value, Jti, ExpiredDate, UserId, IsRevoked " +
+                    " FROM RefreshTokens " +
+                    " WHERE Jti = @jti ";
+                var param = new { jti };
+                refreshToken = await con.QueryFirstOrDefaultAsync<RefreshToken>(sql, param: param);
+            }
             return refreshToken;
         }
-        public int CreateRefreshToken(RefreshToken refreshToken)
+        public async Task CreateRefreshTokenAsync(RefreshToken refreshToken)
         {
-            int count = 0;
-            return count;
+            await _context.RefreshTokens.AddAsync(refreshToken);
         }
-        public int DeleteRefreshToken(long id)
+        public async Task DeleteRefreshTokenAsync(long id)
         {
-            int count = 0;
-            return count;
+            await Task.CompletedTask;
         }
-        public int RevokeRefreshToken(Guid Jti)
+        public async Task RevokeRefreshTokenAsync(string jti)
         {
-            int count = 0;
-            return count;
+            await Task.CompletedTask;
         }
 
     }

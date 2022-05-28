@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Term7MovieCore.Entities
 {
-    public class AppDbContext : IdentityDbContext<User, Role, long, IdentityUserClaim<long>, UserRole, IdentityUserLogin<long>, IdentityRoleClaim<long>, IdentityUserToken<long>>
+    public class AppDbContext : IdentityDbContext<User, Role, long, IdentityUserClaim<long>, UserRole, UserLogin, IdentityRoleClaim<long>, IdentityUserToken<long>>
     {
-       
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public virtual DbSet<Actor> Actors { get; set; }
@@ -34,6 +34,14 @@ namespace Term7MovieCore.Entities
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<User>()
+                .Property(u => u.Address)
+                .IsRequired(false);
+
+            builder.Entity<User>()
+                .Property(u => u.PictureUrl)
+                .IsRequired(false);
+
             builder.Entity<UserRole>()
                 .HasOne(ur => ur.User)
                 .WithMany(u => u.UserRoles)
@@ -43,6 +51,9 @@ namespace Term7MovieCore.Entities
                 .HasOne(ur => ur.Role)
                 .WithMany(u => u.UserRoles)
                 .HasForeignKey(ur => ur.RoleId);
+
+            builder.Entity<UserLogin>()
+                .HasKey(ul => new { ul.ProviderKey, ul.LoginProvider });
 
             builder.Entity<MovieActor>()
                 .HasKey(ma => new { ma.MovieId, ma.ActorId });

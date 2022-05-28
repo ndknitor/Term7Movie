@@ -1,11 +1,17 @@
-﻿using Term7MovieCore.Entities;
+﻿using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Entities;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        int CreateUser(User user);
-        int UpdateUser(User user);
-        int DeleteUser(long id);
+        Task CreateUserAsync(User user);
+        Task UpdateUserAsync(User userUpdate);
+        Task DeleteUserAsync(long id);
+
+        Task<long> GetUserIdByUserLoginAsync(UserInfo userInfo);
+        Task<User> GetUserByIdAsync(long id);
+
+        Task<User> GetUserWithRoleByIdAsync(long id);
     }
 }
