@@ -24,5 +24,6 @@ namespace Term7MovieCore.Entities
         public ICollection<TransactionHistory> TransactionHistories { set; get; }
         public ICollection<Theater> Theaters { set; get; }
         public ICollection<PromotionCode> PromotionCodes { set; get; }
+        public ICollection<MovieRating> MovieRatings { set; get; }
     }
 }
