@@ -6,10 +6,11 @@ namespace Term7MovieCore.Entities
     public class Movie
     {
         public int Id { get; set; }
+        public int ExternalId { set; get; }
         [Column(TypeName = "nvarchar(100)"), Required]
         public string Title { get; set; }
-        [Required]
         public DateTime ReleaseDate { set; get; }
+        public int Duration { set; get; }
         public int? RestrictedAge { set; get; }
         [Column(TypeName = "varchar(200)")]
         public string PosterImageUrl { set; get; }
@@ -21,8 +22,7 @@ namespace Term7MovieCore.Entities
         public string Description { set; get; }
         public long ViewCount { set; get; }
         public float TotalRating { set; get; }
-        [Required]
-        public int DirectorId { set; get; }
+        public int? DirectorId { set; get; }
         public Director Director { set; get; }
         public ICollection<MovieActor> MovieActors { set; get; }
         public ICollection<MovieLanguage> MovieLanguages { set; get; }
