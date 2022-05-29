@@ -7,18 +7,18 @@ namespace Term7MovieCore.Entities
     {
         public int Id { get; set; }
         public int ExternalId { set; get; }
-        [Column(TypeName = "nvarchar(100)")]
+        [Column(TypeName = "nvarchar(300)")]
         public string Title { get; set; }
         public DateTime ReleaseDate { set; get; }
         public int Duration { set; get; }
         public int? RestrictedAge { set; get; }
-        [Column(TypeName = "varchar(200)")]
+        [Column(TypeName = "varchar(max)")]
         public string PosterImageUrl { set; get; }
-        [Column(TypeName = "varchar(200)")]
+        [Column(TypeName = "varchar(max)")]
         public string CoverImageUrl { set; get; }
-        [Column(TypeName = "varchar(200)")]
+        [Column(TypeName = "varchar(max)")]
         public string TrailerUrl { set; get; }
-        [Column(TypeName = "nvarchar(200)")]
+        [Column(TypeName = "nvarchar(max)")]
         public string Description { set; get; }
         public long ViewCount { set; get; }
         public float TotalRating { set; get; }

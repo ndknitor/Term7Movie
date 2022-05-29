@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Term7MovieCore.Entities;
 
@@ -11,9 +12,10 @@ using Term7MovieCore.Entities;
 namespace Term7MovieApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220529162554_nullable_movie_cols")]
+    partial class nullable_movie_cols
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,10 +168,10 @@ namespace Term7MovieApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("CoverImageUrl")
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("varchar(200)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("DirectorId")
                         .HasColumnType("int");
@@ -181,7 +183,7 @@ namespace Term7MovieApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PosterImageUrl")
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("varchar(200)");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
@@ -191,13 +193,13 @@ namespace Term7MovieApi.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<float>("TotalRating")
                         .HasColumnType("real");
 
                     b.Property<string>("TrailerUrl")
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("varchar(200)");
 
                     b.Property<long>("ViewCount")
                         .HasColumnType("bigint");
