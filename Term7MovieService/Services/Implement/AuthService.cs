@@ -12,6 +12,9 @@ using Term7MovieCore.Data.Enum;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Microsoft.Extensions.Options;
+using Term7MovieCore.Extensions;
+using System.Text;
+using System.Net.Mime;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -37,8 +40,14 @@ namespace Term7MovieService.Services.Implement
             using (var client = new HttpClient())
             {
                 string jsonString = null;
-                string url = _googleAuthOption.TokenUri + Constants.QUESTION_MARK + Constants.GOOGLE_TOKEN_PARAM + idToken;
-                var message = await client.GetAsync(url);
+                string url = _googleAuthOption.TokenUri;
+                var contentObj = new
+                {
+                    idToken,
+                };
+                var stringContent = new StringContent(contentObj.ToJson(), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+                var message = await client.PostAsync(url, stringContent);
                 if (message.IsSuccessStatusCode)
                 {
                     jsonString = await message.Content.ReadAsStringAsync();
@@ -62,13 +71,15 @@ namespace Term7MovieService.Services.Implement
         private UserInfo GetUserInfo(string jsonString)
         {
             JObject jo = JObject.Parse(jsonString);
+            var users = jo[Constants.USERS][0];
+            var providerInfo = users[Constants.PROVIDER_USER_INFO][0];
             UserInfo userInfo = new UserInfo()
             {
-                DisplayName = jo[ Constants.GOOGLE_USER_INFO_GIVEN_NAME] + " " + jo[Constants.GOOGLE_USER_INFO_FAMILY_NAME],
-                ProviderId = Constants.GOOGLE_USER_INFO_PROVIDER,
-                Email = jo[Constants.GOOGLE_USER_INFO_EMAIL] + "",
-                PhotoUrl = jo[Constants.GOOGLE_USER_INFO_PICTURE] + "",
-                Uid = jo[Constants.GOOGLE_USER_INFO_SUB] + ""
+                DisplayName = users[Constants.USER_INFO_DISPLAY_NAME].ToString(),
+                ProviderId = providerInfo[Constants.PROVIDER_ID].ToString(),
+                Email = users[Constants.USER_INFO_EMAIL].ToString(),
+                PhotoUrl = users[Constants.USER_INFO_PICTURE].ToString(),
+                Uid = providerInfo[Constants.USER_RAW_ID].ToString()
             };
             return userInfo;
         }

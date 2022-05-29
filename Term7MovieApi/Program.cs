@@ -81,6 +81,15 @@ builder.Services.AddCors(option =>
 builder.Services.AddSwaggerGen();
 builder.Services.AddDistributedMemoryCache();
 
+if (builder.Environment.IsProduction())
+{
+    //builder.Logging.ClearProviders();
+    builder.WebHost.ConfigureLogging((context, build) =>
+    {
+        build.AddFile(builder.Configuration.GetSection("FileLogging"));
+    });
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -90,13 +99,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo");
-    });
-}
-else
-{
-    builder.WebHost.ConfigureLogging((context, build) =>
-    {
-        build.AddFile(builder.Configuration.GetSection("FileLogging"));
     });
 }
 app.UseForwardedHeaders(new ForwardedHeadersOptions
