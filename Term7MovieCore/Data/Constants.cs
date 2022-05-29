@@ -10,17 +10,19 @@ namespace Term7MovieCore.Data
     {
         public const string CONNECTION_STRING = "ConnectionStrings";
 
-        public const string GOOGLE_USER_INFO_GIVEN_NAME = "given_name";
-        public const string GOOGLE_USER_INFO_FAMILY_NAME = "family_name";
-        public const string GOOGLE_USER_INFO_EMAIL = "email";
-        public const string GOOGLE_USER_INFO_SUB = "sub";
-        public const string GOOGLE_USER_INFO_PICTURE = "picture";
+        public const string USER_INFO_EMAIL = "email";
+        public const string USER_RAW_ID = "rawId";
+        public const string USER_INFO_PICTURE = "photoUrl";
+        public const string PROVIDER_USER_INFO = "providerUserInfo";
+        public const string PROVIDER_ID = "providerId";
         public const string GOOGLE_USER_INFO_PROVIDER = "Google";
 
+        public const string USER_INFO_DISPLAY_NAME = "displayName";
+        public const string USERS = "users";
 
         public const string GOOGLE_CREDENTIAL = "GoogleCredential";
         public const string GOOGLE_TOKEN_INFO_URI = "token_info_uri";
-        public const string GOOGLE_TOKEN_PARAM = "id_token=";
+        public const string GOOGLE_TOKEN_PARAM = "idToken";
 
         public const string JWT = "Jwt";
         public const string JWT_EXPIRED_IN = "ExpiredIn";
