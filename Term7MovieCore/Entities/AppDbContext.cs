@@ -75,6 +75,22 @@ namespace Term7MovieCore.Entities
                 .HasIndex(m => m.ExternalId)
                 .IsUnique();
 
+            builder.Entity<Movie>()
+                .Property(m => m.TrailerUrl)
+                .IsRequired(false);
+
+            builder.Entity<Movie>()
+                .Property(m => m.CoverImageUrl)
+                .IsRequired(false);
+
+            builder.Entity<Movie>()
+                .Property(m => m.PosterImageUrl)
+                .IsRequired(false);
+
+            builder.Entity<Movie>()
+                .Property(m => m.Description)
+                .IsRequired(false);
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();
