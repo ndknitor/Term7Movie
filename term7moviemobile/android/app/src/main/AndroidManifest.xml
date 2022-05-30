@@ -2,7 +2,7 @@
     package="com.example.term7moviemobile">
    <application
         android:usesCleartextTraffic="true"
-        android:label="term7moviemobile"
+        android:label="f-cine"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

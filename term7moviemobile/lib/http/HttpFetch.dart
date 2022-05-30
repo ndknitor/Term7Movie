@@ -1,16 +1,17 @@
 import 'package:http/http.dart' as http;
+
 class HttpFetch {
-  static String host;
-  static Map<String, String> headers = new Map<String,String>();
+  static String? host;
+  static Map<String, String> headers = new Map<String, String>();
   static Future<http.Response> get(String url) async {
     if (headers == null) {
       headers = Map();
     }
     http.Response response =
-        await http.get(Uri.parse(host + url), headers: headers);
+        await http.get(Uri.parse(host! + url), headers: headers);
 
     if (response.headers['set-cookie'] != null) {
-      headers["cookie"] = response.headers['set-cookie'];
+      headers["cookie"] = response.headers['set-cookie']!;
     }
     return response;
   }
@@ -28,9 +29,9 @@ class HttpFetch {
       headers['Content-Type'] = "application/x-www-form-urlencoded";
     }
     http.Response response =
-        await http.post(Uri.parse(host + url), body: body, headers: headers);
+        await http.post(Uri.parse(host! + url), body: body, headers: headers);
     if (response.headers['set-cookie'] != null) {
-      headers["cookie"] = response.headers['set-cookie'];
+      headers["cookie"] = response.headers['set-cookie']!;
     }
     return response;
   }
@@ -48,10 +49,10 @@ class HttpFetch {
       headers['Content-Type'] = "application/x-www-form-urlencoded";
     }
     http.Response response =
-        await http.put(Uri.parse(host + url), body: body, headers: headers);
+        await http.put(Uri.parse(host! + url), body: body, headers: headers);
 
     if (response.headers['set-cookie'] != null) {
-      headers["cookie"] = response.headers['set-cookie'];
+      headers["cookie"] = response.headers['set-cookie']!;
     }
     return response;
   }
@@ -61,10 +62,10 @@ class HttpFetch {
       headers = Map();
     }
     http.Response response =
-        await http.delete(Uri.parse(host + url), headers: headers);
+        await http.delete(Uri.parse(host! + url), headers: headers);
 
     if (response.headers['set-cookie'] != null) {
-      headers["cookie"] = response.headers['set-cookie'];
+      headers["cookie"] = response.headers['set-cookie']!;
     }
     return response;
   }
