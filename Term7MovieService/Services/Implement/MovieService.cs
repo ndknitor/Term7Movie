@@ -1,5 +1,6 @@
 ﻿using Term7MovieCore.Data.Response;
 using Term7MovieCore.Entities;
+using Term7MovieCore.Data.Dto;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 
@@ -15,19 +16,27 @@ namespace Term7MovieService.Services.Implement
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<MovieHomePageResponse>> GetThreeLatestMovieForHomepage()
+        public async Task<MovieHomePageResponse> GetThreeLatestMovieForHomepage()
         {
-            List<MovieHomePageResponse> result = new List<MovieHomePageResponse>();
+            MovieHomePageResponse mhpr = new MovieHomePageResponse();
+            List<MovieCoverDTO> list = new List<MovieCoverDTO>();
             IMovieRepository movierepo = _unitOfWork.MovieRepository;
             foreach(var item in await movierepo.GetThreeLatestMovie())
             {
-                MovieHomePageResponse res = new MovieHomePageResponse();
-                res.Message = "Nothing wrong hihi";
-                res.movieID = item.Id;
-                res.coverImgURL = item.CoverImageUrl;
-                result.Add(res);
+                MovieCoverDTO cover = new MovieCoverDTO();
+                cover.MovieId = item.Id;
+                cover.coverImgURL = item.CoverImageUrl;
+                list.Add(cover);
             }
-            return result;
+            if(list.Any(a => string.IsNullOrEmpty(a.coverImgURL)))
+            {
+                mhpr.Message = "One or more movies have null cover img";
+                mhpr.movieCoverList = list;
+                return mhpr;
+            }
+            mhpr.Message = "Perfection";
+            mhpr.movieCoverList = list;
+            return mhpr;
         }
     }
 }

@@ -4,6 +4,6 @@ namespace Term7MovieService.Services.Interface
 {
     public interface IMovieService
     {
-        Task<IEnumerable<MovieHomePageResponse>> GetThreeLatestMovieForHomepage();
+        Task<MovieHomePageResponse> GetThreeLatestMovieForHomepage();
     }
 }

@@ -42,6 +42,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return count;
         }
 
+        /* ------------- START QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
         //public async Task<IEnumerable<MovieSoldDTO>> GetFourMoviesForFun()
         //{
         //    List<MovieSoldDTO> list = new List<MovieSoldDTO>();
@@ -72,7 +73,13 @@ namespace Term7MovieRepository.Repositories.Implement
                 .Take(3);
             movies = query.ToList();
             return movies;
+            //vẫn chưa lọc phim cùng ngày 
+            //vẫn chưa xử lí phim ko có cover img
+            //chờ hỏi front end :D
         }
 
+        
+
+        /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
     }
 }
