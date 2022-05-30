@@ -60,26 +60,25 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetThreeLatestMovie()
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception("Database Dead");
+                throw new Exception();
+                //return null;
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
-                .Where(a => a.ReleaseDate < DateTime.Now)
+                .Where(a => a.ReleaseDate < DateTime.Now 
+                            && !string.IsNullOrEmpty(a.CoverImageUrl)
+                            && !string.IsNullOrEmpty(a.PosterImageUrl))
                 .OrderByDescending(a => a.ReleaseDate)
                 .Select(a => new Movie
                 {
                     Id = a.Id,
-                    CoverImageUrl = a.CoverImageUrl
+                    CoverImageUrl = a.CoverImageUrl,
+                    PosterImageUrl = a.PosterImageUrl
                 })
-                .Take(3);
+                .Take(8);
             movies = query.ToList();
             return movies;
-            //vẫn chưa lọc phim cùng ngày 
-            //vẫn chưa xử lí phim ko có cover img
-            //chờ hỏi front end :D
+            
         }
-
-        
-
         /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
     }
 }

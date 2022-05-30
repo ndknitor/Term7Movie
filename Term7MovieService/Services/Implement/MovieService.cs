@@ -16,26 +16,29 @@ namespace Term7MovieService.Services.Implement
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<MovieHomePageResponse> GetThreeLatestMovieForHomepage()
+        public async Task<MovieHomePageResponse> GetEightLatestMovieForHomepage()
         {
-            MovieHomePageResponse mhpr = new MovieHomePageResponse();
-            List<MovieCoverDTO> list = new List<MovieCoverDTO>();
+            //Handle Error
             IMovieRepository movierepo = _unitOfWork.MovieRepository;
-            foreach(var item in await movierepo.GetThreeLatestMovie())
+            if (movierepo == null) 
+                return new MovieHomePageResponse { Message = "REPOSITORY NULL" };
+            IEnumerable<Movie> rawData = await movierepo.GetThreeLatestMovie();
+            if (!rawData.Any()) 
+                return new MovieHomePageResponse { Message = "DATABASE IS EMPTY" };
+
+            //Start making process
+            MovieHomePageResponse mhpr = new MovieHomePageResponse();
+            List<MovieHomePageDTO> list = new List<MovieHomePageDTO>();
+            foreach(var item in rawData)
             {
-                MovieCoverDTO cover = new MovieCoverDTO();
+                MovieHomePageDTO cover = new MovieHomePageDTO();
                 cover.MovieId = item.Id;
                 cover.coverImgURL = item.CoverImageUrl;
+                cover.posterImgURL = item.PosterImageUrl;
                 list.Add(cover);
             }
-            if(list.Any(a => string.IsNullOrEmpty(a.coverImgURL)))
-            {
-                mhpr.Message = "One or more movies have null cover img";
-                mhpr.movieCoverList = list;
-                return mhpr;
-            }
-            mhpr.Message = "Perfection";
-            mhpr.movieCoverList = list;
+            mhpr.Message = "Succesfully";
+            mhpr.movieList = list;
             return mhpr;
         }
     }

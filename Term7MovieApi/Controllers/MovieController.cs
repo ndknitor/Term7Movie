@@ -62,14 +62,14 @@ namespace Term7MovieApi.Controllers
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
             try
             {
-                var result = await _movieService.GetThreeLatestMovieForHomepage();
+                var result = await _movieService.GetEightLatestMovieForHomepage();
                 if (result == null)
-                    return BadRequest(new ParentResponse { Message = "Can't getting data" });
+                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
                 return Ok(result);
             }
             catch
             {
-                return BadRequest(new ParentResponse { Message = "Something wrong with database" });
+                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
             }
         }
     }
