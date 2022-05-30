@@ -56,8 +56,8 @@ namespace Term7MovieApi.Controllers
         }
 
         [NonAuthorized]
-        [HttpGet("get-less-detail-movie")]
-        public async Task<IActionResult> GetThreeLattestMovies()
+        [HttpGet("get-movies-for-homepage")]
+        public async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
             try
