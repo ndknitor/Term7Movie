@@ -10,5 +10,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         int UpdateMovie(Movie movie);
         int DeleteMovie(int id);
         int Count();
+        Task<IEnumerable<Movie>> GetThreeLatestMovie();
     }
 }
