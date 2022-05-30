@@ -59,12 +59,18 @@ namespace Term7MovieApi.Controllers
         [HttpGet("get-less-detail-movie")]
         public async Task<IActionResult> GetThreeLattestMovies()
         {
-            var result = await _movieService.GetThreeLatestMovieForHomepage();
-            if(result == null)
+            //sr vì chưa handle lỗi tốt lắm. hmu hmu
+            try
             {
-                return BadRequest(new ParentResponse { Message = "Failed getting movies." });
+                var result = await _movieService.GetThreeLatestMovieForHomepage();
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "Can't getting data" });
+                return Ok(result);
             }
-            return Ok(result);
+            catch
+            {
+                return BadRequest(new ParentResponse { Message = "Something wrong with database" });
+            }
         }
     }
 }
