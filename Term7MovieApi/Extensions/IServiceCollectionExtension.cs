@@ -11,6 +11,7 @@ namespace Term7MovieApi.Extensions
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IMovieService, MovieService>();
 
             return services;
         }

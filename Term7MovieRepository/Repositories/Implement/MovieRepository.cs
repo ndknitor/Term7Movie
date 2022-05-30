@@ -61,7 +61,9 @@ namespace Term7MovieRepository.Repositories.Implement
             if (await _context.Database.CanConnectAsync())
                 throw new Exception("Database Dead");
             List<Movie> movies = new List<Movie>();
-            var query = _context.Movies.OrderByDescending(a => a.ReleaseDate)
+            var query = _context.Movies
+                .Where(a => a.ReleaseDate < DateTime.Now)
+                .OrderByDescending(a => a.ReleaseDate)
                 .Select(a => new Movie
                 {
                     Id = a.Id,

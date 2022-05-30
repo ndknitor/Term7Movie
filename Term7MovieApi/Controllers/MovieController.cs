@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data;
 using Term7MovieCore.Entities;
+using Term7MovieService.Services.Interface;
+using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieApi.Controllers
 {
@@ -10,30 +12,48 @@ namespace Term7MovieApi.Controllers
     [ApiController]
     public class MovieController : ControllerBase
     {
-        [Authorize(Roles = Constants.ROLE_CUSTOMER)]
-        [HttpGet("all")]
-        public IActionResult GetAllMovie()
+        private readonly ILogger<MovieController> _logger;
+        private readonly IMovieService _movieService;
+        //private readonly IUnitOfWork _unitOfWork;
+
+        public MovieController(ILogger<MovieController> logger, IMovieService movieService)
         {
-            var movie = new Movie[]
-            {
-                new Movie
-                {
-                    Id = 1,
-                    CoverImageUrl = "google.com",
-                    Description = "Test",
-                    ReleaseDate = DateTime.UtcNow,
-                    Title = "Test Movie 1"
-                },
-                new Movie
-                {
-                    Id = 2,
-                    CoverImageUrl = "google.com",
-                    Description = "Test",
-                    ReleaseDate = DateTime.UtcNow,
-                    Title = "Test Movie 2"
-                }
-            };
-            return Ok(movie);
+            _logger = logger;
+            _movieService = movieService;
+
         }
+
+
+        //[Authorize(Roles = Constants.ROLE_CUSTOMER)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMovie()
+        {
+            //var movie = new Movie[]
+            //{
+            //    new Movie
+            //    {
+            //        Id = 1,
+            //        CoverImageUrl = "google.com",
+            //        Description = "Test",
+            //        ReleaseDate = DateTime.UtcNow,
+            //        Title = "Test Movie 1"
+            //    },
+            //    new Movie
+            //    {
+            //        Id = 2,
+            //        CoverImageUrl = "google.com",
+            //        Description = "Test",
+            //        ReleaseDate = DateTime.UtcNow,
+            //        Title = "Test Movie 2"
+            //    }
+            //};
+            foreach (var item in await _movieService.GetThreeLatestMovieForHomepage())
+            {
+                _logger.LogInformation(item.Message + "_" + item.movieID + "_" + item.coverImgURL);
+            }
+            return Ok();
+        }
+
+
     }
 }
