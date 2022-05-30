@@ -58,7 +58,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
         public async Task<IEnumerable<Movie>> GetThreeLatestMovie()
         {
-            if (await _context.Database.CanConnectAsync())
+            if (!await _context.Database.CanConnectAsync())
                 throw new Exception("Database Dead");
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
