@@ -10,6 +10,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         int UpdateMovie(Movie movie);
         int DeleteMovie(int id);
         int Count();
-        Task<IEnumerable<Movie>> GetThreeLatestMovie();
+        Task<IEnumerable<Movie>> GetEightLosslessLatestMovies();
+        Task<IEnumerable<Movie>> GetEightLatestMovies();
+        Task<Dictionary<int, Dictionary<int, string>>> GetCategoriesFromMovieList(int[] MovieIds);
     }
 }

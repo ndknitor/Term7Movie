@@ -1,6 +1,8 @@
 ﻿using Term7MovieCore.Entities;
 using Term7MovieCore.Data.Dto;
 using Term7MovieRepository.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 namespace Term7MovieRepository.Repositories.Implement
 {
     public class MovieRepository : IMovieRepository
@@ -57,7 +59,7 @@ namespace Term7MovieRepository.Repositories.Implement
         //                join tick in _context.Tickets on st.
         //}
 
-        public async Task<IEnumerable<Movie>> GetThreeLatestMovie()
+        public async Task<IEnumerable<Movie>> GetEightLosslessLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception();
@@ -78,6 +80,55 @@ namespace Term7MovieRepository.Repositories.Implement
             movies = query.ToList();
             return movies;
             
+        }
+
+        public async Task<IEnumerable<Movie>> GetEightLatestMovies()
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception();
+            //return null;
+            List<Movie> movies = new List<Movie>();
+            var query = _context.Movies
+                .Where(a => a.ReleaseDate < DateTime.Now
+                            && !string.IsNullOrEmpty(a.CoverImageUrl)
+                            && !string.IsNullOrEmpty(a.PosterImageUrl))
+                .OrderByDescending(a => a.ReleaseDate)
+                .Select(a => new Movie
+                {
+                    Id = a.Id,
+                    CoverImageUrl = a.CoverImageUrl,
+                    PosterImageUrl = a.PosterImageUrl,
+                    Title = a.Title,
+                    ReleaseDate = a.ReleaseDate,
+                    Duration = a.Duration,
+                    RestrictedAge = a.RestrictedAge
+                })
+                .Take(8);
+            movies = query.ToList();
+            return movies;
+
+        }
+
+        public async Task<Dictionary<int, Dictionary<int, string>>> GetCategoriesFromMovieList(int[] MovieIds)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception();
+            Dictionary<int, Dictionary<int, string>> result = new Dictionary<int, Dictionary<int, string>>();
+            foreach(int movieId in MovieIds)
+            {
+                var list = _context.MovieCategories
+                                                .Include(a => a.Category)
+                                                .Where(a => a.MovieId == movieId).ToList();
+                Dictionary<int, string> categories = new Dictionary<int, string>();
+                foreach(var category in list)
+                {
+                    categories.Add(category.CategoryId, category.Category.Name);
+                }
+                result.Add(movieId, categories);
+            }
+
+
+            return result;
         }
         /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
     }

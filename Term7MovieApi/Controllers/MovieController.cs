@@ -56,6 +56,24 @@ namespace Term7MovieApi.Controllers
         }
 
         [NonAuthorized]
+        [HttpGet("get-lossless-movies-for-homepage")]
+        public async Task<IActionResult> GetEightLosslessLatestMovies()
+        {
+            //chưa dùng đến. (để dự phòng thôi)
+            try
+            {
+                var result = await _movieService.GetEightLosslessLatestMovieForHomepage();
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
+        }
+
+        [NonAuthorized]
         [HttpGet("get-movies-for-homepage")]
         public async Task<IActionResult> GetEightLatestMovies()
         {

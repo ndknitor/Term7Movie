@@ -9,7 +9,12 @@ namespace Term7MovieCore.Data.Dto
     public class MovieHomePageDTO
     {
         public int MovieId { get; set; }
-        public string? coverImgURL { get; set; }
-        public string? posterImgURL { get; set; }
+        public string Title { get; set; }
+        public Dictionary<int, string> Categories { get; set; }
+        public int? AgeRestrict { get; set; }
+        public int Duration { get; set; }
+        public DateTime ReleaseDate { get; set; }
+        public string? CoverImgURL { get; set; }
+        public string? PosterImgURL { get; set; }
     }
 }
