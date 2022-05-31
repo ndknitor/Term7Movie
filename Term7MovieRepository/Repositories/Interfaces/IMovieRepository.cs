@@ -1,4 +1,5 @@
 ﻿using Term7MovieCore.Entities;
+using Term7MovieCore.Data.Dto;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
@@ -12,6 +13,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         int Count();
         Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies();
         Task<IEnumerable<Movie>> GetEightLatestMovies();
-        Task<Dictionary<int, Dictionary<int, string>>> GetCategoriesFromMovieList(int[] MovieIds);
+        Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds);
     }
 }

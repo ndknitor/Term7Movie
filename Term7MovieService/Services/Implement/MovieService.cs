@@ -60,7 +60,7 @@ namespace Term7MovieService.Services.Implement
             {
                 movieIds[j] = rawData.ElementAt(j).Id;
             }
-            Dictionary<int, Dictionary<int, string>> categories = await movierepo.GetCategoriesFromMovieList(movieIds);
+            Dictionary<int, IEnumerable<MovieType>> categories = await movierepo.GetCategoriesFromMovieList(movieIds);
             //The code below effect RAM only
             bool DoesItNull = false;
             MovieHomePageResponse mhpr = new MovieHomePageResponse();
@@ -77,8 +77,9 @@ namespace Term7MovieService.Services.Implement
                 DateTime dt = item.ReleaseDate;
                 movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + "," + dt.ToString("yyyy");
                 //movie.Types = categories.GetValueOrDefault(item.Id);
+                //movie.Categories = categories.GetValueOrDefault(item.Id);
+                //if (movie.Categories == null || movie.Categories.Count == 0) DoesItNull = true;
                 movie.Categories = categories.GetValueOrDefault(item.Id);
-                if (movie.Categories == null || movie.Categories.Count == 0) DoesItNull = true;
                 list.Add(movie);
             }
             if (!DoesItNull)

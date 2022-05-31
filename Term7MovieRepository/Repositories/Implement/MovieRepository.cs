@@ -112,20 +112,23 @@ namespace Term7MovieRepository.Repositories.Implement
 
         }
 
-        public async Task<Dictionary<int, Dictionary<int, string>>> GetCategoriesFromMovieList(int[] MovieIds)
+        public async Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception();
-            Dictionary<int, Dictionary<int, string>> result = new Dictionary<int, Dictionary<int, string>>();
+            Dictionary<int, IEnumerable<MovieType>> result = new Dictionary<int, IEnumerable<MovieType>>();
             foreach(int movieId in MovieIds)
             {
                 var list = _context.MovieCategories
                                                 .Include(a => a.Category)
                                                 .Where(a => a.MovieId == movieId).ToList();
-                Dictionary<int, string> categories = new Dictionary<int, string>();
+                List<MovieType> categories = new List<MovieType>();
                 foreach(var category in list)
                 {
-                    categories.Add(category.CategoryId, category.Category.Name);
+                    MovieType mt = new MovieType();
+                    mt.CateId = category.CategoryId;
+                    mt.CateName = category.Category.Name;
+                    categories.Add(mt);
                 }
                 result.Add(movieId, categories);
             }

@@ -56,7 +56,7 @@ namespace Term7MovieApi.Controllers
             return Ok();
         }
 
-        [NonAuthorized]
+        [AllowAnonymous]
         [HttpGet("get-incoming-movies-for-homepage")]
         public async Task<IActionResult> GetIncomingMovies()
         {
@@ -74,7 +74,7 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        [NonAuthorized]
+        [AllowAnonymous]
         [HttpGet("get-movies-for-homepage")]
         public async Task<IActionResult> GetEightLatestMovies()
         {

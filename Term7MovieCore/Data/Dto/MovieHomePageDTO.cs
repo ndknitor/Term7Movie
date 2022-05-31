@@ -10,11 +10,17 @@ namespace Term7MovieCore.Data.Dto
     {
         public int MovieId { get; set; }
         public string Title { get; set; }
-        public Dictionary<int, string> Categories { get; set; }
+        public IEnumerable<MovieType> Categories { get; set; }
         public int? AgeRestrict { get; set; }
         public int Duration { get; set; }
         public string ReleaseDate { get; set; }
         public string? CoverImgURL { get; set; }
         public string? PosterImgURL { get; set; }
+    }
+
+    public class MovieType
+    {
+        public int CateId { get; set; }
+        public string CateName { get; set; }
     }
 }
