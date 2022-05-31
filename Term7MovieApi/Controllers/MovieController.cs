@@ -6,6 +6,7 @@ using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace Term7MovieApi.Controllers
 {
@@ -80,7 +81,11 @@ namespace Term7MovieApi.Controllers
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
             try
             {
+                Stopwatch zaWarudo = new Stopwatch();
+                zaWarudo.Start();
                 var result = await _movieService.GetEightLatestMovieForHomepage();
+                zaWarudo.Stop();
+                _logger.LogInformation("The power of Dio has stopped the world for: " + zaWarudo.ElapsedMilliseconds);
                 if (result == null)
                     return BadRequest(new ParentResponse { Message = "NULL DATA" });
                 return Ok(result);
