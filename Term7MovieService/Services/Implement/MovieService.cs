@@ -72,7 +72,8 @@ namespace Term7MovieService.Services.Implement
                 movie.Title = item.Title;
                 movie.AgeRestrict = item.RestrictedAge;
                 movie.Duration = item.Duration;
-                movie.ReleaseDate = item.ReleaseDate.ToString("d");
+                DateTime dt = item.ReleaseDate;
+                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + "," + dt.ToString("yyyy");
                 //movie.Types = categories.GetValueOrDefault(item.Id);
                 movie.Categories = categories.GetValueOrDefault(item.Id);
                 if (movie.Categories == null || movie.Categories.Count == 0) DoesItNull = true;
