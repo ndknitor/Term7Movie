@@ -1,4 +1,5 @@
 ﻿using Term7MovieCore.Entities;
+using Term7MovieCore.Data.Dto;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
@@ -10,6 +11,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         int UpdateMovie(Movie movie);
         int DeleteMovie(int id);
         int Count();
-        Task<IEnumerable<Movie>> GetThreeLatestMovie();
+        Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies();
+        Task<IEnumerable<Movie>> GetEightLatestMovies();
+        Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds);
     }
 }

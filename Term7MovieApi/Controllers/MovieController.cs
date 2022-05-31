@@ -6,6 +6,7 @@ using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace Term7MovieApi.Controllers
 {
@@ -55,14 +56,36 @@ namespace Term7MovieApi.Controllers
             return Ok();
         }
 
-        [NonAuthorized]
+        [AllowAnonymous]
+        [HttpGet("get-incoming-movies-for-homepage")]
+        public async Task<IActionResult> GetIncomingMovies()
+        {
+            //chưa dùng đến. (để dự phòng thôi)
+            try
+            {
+                var result = await _movieService.GetEightLosslessLatestMovieForHomepage();
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
+        }
+
+        [AllowAnonymous]
         [HttpGet("get-movies-for-homepage")]
         public async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
             try
             {
+                Stopwatch zaWarudo = new Stopwatch();
+                zaWarudo.Start();
                 var result = await _movieService.GetEightLatestMovieForHomepage();
+                zaWarudo.Stop();
+                _logger.LogInformation("The power of Dio has stopped the world for: " + zaWarudo.ElapsedMilliseconds);
                 if (result == null)
                     return BadRequest(new ParentResponse { Message = "NULL DATA" });
                 return Ok(result);
