@@ -59,27 +59,27 @@ namespace Term7MovieRepository.Repositories.Implement
         //                join tick in _context.Tickets on st.
         //}
 
-        public async Task<IEnumerable<Movie>> GetEightLosslessLatestMovies()
+        public async Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception();
                 //return null;
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
-                .Where(a => a.ReleaseDate < DateTime.Now 
+                .Where(a => a.ReleaseDate > DateTime.Now
+                            && a.ReleaseDate < DateTime.Now.AddMonths(1)
                             && !string.IsNullOrEmpty(a.CoverImageUrl)
                             && !string.IsNullOrEmpty(a.PosterImageUrl))
                 .OrderByDescending(a => a.ReleaseDate)
                 .Select(a => new Movie
                 {
                     Id = a.Id,
-                    CoverImageUrl = a.CoverImageUrl,
+                    //overImageUrl = a.CoverImageUrl,
                     PosterImageUrl = a.PosterImageUrl
                 })
-                .Take(8);
+                .Take(3);
             movies = query.ToList();
             return movies;
-            
         }
 
         public async Task<IEnumerable<Movie>> GetEightLatestMovies()

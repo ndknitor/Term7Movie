@@ -57,8 +57,8 @@ namespace Term7MovieApi.Controllers
         }
 
         [NonAuthorized]
-        [HttpGet("get-lossless-movies-for-homepage")]
-        public async Task<IActionResult> GetEightLosslessLatestMovies()
+        [HttpGet("get-incoming-movies-for-homepage")]
+        public async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
             try

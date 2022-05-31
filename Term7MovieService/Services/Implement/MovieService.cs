@@ -16,30 +16,32 @@ namespace Term7MovieService.Services.Implement
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<MovieHomePageResponse> GetEightLosslessLatestMovieForHomepage()
+        public async Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage()
         {
             //Handle Error
             IMovieRepository movierepo = _unitOfWork.MovieRepository;
             if (movierepo == null) 
-                return new MovieHomePageResponse { Message = "REPOSITORY NULL" };
-            IEnumerable<Movie> rawData = await movierepo.GetEightLosslessLatestMovies();
+                return new IncomingMovieResponse { Message = "REPOSITORY NULL" };
+            IEnumerable<Movie> rawData = await movierepo.GetLessThanThreeLosslessLatestMovies();
             if (!rawData.Any()) 
-                return new MovieHomePageResponse { Message = "DATABASE IS EMPTY" };
+                return new IncomingMovieResponse { Message = "DATABASE IS EMPTY" };
 
             //Start making process
-            MovieHomePageResponse mhpr = new MovieHomePageResponse();
-            List<MovieHomePageDTO> list = new List<MovieHomePageDTO>();
+            IncomingMovieResponse IMR = new IncomingMovieResponse();
+            List<SmallMovieHomePageDTO> list = new List<SmallMovieHomePageDTO>();
             foreach(var item in rawData)
             {
-                MovieHomePageDTO cover = new MovieHomePageDTO();
-                cover.MovieId = item.Id;
-                cover.CoverImgURL = item.CoverImageUrl;
-                cover.PosterImgURL = item.PosterImageUrl;
-                list.Add(cover);
+                SmallMovieHomePageDTO smp = new SmallMovieHomePageDTO();
+                smp.MovieId = item.Id;
+                //cover.CoverImgURL = item.CoverImageUrl;
+                smp.PosterImgURL = item.PosterImageUrl;
+                list.Add(smp);
             }
-            mhpr.Message = "Succesfully";
-            mhpr.movieList = list;
-            return mhpr;
+            if (list.Count == 0) IMR.Message = "No data for incoming movies :(";
+            else if (list.Count < 3) IMR.Message = "Missing incoming movie from database";
+            else IMR.Message = "Succesfully";
+            IMR.LosslessMovieList = list;
+            return IMR;
         }
 
         public async Task<MovieHomePageResponse> GetEightLatestMovieForHomepage()
