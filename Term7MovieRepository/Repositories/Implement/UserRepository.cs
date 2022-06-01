@@ -68,7 +68,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string userQ =
-                    " SELECT Id, Email " +
+                    " SELECT Id, Email, FullName, PictureUrl " +
                     " FROM Users " +
                     " WHERE Id = @id ; ";
 

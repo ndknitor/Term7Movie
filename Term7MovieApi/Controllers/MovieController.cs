@@ -53,7 +53,7 @@ namespace Term7MovieApi.Controllers
             //{
             //    _logger.LogInformation(item.Message + "_" + item.movieID + "_" + item.coverImgURL);
             //}
-            return Ok();
+            return Ok(movie);
         }
 
         [AllowAnonymous]
