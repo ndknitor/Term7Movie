@@ -28,6 +28,8 @@ namespace Term7MovieCore.Data
         public const string JWT_EXPIRED_IN = "ExpiredIn";
         public const string JWT_REFRESH_EXPIRED_IN = "RefreshExpiredIn";
 
+        public const string JWT_CLAIM_PICTURE = "Picture";
+
         public static DateTime JSON_START_DATE = new DateTime(1970, 1, 1);
 
         public const string ROLE_ADMIN = "Admin";
@@ -42,5 +44,14 @@ namespace Term7MovieCore.Data
         public const string MESSAGE_INVALID_ACCOUNT = "Invalid account";
         public const string MESSAGE_INVALID_REFRESH_TOKEN = "Invalid refresh token";
         public const string MESSAGE_EXIRED_REFRESH_TOKEN = "Expired refresh token";
+
+        public const string MESSAGE_NOT_FOUND = "Not found";
+        public const string MESSAGE_OPERATION_FAILED = "Operation failed";
+
+        public const string CONSTRAIN_REQUEST_MESSAGE_REQUIRED = "Required";
+        public const string CONSTRAIN_REQUEST_MESSAGE_INVALID_FIELD = "Invalid field";
+
+
+        
     }
 }

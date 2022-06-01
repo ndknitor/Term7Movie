@@ -8,6 +8,7 @@ namespace Term7MovieCore.Entities
         public long TransactionId { get; set; }
         public long UserId { set; get; }
         public User User { get; set; }
+        public int MovieId { set; get; }
         public long TicketId { set; get; }
         [Column(TypeName = "money")]
         public decimal TicketPrice { set; get; }
