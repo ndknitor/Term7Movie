@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 
 namespace Term7MovieApi.Profiles
@@ -23,6 +24,9 @@ namespace Term7MovieApi.Profiles
                     des => des.UserName,
                     option => option.MapFrom(src => src.Email)
                 );
+
+            CreateMap<RoomCreateRequest, Room>()
+                .BeforeMap((src, des) => des.Status = true);
         }          
     }
 }

@@ -146,7 +146,9 @@ namespace Term7MovieService.Services.Implement
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, roleName),
-                new Claim(JwtRegisteredClaimNames.Jti, jti.ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, jti.ToString()),
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(Constants.JWT_CLAIM_PICTURE, user.PictureUrl)
              };
         }
 

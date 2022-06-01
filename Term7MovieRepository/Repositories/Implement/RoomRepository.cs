@@ -1,39 +1,94 @@
-﻿using Term7MovieCore.Entities;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Options;
+using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
     public class RoomRepository : IRoomRepository
     {
-        private AppDbContext _context;
-        public RoomRepository(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly ConnectionOption _connectionOption;
+        public RoomRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
+            _connectionOption = connectionOption;
+
+
         }
-        public IEnumerable<Room> GetAllRoom(int theaterId)
+        public async Task<IEnumerable<RoomDto>> GetAllRoomByTheaterId(int theaterId)
         {
-            IEnumerable<Room> list = new List<Room>();
+            IEnumerable<RoomDto> list = new List<RoomDto>();
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = 
+                    " SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status " +
+                    " FROM Rooms " +
+                    " WHERE TheaterId = @theaterId ";
+                var param = new { theaterId };
+                list = (await con.QueryAsync<RoomDto>(sql, param)).ToList();
+            }
+
             return list;
         }
-        public Room GetRoomById(int id)
+        public async Task<RoomDto> GetRoomById(int id)
         {
-            Room room = null;
+            RoomDto room = null;
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string roomSql =
+                    " SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status " +
+                    " FROM Rooms " +
+                    " WHERE Id = @id AND Status = 1 ; ";
+
+                string seatSql =
+                    " SELECT s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, st.BonusPrice " +
+                    " FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
+                    " WHERE s.RoomId = @id ";
+
+                var param = new { id };
+
+                var multiQ = await con.QueryMultipleAsync(roomSql + seatSql, param);
+
+                room = await multiQ.ReadFirstOrDefaultAsync<RoomDto>();
+
+                if (room == null) return null;
+
+                List<SeatDto> seats = multiQ.Read<SeatDto, SeatTypeDto, SeatDto>((s, st) => 
+                {
+                    s.SeatType = st;
+                    return s;
+                },splitOn: "Id").ToList();
+
+                room.SeatDtos = seats;
+            }
             return room;
         }
-        public int CreateRoom(Room room)
+        public async Task CreateRoom(Room room)
         {
-            int count = 0;
-            return count;
+            await _context.AddAsync(room);
         }
-        public int UpdateRoom(Room room)
+        public async Task UpdateRoom(Room room)
         {
-            int count = 0;
-            return count;
+            Room dbRoom = await  _context.Rooms.FindAsync(room.Id);
+
+            if (dbRoom == null) return;
+
+            dbRoom.NumberOfColumn = room.NumberOfColumn;
+            dbRoom.NumberOfRow = room.NumberOfRow;
+            dbRoom.Status = room.Status;
+            
         }
-        public int DeleteRoom(int id)
+        public async Task DeleteRoom(int id)
         {
-            int count = 0;
-            return count;
+            Room dbRoom = await _context.Rooms.FindAsync(id);
+
+            if (dbRoom == null) return;
+
+            dbRoom.Status = false;
         }
     }
 }
