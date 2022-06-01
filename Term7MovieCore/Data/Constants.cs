@@ -28,7 +28,11 @@ namespace Term7MovieCore.Data
         public const string JWT_EXPIRED_IN = "ExpiredIn";
         public const string JWT_REFRESH_EXPIRED_IN = "RefreshExpiredIn";
 
+        public const string JWT_CLAIM_USER_ID = "UserId";
+        public const string JWT_CLAIM_NAME = "Name";
+        public const string JWT_CLAIM_EMAIL = "Email";
         public const string JWT_CLAIM_PICTURE = "Picture";
+        public const string JWT_CLAIM_ROLE = "Role";
 
         public static DateTime JSON_START_DATE = new DateTime(1970, 1, 1);
 

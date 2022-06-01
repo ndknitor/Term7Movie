@@ -143,11 +143,12 @@ namespace Term7MovieService.Services.Implement
         {
             return new List<Claim>()
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(Constants.JWT_CLAIM_USER_ID, user.Id.ToString()),
+                new Claim(Constants.JWT_CLAIM_EMAIL, user.Email),
+                new Claim(Constants.JWT_CLAIM_ROLE, roleName),
                 new Claim(ClaimTypes.Role, roleName),
                 new Claim(JwtRegisteredClaimNames.Jti, jti.ToString()),
-                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(Constants.JWT_CLAIM_NAME, user.FullName),
                 new Claim(Constants.JWT_CLAIM_PICTURE, user.PictureUrl)
              };
         }
