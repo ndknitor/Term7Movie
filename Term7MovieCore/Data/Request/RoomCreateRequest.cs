@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Term7MovieCore.Data.Dto;
 
 namespace Term7MovieCore.Data.Request
 {
@@ -20,5 +17,7 @@ namespace Term7MovieCore.Data.Request
         [Required(ErrorMessage = Constants.CONSTRAIN_REQUEST_MESSAGE_REQUIRED)]
         [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAIN_REQUEST_MESSAGE_INVALID_FIELD)]
         public int NumberOfColumn { set; get; }
+        [Required(ErrorMessage = Constants.CONSTRAIN_REQUEST_MESSAGE_REQUIRED)]
+        public List<SeatDto> Seats { set; get; }
     }
 }

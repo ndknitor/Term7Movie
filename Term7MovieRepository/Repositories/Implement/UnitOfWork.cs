@@ -23,10 +23,10 @@ namespace Term7MovieRepository.Repositories.Implement
         public IMovieActorRepository MovieActorRepository { get => new MovieActorRepository(_context); }
         public IMovieCategoryRepository MovieCategoryRepository { get => new MovieCategoryRepository(_context); }
         public IMovieLanguageRepository MovieLanguageRepository { get => new MovieLanguageRepository(_context); }
-        public IMovieRepository MovieRepository { get => new MovieRepository(_context); }
+        public IMovieRepository MovieRepository { get => new MovieRepository(_context, _connectionOption); }
         public IRefreshTokenRepository RefreshTokenRepository { get => new RefreshTokenRepository(_context, _connectionOption); }
         public IRoomRepository RoomRepository { get => new RoomRepository(_context, _connectionOption); }
-        public ISeatRepository SeatRepository { get => new SeatRepository(_context); }
+        public ISeatRepository SeatRepository { get => new SeatRepository(_context, _connectionOption); }
         public ISeatTypeRepository SeatTypeRepository { get => new SeatTypeRepository(_context); }
         public IShowtimeRepository ShowtimeRepository { get => new ShowtimeRepository(_context); }
         public ITheaterRepository TheaterRepository { get => new TheaterRepository(_context); }

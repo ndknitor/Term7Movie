@@ -20,7 +20,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [Authorize]
-        [HttpGet("room/{id:int}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetRoomById(int id)
         {
             var response = await _roomService.GetRoomDetail(id);
@@ -48,7 +48,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
-        [HttpPost("room")]
+        [HttpPost]
         public async Task<IActionResult> CreateRoom(RoomCreateRequest request)
         {
             var response = await _roomService.CreateRoom(request);
@@ -61,7 +61,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
-        [HttpPut("room")]
+        [HttpPut]
         public async Task<IActionResult> UpdateRoom(RoomUpdateRequest request)
         {
             var response = await _roomService.UpdateRoom(request);
@@ -74,7 +74,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
-        [HttpDelete("room/{roomId:int}")]
+        [HttpDelete("{roomId:int}")]
         public async Task<IActionResult> DeleteRoom(int roomId)
         {
             var response = await _roomService.DeleteRoom(roomId);

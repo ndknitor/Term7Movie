@@ -3,17 +3,32 @@ using Term7MovieCore.Entities;
 using Term7MovieCore.Data.Dto;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
-
+using Term7MovieCore.Data.Options;
+using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Collections;
 
 namespace Term7MovieService.Services.Implement
 {
     public class MovieService : IMovieService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMovieRepository movieRepository;
 
         public MovieService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            movieRepository = _unitOfWork.MovieRepository;
+        }
+
+        public async Task<MovieListResponse> GetAllMovie(ParentFilterRequest request)
+        {
+            PagingList<MovieDto> movies = await movieRepository.GetAllMovie(request);
+
+            return new MovieListResponse
+            {
+                Message = "Success",
+                Movies = movies
+            };
         }
 
         public async Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage()

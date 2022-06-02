@@ -56,6 +56,7 @@ namespace Term7MovieCore.Data
         public const string CONSTRAIN_REQUEST_MESSAGE_INVALID_FIELD = "Invalid field";
         public const string CONSTRAIN_REQUEST_MESSAGE_GREATER_THAN_ZERO = "Must be greater than zero";
 
-
+        public const int DefaultPageSize = 10;
+        public const int DefaultPage = 1;
     }
 }
