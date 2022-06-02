@@ -19,21 +19,8 @@ namespace Term7MovieApi.Controllers
             _roomService = roomService;
         }
 
-        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
-        [HttpPost("create-room")]
-        public async Task<IActionResult> CreateRoom(RoomCreateRequest request)
-        {
-            var response = await _roomService.CreateRoom(request);
-
-            if(response == null)
-            {
-                return BadRequest(new ParentResponse { Message = Constants.MESSAGE_OPERATION_FAILED });
-            }
-            return Ok();
-        }
-
         [Authorize]
-        [HttpGet("get-room/{id:int}")]
+        [HttpGet("room/{id:int}")]
         public async Task<IActionResult> GetRoomById(int id)
         {
             var response = await _roomService.GetRoomDetail(id);
@@ -48,7 +35,7 @@ namespace Term7MovieApi.Controllers
 
 
         [Authorize]
-        [HttpGet("get-theater-rooms/{theaterId:int}")]
+        [HttpGet("theater-rooms/{theaterId:int}")]
         public async Task<IActionResult> GetRoomsByTheaterId(int theaterId)
         {
             var response = await _roomService.GetRoomsByTheaterId(theaterId);
@@ -57,7 +44,46 @@ namespace Term7MovieApi.Controllers
             {
                 return BadRequest(new ParentResponse { Message = Constants.MESSAGE_NOT_FOUND });
             }
-            return Ok();
+            return Ok(response);
+        }
+
+        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
+        [HttpPost("room")]
+        public async Task<IActionResult> CreateRoom(RoomCreateRequest request)
+        {
+            var response = await _roomService.CreateRoom(request);
+
+            if (response == null)
+            {
+                return BadRequest(new ParentResponse { Message = Constants.MESSAGE_OPERATION_FAILED });
+            }
+            return Ok(response);
+        }
+
+        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
+        [HttpPut("room")]
+        public async Task<IActionResult> UpdateRoom(RoomUpdateRequest request)
+        {
+            var response = await _roomService.UpdateRoom(request);
+
+            if (response == null)
+            {
+                return BadRequest(new ParentResponse { Message = Constants.MESSAGE_NOT_FOUND });
+            }
+            return Ok(response);
+        }
+
+        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
+        [HttpDelete("room/{roomId:int}")]
+        public async Task<IActionResult> DeleteRoom(int roomId)
+        {
+            var response = await _roomService.DeleteRoom(roomId);
+
+            if (response == null)
+            {
+                return BadRequest(new ParentResponse { Message = Constants.MESSAGE_NOT_FOUND });
+            }
+            return Ok(response);
         }
     }
 }
