@@ -1,4 +1,6 @@
 ﻿using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Entities;
 using Term7MovieCore.Data.Dto;
 using Term7MovieService.Services.Interface;
@@ -54,6 +56,8 @@ namespace Term7MovieService.Services.Implement
             if (!rawData.Any())
                 return new MovieHomePageResponse { Message = "DATABASE IS EMPTY" };
 
+            //rawData = rawData.ToList().OrderByDescending(a => a.ReleaseDate).Take(8);
+            
             //Start making process
             int[] movieIds = new int[rawData.Count()];
             for(int j = 0; j < rawData.Count(); j++)
@@ -64,10 +68,10 @@ namespace Term7MovieService.Services.Implement
             //The code below effect RAM only
             bool DoesItNull = false;
             MovieHomePageResponse mhpr = new MovieHomePageResponse();
-            List<MovieHomePageDTO> list = new List<MovieHomePageDTO>();
+            List<MovieDTO> list = new List<MovieDTO>();
             foreach (var item in rawData)
             {
-                MovieHomePageDTO movie = new MovieHomePageDTO();
+                MovieDTO movie = new MovieDTO();
                 movie.MovieId = item.Id;
                 movie.CoverImgURL = item.CoverImageUrl;
                 movie.PosterImgURL = item.PosterImageUrl;
@@ -75,10 +79,9 @@ namespace Term7MovieService.Services.Implement
                 movie.AgeRestrict = item.RestrictedAge;
                 movie.Duration = item.Duration;
                 DateTime dt = item.ReleaseDate;
-                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + "," + dt.ToString("yyyy");
+                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
                 //movie.Types = categories.GetValueOrDefault(item.Id);
-                //movie.Categories = categories.GetValueOrDefault(item.Id);
-                //if (movie.Categories == null || movie.Categories.Count == 0) DoesItNull = true;
+                if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
                 movie.Categories = categories.GetValueOrDefault(item.Id);
                 list.Add(movie);
             }
@@ -87,6 +90,60 @@ namespace Term7MovieService.Services.Implement
             else mhpr.Message = "Some movie categories is null";
             mhpr.movieList = list;
             return mhpr;
+        }
+
+        public async Task<MovieListResponse> GetMovieListFollowPage(MovieListPageRequest request)
+        {
+            IMovieRepository movieRepo = _unitOfWork.MovieRepository;
+            //checking singleton went wrong
+            if (movieRepo == null)
+                return new MovieListResponse { Message = "REPOSITORY IS NULL" };
+            IEnumerable<Movie> rawData = await movieRepo.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize);
+            //checking database connection
+            if (rawData == null)
+                return new MovieListResponse { Message = "Unresponsible database" };
+            //checking if there is any data in database
+            if (!rawData.Any())
+                return new MovieListResponse { Message = "Empty Data" };
+            //checking input logical
+            int maxpage = movieRepo.Count() / 16 + 1;
+            if (request.PageIndex > maxpage) //madness shit
+                return new MovieListResponse { Message = "Sao lại để hacker tràn dô nhà dị cha" };
+
+            // ********* End validating or checking shet *********** //
+            MovieListResponse mlr = new MovieListResponse();
+            int[] movieIds = new int[rawData.Count()];
+            for (int j = 0; j < rawData.Count(); j++)
+            {
+                movieIds[j] = rawData.ElementAt(j).Id;
+            }
+            Dictionary<int, IEnumerable<MovieType>> categories = await movieRepo.GetCategoriesFromMovieList(movieIds);
+            //The code below effect RAM only
+            bool DoesItNull = false;
+            List<MovieDTO> list = new List<MovieDTO>();
+            foreach (var item in rawData)
+            {
+                MovieDTO movie = new MovieDTO();
+                movie.MovieId = item.Id;
+                movie.CoverImgURL = item.CoverImageUrl;
+                movie.PosterImgURL = item.PosterImageUrl;
+                movie.Title = item.Title;
+                movie.AgeRestrict = item.RestrictedAge;
+                movie.Duration = item.Duration;
+                DateTime dt = item.ReleaseDate;
+                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
+                //movie.Types = categories.GetValueOrDefault(item.Id);
+                movie.Categories = categories.GetValueOrDefault(item.Id);
+                if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
+                list.Add(movie);
+            }
+            if (!DoesItNull)
+                mlr.Message = "Succesfully";
+            else mlr.Message = "Some movie categories is null";
+            mlr.MovieList = list;
+            mlr.CurrentPage = request.PageIndex;
+            mlr.TotalPages = maxpage;
+            return mlr;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
@@ -10,7 +11,7 @@ using System.Diagnostics;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/movie")]
+    [Route("api/v1")]
     [ApiController]
     public class MovieController : ControllerBase
     {
@@ -28,7 +29,7 @@ namespace Term7MovieApi.Controllers
 
         //[Authorize(Roles = Constants.ROLE_CUSTOMER)]
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllMovie()
+        public IActionResult GetAllMovie()
         {
             var movie = new Movie[]
             {
@@ -57,7 +58,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("get-incoming-movies-for-homepage")]
+        [HttpGet("movie-incoming")]
         public async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
@@ -75,7 +76,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("get-movies-for-homepage")]
+        [HttpGet("movie-now-showing")]
         public async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
@@ -93,6 +94,24 @@ namespace Term7MovieApi.Controllers
             catch
             {
                 return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("movie/{PageIndex:int}")]
+        public async Task<IActionResult> GetMoviesPaging(int PageIndex)
+        {
+            try
+            {
+                MovieListPageRequest mlpr = new MovieListPageRequest(){PageIndex = PageIndex,};
+                var result = await _movieService.GetMovieListFollowPage(mlpr);
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "Singleton dead." });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ParentResponse { Message = ex.Message });
             }
         }
     }

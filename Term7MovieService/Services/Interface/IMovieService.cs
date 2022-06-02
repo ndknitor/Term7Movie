@@ -1,4 +1,5 @@
 ﻿using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Request;
 
 namespace Term7MovieService.Services.Interface
 {
@@ -6,5 +7,6 @@ namespace Term7MovieService.Services.Interface
     {
         Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage();
         Task<MovieHomePageResponse> GetEightLatestMovieForHomepage();
+        Task<MovieListResponse> GetMovieListFollowPage(MovieListPageRequest request);
     }
 }
