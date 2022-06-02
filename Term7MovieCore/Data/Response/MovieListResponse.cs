@@ -13,3 +13,16 @@ namespace Term7MovieCore.Data.Response
         public PagingList<MovieDto>? Movies { set; get; }
     }
 }
+
+﻿using System;
+using System.Collections.Generic;
+using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
+
+namespace Term7MovieCore.Data.Response
+{
+    public class MovieListResponse : ParentResponse
+    {
+        public PagingList<MovieDto> Movies { set; get; }
+    }
+}
