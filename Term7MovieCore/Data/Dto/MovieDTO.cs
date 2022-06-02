@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Term7MovieCore.Data.Dto
 {
-    public class MovieHomePageDTO
+    public class MovieDTO
     {
         public int MovieId { get; set; }
         public string Title { get; set; }

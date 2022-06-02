@@ -1,4 +1,6 @@
 ﻿using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Entities;
 using Term7MovieCore.Data.Dto;
 using Term7MovieService.Services.Interface;
@@ -69,6 +71,8 @@ namespace Term7MovieService.Services.Implement
             if (!rawData.Any())
                 return new MovieHomePageResponse { Message = "DATABASE IS EMPTY" };
 
+            //rawData = rawData.ToList().OrderByDescending(a => a.ReleaseDate).Take(8);
+            
             //Start making process
             int[] movieIds = new int[rawData.Count()];
             for(int j = 0; j < rawData.Count(); j++)
@@ -79,10 +83,10 @@ namespace Term7MovieService.Services.Implement
             //The code below effect RAM only
             bool DoesItNull = false;
             MovieHomePageResponse mhpr = new MovieHomePageResponse();
-            List<MovieHomePageDTO> list = new List<MovieHomePageDTO>();
+            List<MovieDTO> list = new List<MovieDTO>();
             foreach (var item in rawData)
             {
-                MovieHomePageDTO movie = new MovieHomePageDTO();
+                MovieDTO movie = new MovieDTO();
                 movie.MovieId = item.Id;
                 movie.CoverImgURL = item.CoverImageUrl;
                 movie.PosterImgURL = item.PosterImageUrl;
@@ -90,10 +94,9 @@ namespace Term7MovieService.Services.Implement
                 movie.AgeRestrict = item.RestrictedAge;
                 movie.Duration = item.Duration;
                 DateTime dt = item.ReleaseDate;
-                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + "," + dt.ToString("yyyy");
+                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
                 //movie.Types = categories.GetValueOrDefault(item.Id);
-                //movie.Categories = categories.GetValueOrDefault(item.Id);
-                //if (movie.Categories == null || movie.Categories.Count == 0) DoesItNull = true;
+                if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
                 movie.Categories = categories.GetValueOrDefault(item.Id);
                 list.Add(movie);
             }
