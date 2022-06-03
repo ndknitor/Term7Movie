@@ -94,10 +94,10 @@ namespace Term7MovieRepository.Repositories.Implement
             var query = _context.Movies
                 //lấy phim tính từ 1 tháng trước đến bây giờ
                 //order by sẽ được tối ưu hơn khi chỉ lấy phim trong vòng 1 tháng (nếu performance chưa lên thì sẽ chơi trò khác :D)
-                /*.Where(a => a.ReleaseDate < DateTime.Now
+                .Where(a => a.ReleaseDate < DateTime.Now
                             && a.ReleaseDate > DateTime.Now.AddMonths(-1)
                             && !string.IsNullOrEmpty(a.CoverImageUrl)
-                            && !string.IsNullOrEmpty(a.PosterImageUrl))*/
+                            && !string.IsNullOrEmpty(a.PosterImageUrl))
                 .OrderByDescending(a => a.ReleaseDate)
                 .Select(a => new Movie
                 {
