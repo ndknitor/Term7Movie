@@ -10,6 +10,6 @@ namespace Term7MovieCore.Data.Response
 {
     public class MovieListResponse : ParentResponse
     {
-        public PagingList<MovieDto> Movies { set; get; }
+        public PagingList<MovieDto>? Movies { set; get; }
     }
 }

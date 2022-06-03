@@ -34,7 +34,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("get-incoming-movies-for-homepage")]
+        [HttpGet("movies/incoming")]
         public async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
@@ -52,7 +52,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("get-movies-for-homepage")]
+        [HttpGet("movies/latest")]
         public async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
@@ -70,6 +70,24 @@ namespace Term7MovieApi.Controllers
             catch
             {
                 return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("movie/{PageIndex:int}")]
+        public async Task<IActionResult> GetMoviesPaging(int PageIndex)
+        {
+            try
+            {
+                MovieListPageRequest mlpr = new MovieListPageRequest(){PageIndex = PageIndex,};
+                var result = await _movieService.GetMovieListFollowPage(mlpr);
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "Singleton dead." });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ParentResponse { Message = ex.Message });
             }
         }
     }

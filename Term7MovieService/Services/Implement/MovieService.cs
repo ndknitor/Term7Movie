@@ -103,5 +103,59 @@ namespace Term7MovieService.Services.Implement
             mhpr.movieList = list;
             return mhpr;
         }
+
+        public async Task<TemptMoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest request)
+        {
+            IMovieRepository movieRepo = _unitOfWork.MovieRepository;
+            //checking singleton went wrong
+            if (movieRepo == null)
+                return new TemptMoviePagingResponse { Message = "REPOSITORY IS NULL" };
+            IEnumerable<Movie> rawData = await movieRepo.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize);
+            //checking database connection
+            if (rawData == null)
+                return new TemptMoviePagingResponse { Message = "Unresponsible database" };
+            //checking if there is any data in database
+            if (!rawData.Any())
+                return new TemptMoviePagingResponse { Message = "Empty Data" };
+            //checking input logical
+            int maxpage = movieRepo.Count() / 16 + 1;
+            if (request.PageIndex > maxpage) //madness shit
+                return new TemptMoviePagingResponse { Message = "Sao lại để hacker tràn dô nhà dị cha" };
+
+            // ********* End validating or checking shet *********** //
+            TemptMoviePagingResponse mlr = new TemptMoviePagingResponse();
+            int[] movieIds = new int[rawData.Count()];
+            for (int j = 0; j < rawData.Count(); j++)
+            {
+                movieIds[j] = rawData.ElementAt(j).Id;
+            }
+            Dictionary<int, IEnumerable<MovieType>> categories = await movieRepo.GetCategoriesFromMovieList(movieIds);
+            //The code below effect RAM only
+            bool DoesItNull = false;
+            List<MovieHomePageDTO> list = new List<MovieHomePageDTO>();
+            foreach (var item in rawData)
+            {
+                MovieHomePageDTO movie = new MovieHomePageDTO();
+                movie.MovieId = item.Id;
+                movie.CoverImgURL = item.CoverImageUrl;
+                movie.PosterImgURL = item.PosterImageUrl;
+                movie.Title = item.Title;
+                movie.AgeRestrict = item.RestrictedAge;
+                movie.Duration = item.Duration;
+                DateTime dt = item.ReleaseDate;
+                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
+                //movie.Types = categories.GetValueOrDefault(item.Id);
+                movie.Categories = categories.GetValueOrDefault(item.Id);
+                if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
+                list.Add(movie);
+            }
+            if (!DoesItNull)
+                mlr.Message = "Succesfully";
+            else mlr.Message = "Some movie categories is null";
+            mlr.MovieList = list;
+            mlr.CurrentPage = request.PageIndex;
+            mlr.TotalPages = maxpage;
+            return mlr;
+        }
     }
 }

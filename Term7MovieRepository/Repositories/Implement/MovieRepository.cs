@@ -47,29 +47,30 @@ namespace Term7MovieRepository.Repositories.Implement
 
             return pagingList;
         }
-        public Movie GetMovieById(int id)
+        public async Task<Movie> GetMovieById(int id)
         {
             Movie movie = null;
+            movie = await _context.Movies.FindAsync(id);
             return movie;
         }
-        public int CreateMovie(Movie movie)
+        public async Task CreateMovie(Movie movie)
         {
-            int count = 0;
-            return count;
+            await _context.Movies.AddAsync(movie);
+            //return count;
         }
-        public int UpdateMovie(Movie movie)
+        public async Task UpdateMovie(Movie movie)
         {
-            int count = 0;
-            return count;
+            _context.Movies.Update(movie);
+            await _context.SaveChangesAsync();
         }
-        public int DeleteMovie(int id)
+        public async Task DeleteMovie(Movie movie)
         {
-            int count = 0;
-            return count;
+            _context.Movies.Remove(movie);
+            await _context.SaveChangesAsync();
         }
         public int Count()
         {
-            int count = 0;
+            int count = _context.Movies.Count();
             return count;
         }
 
@@ -166,5 +167,21 @@ namespace Term7MovieRepository.Repositories.Implement
             return result;
         }
         /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
+        
+        /* ------------- START QUERYING PAGING MOVIE INTO LIST ----------------------------- */
+        //high end paging - flow: paging on database rather than the above shit
+        public async Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            List<Movie> movies = new List<Movie>();
+            var query = _context.Movies
+                                    .OrderBy(a => a.Id)
+                                    .Skip((page - 1) * pageCapacity)
+                                    .Take(pageCapacity);
+            movies = await query.ToListAsync();
+            return movies;
+        }
+        /* ------------- END QUERYING PAGING MOVIE INTO LIST ----------------------- */    
     }
 }
