@@ -13,7 +13,7 @@ namespace Term7MovieApi.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<IRoomService, RoomService>();
-
+            services.AddScoped<ISeatService, SeatService>();
             return services;
         }
 

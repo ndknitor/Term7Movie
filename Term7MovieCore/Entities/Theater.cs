@@ -10,6 +10,10 @@ namespace Term7MovieCore.Entities
         public string Name { set; get; }
         [Column(TypeName = "nvarchar(100)"), Required]
         public string Address { set; get; }
+        [Column(TypeName = "varchar(10)")]
+        public string Latitude { set; get; } // North to South
+        [Column(TypeName = "varchar(10)")]
+        public string Longitude { set; get; } // West to East
         [Required]
         public int CompanyId { set; get; }
         public TheaterCompany Company { set; get; }
