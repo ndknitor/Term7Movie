@@ -12,7 +12,7 @@ using Term7MovieCore.Data.Request;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/v1")]
+    [Route("api/v1/movies")]
     [ApiController]
     public class MovieController : ControllerBase
     {
@@ -27,15 +27,15 @@ namespace Term7MovieApi.Controllers
 
         }
 
-        [HttpPost("all")]
-        public async Task<IActionResult> GetAllMovie(ParentFilterRequest request)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
         {
             var response = await _movieService.GetAllMovie(request);
             return Ok(response);
         }
 
         [AllowAnonymous]
-        [HttpGet("movies/incoming")]
+        [HttpGet("incoming")]
         public async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
@@ -53,7 +53,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("movies/latest")]
+        [HttpGet("latest")]
         public async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
@@ -75,12 +75,12 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("movie/{PageIndex:int}")]
-        public async Task<IActionResult> GetMoviesPaging(int PageIndex)
+        [HttpGet(" ")]
+        public async Task<IActionResult> GetMoviesPaging(int pageIndex)
         {
             try
             {
-                MovieListPageRequest mlpr = new MovieListPageRequest(){PageIndex = PageIndex,};
+                MovieListPageRequest mlpr = new MovieListPageRequest(){PageIndex = pageIndex,};
                 var result = await _movieService.GetMovieListFollowPage(mlpr);
                 if (result == null)
                     return BadRequest(new ParentResponse { Message = "Singleton dead." });

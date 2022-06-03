@@ -24,7 +24,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<MovieListResponse> GetAllMovie(ParentFilterRequest request)
         {
-            PagingList<MovieDto> movies = await movieRepository.GetAllMovie(request);
+            PagingList<MovieModelDto> movies = await movieRepository.GetAllMovie(request);
 
             return new MovieListResponse
             {
@@ -135,10 +135,10 @@ namespace Term7MovieService.Services.Implement
             Dictionary<int, IEnumerable<MovieType>> categories = await movieRepo.GetCategoriesFromMovieList(movieIds);
             //The code below effect RAM only
             bool DoesItNull = false;
-            List<MovieHomePageDTO> list = new List<MovieHomePageDTO>();
+            List<MovieDTO> list = new List<MovieDTO>();
             foreach (var item in rawData)
             {
-                MovieHomePageDTO movie = new MovieHomePageDTO();
+                MovieDTO movie = new MovieDTO();
                 movie.MovieId = item.Id;
                 movie.CoverImgURL = item.CoverImageUrl;
                 movie.PosterImgURL = item.PosterImageUrl;

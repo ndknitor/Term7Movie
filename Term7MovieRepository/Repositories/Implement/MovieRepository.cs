@@ -21,16 +21,16 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
-        public async Task<PagingList<MovieDto>> GetAllMovie(ParentFilterRequest request)
+        public async Task<PagingList<MovieModelDto>> GetAllMovie(ParentFilterRequest request)
         {
-            PagingList<MovieDto> pagingList;
+            PagingList<MovieModelDto> pagingList;
             int fetch = request.PageSize;
             int offset = (request.Page - 1) * request.PageSize;
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string query =
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
-                    " FROM view_movies_sorted_by_release_date_desc " +
+                    " FROM Movies " +
                     " ORDER BY ReleaseDate DESC " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
@@ -39,10 +39,10 @@ namespace Term7MovieRepository.Repositories.Implement
                 object param = new { offset, fetch };
                 
                 var multiQ = await con.QueryMultipleAsync(query + count, param);
-                IEnumerable<MovieDto> list = await multiQ.ReadAsync<MovieDto>();
+                IEnumerable<MovieModelDto> list = await multiQ.ReadAsync<MovieModelDto>();
                 long total = await multiQ.ReadFirstAsync<long>();
 
-                pagingList = new PagingList<MovieDto>(request.PageSize, request.Page, list, total);
+                pagingList = new PagingList<MovieModelDto>(request.PageSize, request.Page, list, total);
             }
 
             return pagingList;

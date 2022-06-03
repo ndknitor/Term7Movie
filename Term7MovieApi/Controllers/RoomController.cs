@@ -8,7 +8,7 @@ using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/room")]
+    [Route("api/rooms")]
     [ApiController]
     public class RoomController : ControllerBase
     {

@@ -21,6 +21,6 @@ namespace Term7MovieCore.Data.Request
             get => page; 
         }
 
-        public string SearchKey { set; get; }
+        public string? SearchKey { set; get; }
     }
 }
