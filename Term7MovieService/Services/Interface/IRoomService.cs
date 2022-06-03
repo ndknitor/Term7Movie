@@ -10,5 +10,7 @@ namespace Term7MovieService.Services.Interface
         Task<RoomResponse> GetRoomDetail(int roomId);
         Task<TheaterRoomsResponse> GetRoomsByTheaterId(int theaterId);
         Task<ParentResponse> CreateRoom(RoomCreateRequest request);
+        Task<ParentResponse> UpdateRoom(RoomUpdateRequest request);
+        Task<ParentResponse> DeleteRoom(int id);
     }
 }

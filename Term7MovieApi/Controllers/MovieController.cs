@@ -7,6 +7,7 @@ using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using System.Text.Json;
 using System.Diagnostics;
+using Term7MovieCore.Data.Request;
 
 namespace Term7MovieApi.Controllers
 {
@@ -25,35 +26,11 @@ namespace Term7MovieApi.Controllers
 
         }
 
-
-        //[Authorize(Roles = Constants.ROLE_CUSTOMER)]
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllMovie()
+        [HttpPost("all")]
+        public async Task<IActionResult> GetAllMovie(ParentFilterRequest request)
         {
-            var movie = new Movie[]
-            {
-                new Movie
-                {
-                    Id = 1,
-                    CoverImageUrl = "google.com",
-                    Description = "Test",
-                    ReleaseDate = DateTime.UtcNow,
-                    Title = "Test Movie 1"
-                },
-                new Movie
-                {
-                    Id = 2,
-                    CoverImageUrl = "google.com",
-                    Description = "Test",
-                    ReleaseDate = DateTime.UtcNow,
-                    Title = "Test Movie 2"
-                }
-            };
-            //foreach (var item in await _movieService.GetThreeLatestMovieForHomepage())
-            //{
-            //    _logger.LogInformation(item.Message + "_" + item.movieID + "_" + item.coverImgURL);
-            //}
-            return Ok(movie);
+            var response = await _movieService.GetAllMovie(request);
+            return Ok(response);
         }
 
         [AllowAnonymous]

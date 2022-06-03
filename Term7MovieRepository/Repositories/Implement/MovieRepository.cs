@@ -2,6 +2,11 @@
 using Term7MovieCore.Data.Dto;
 using Term7MovieRepository.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Term7MovieCore.Data.Options;
+using Microsoft.Data.SqlClient;
+using Term7MovieCore.Data.Request;
+using Dapper;
+using Term7MovieCore.Data.Collections;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -9,14 +14,38 @@ namespace Term7MovieRepository.Repositories.Implement
     {
 
         private AppDbContext _context;
-        public MovieRepository(AppDbContext context)
+        private readonly ConnectionOption _connectionOption;
+
+        public MovieRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
+            _connectionOption = connectionOption;
         }
-        public IEnumerable<Movie> GetAllMovie()
+        public async Task<PagingList<MovieDto>> GetAllMovie(ParentFilterRequest request)
         {
-            IEnumerable<Movie> list = new List<Movie>();
-            return list;
+            PagingList<MovieDto> pagingList;
+            int fetch = request.PageSize;
+            int offset = (request.Page - 1) * request.PageSize;
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string query =
+                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
+                    " FROM view_movies_sorted_by_release_date_desc " +
+                    " ORDER BY ReleaseDate DESC " +
+                    " OFFSET @offset ROWS " +
+                    " FETCH NEXT @fetch ROWS ONLY ; ";
+                string count = " SELECT COUNT(1) FROM Movies ";
+
+                object param = new { offset, fetch };
+                
+                var multiQ = await con.QueryMultipleAsync(query + count, param);
+                IEnumerable<MovieDto> list = await multiQ.ReadAsync<MovieDto>();
+                long total = await multiQ.ReadFirstAsync<long>();
+
+                pagingList = new PagingList<MovieDto>(request.PageSize, request.Page, list, total);
+            }
+
+            return pagingList;
         }
         public Movie GetMovieById(int id)
         {

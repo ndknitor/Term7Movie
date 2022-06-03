@@ -91,6 +91,10 @@ namespace Term7MovieCore.Entities
                 .Property(m => m.Description)
                 .IsRequired(false);
 
+            builder.Entity<Room>()
+                .HasIndex(r => new { r.No, r.TheaterId })
+                .IsUnique();
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();

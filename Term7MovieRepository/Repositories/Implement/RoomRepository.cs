@@ -15,8 +15,6 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             _context = context;
             _connectionOption = connectionOption;
-
-
         }
         public async Task<IEnumerable<RoomDto>> GetAllRoomByTheaterId(int theaterId)
         {
@@ -77,6 +75,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
             if (dbRoom == null) return;
 
+            dbRoom.No = room.No;
             dbRoom.NumberOfColumn = room.NumberOfColumn;
             dbRoom.NumberOfRow = room.NumberOfRow;
             dbRoom.Status = room.Status;

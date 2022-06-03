@@ -1,11 +1,12 @@
-﻿using Term7MovieCore.Entities;
+﻿using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Entities;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ISeatRepository
     {
-        IEnumerable<Seat> GetAllSeat(int roomId);
-        Seat GetSeatById(long id);
+        Task<IEnumerable<SeatDto>> GetAllSeat(int roomId);
+        Task<SeatDto> GetSeatById(long id);
         int CreateSeat(Seat seat);
         int CreateSeat(Seat[] seat);
         int UpdateSeat(Seat seat);

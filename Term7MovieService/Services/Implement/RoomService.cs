@@ -67,5 +67,30 @@ namespace Term7MovieService.Services.Implement
 
             return null;
         }
+
+        public async Task<ParentResponse> UpdateRoom(RoomUpdateRequest request)
+        {
+            Room room = _mapper.Map<Room>(request);
+            await roomRepo.UpdateRoom(room);
+
+            if (_unitOfWork.HasChange())
+            {
+                await _unitOfWork.CompleteAsync();
+                return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
+            }
+            return null;
+        }
+
+        public async Task<ParentResponse> DeleteRoom(int id)
+        {
+            await roomRepo.DeleteRoom(id);
+
+            if (_unitOfWork.HasChange())
+            {
+                await _unitOfWork.CompleteAsync();
+                return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
+            }
+            return null;
+        }
     }
 }
