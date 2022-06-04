@@ -4,6 +4,6 @@ namespace Term7MovieCore.Data.Response
 {
     public class MovieHomePageResponse : ParentResponse
     {
-        public IEnumerable<MovieHomePageDTO>? movieList { get; set; }
+        public IEnumerable<MovieDTO> movieList { get; set; }
     }
 }

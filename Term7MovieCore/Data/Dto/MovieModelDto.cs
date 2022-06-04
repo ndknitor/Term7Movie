@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace Term7MovieCore.Data.Dto
+﻿namespace Term7MovieCore.Data.Dto
 {
-    public class MovieDto
+    public class MovieModelDto
     {
         public int Id { get; set; }
-        [JsonIgnore]
-        public int ExternalId { set; get; }
         public string Title { get; set; }
         public DateTime ReleaseDate { set; get; }
         public int Duration { set; get; }

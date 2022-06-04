@@ -27,6 +27,15 @@ namespace Term7MovieApi.Profiles
 
             CreateMap<RoomCreateRequest, Room>()
                 .BeforeMap((src, des) => des.Status = true);
+
+            CreateMap<RoomUpdateRequest, Room>();
+
+            CreateMap<SeatCreateRequest, Seat>()
+                .BeforeMap((src, des) => des.Status = true);
+
+            CreateMap<SeatUpdateRequest, Seat>();
+
+            CreateMap<SeatTypeUpdateRequest, SeatType>();
         }          
     }
 }

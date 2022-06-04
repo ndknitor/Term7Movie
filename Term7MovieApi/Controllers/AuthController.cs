@@ -11,16 +11,14 @@ using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/auth")]
+    [Route("api/v1/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthService _authServices;
 
-        public AuthController(IUnitOfWork unitOfWork, IAuthService authService)
+        public AuthController(IAuthService authService)
         {
-            _unitOfWork = unitOfWork;
             _authServices = authService;
         }
 

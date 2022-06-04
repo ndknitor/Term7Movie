@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
-using Term7MovieRepository.Repositories.Interfaces;
-using System.Text.Json;
 using System.Diagnostics;
-using Term7MovieCore.Data.Request;
+
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/movie")]
+    [Route("api/v1/movies")]
     [ApiController]
     public class MovieController : ControllerBase
     {
@@ -26,15 +25,15 @@ namespace Term7MovieApi.Controllers
 
         }
 
-        [HttpPost("all")]
-        public async Task<IActionResult> GetAllMovie(ParentFilterRequest request)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
         {
             var response = await _movieService.GetAllMovie(request);
             return Ok(response);
         }
 
         [AllowAnonymous]
-        [HttpGet("get-incoming-movies-for-homepage")]
+        [HttpGet("incoming")]
         public async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
@@ -52,7 +51,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("get-movies-for-homepage")]
+        [HttpGet("latest")]
         public async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
@@ -70,6 +69,24 @@ namespace Term7MovieApi.Controllers
             catch
             {
                 return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet(" ")]
+        public async Task<IActionResult> GetMoviesPaging(int pageIndex)
+        {
+            try
+            {
+                MovieListPageRequest mlpr = new MovieListPageRequest(){PageIndex = pageIndex,};
+                var result = await _movieService.GetMovieListFollowPage(mlpr);
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "Singleton dead." });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ParentResponse { Message = ex.Message });
             }
         }
     }

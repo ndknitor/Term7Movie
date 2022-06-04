@@ -27,7 +27,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public IRefreshTokenRepository RefreshTokenRepository { get => new RefreshTokenRepository(_context, _connectionOption); }
         public IRoomRepository RoomRepository { get => new RoomRepository(_context, _connectionOption); }
         public ISeatRepository SeatRepository { get => new SeatRepository(_context, _connectionOption); }
-        public ISeatTypeRepository SeatTypeRepository { get => new SeatTypeRepository(_context); }
+        public ISeatTypeRepository SeatTypeRepository { get => new SeatTypeRepository(_context, _connectionOption); }
         public IShowtimeRepository ShowtimeRepository { get => new ShowtimeRepository(_context); }
         public ITheaterRepository TheaterRepository { get => new TheaterRepository(_context); }
         public ITicketRepository TicketRepository { get => new TicketRepository(_context); }

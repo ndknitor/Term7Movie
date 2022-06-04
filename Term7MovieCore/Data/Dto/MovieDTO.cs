@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#nullable disable
 
 namespace Term7MovieCore.Data.Dto
 {
-    public class MovieHomePageDTO
+    public class MovieDTO
     {
         public int MovieId { get; set; }
         public string Title { get; set; }
@@ -14,8 +15,8 @@ namespace Term7MovieCore.Data.Dto
         public int? AgeRestrict { get; set; }
         public int Duration { get; set; }
         public string ReleaseDate { get; set; }
-        public string? CoverImgURL { get; set; }
-        public string? PosterImgURL { get; set; }
+        public string CoverImgURL { get; set; }
+        public string PosterImgURL { get; set; }
     }
 
     public class MovieType

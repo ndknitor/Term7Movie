@@ -21,16 +21,17 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
-        public async Task<PagingList<MovieDto>> GetAllMovie(ParentFilterRequest request)
+        public async Task<PagingList<MovieModelDto>> GetAllMovie(ParentFilterRequest request)
         {
-            PagingList<MovieDto> pagingList;
+            PagingList<MovieModelDto> pagingList;
             int fetch = request.PageSize;
             int offset = (request.Page - 1) * request.PageSize;
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string query =
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
-                    " FROM view_movies_sorted_by_release_date_desc " +
+                    " FROM Movies " +
+                    " WHERE ReleaseDate BETWEEN ( GETDATE() - 30) AND (GETDATE() + 30)" +
                     " ORDER BY ReleaseDate DESC " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
@@ -39,37 +40,38 @@ namespace Term7MovieRepository.Repositories.Implement
                 object param = new { offset, fetch };
                 
                 var multiQ = await con.QueryMultipleAsync(query + count, param);
-                IEnumerable<MovieDto> list = await multiQ.ReadAsync<MovieDto>();
+                IEnumerable<MovieModelDto> list = await multiQ.ReadAsync<MovieModelDto>();
                 long total = await multiQ.ReadFirstAsync<long>();
 
-                pagingList = new PagingList<MovieDto>(request.PageSize, request.Page, list, total);
+                pagingList = new PagingList<MovieModelDto>(request.PageSize, request.Page, list, total);
             }
 
             return pagingList;
         }
-        public Movie GetMovieById(int id)
+        public async Task<Movie> GetMovieById(int id)
         {
             Movie movie = null;
+            movie = await _context.Movies.FindAsync(id);
             return movie;
         }
-        public int CreateMovie(Movie movie)
+        public async Task CreateMovie(Movie movie)
         {
-            int count = 0;
-            return count;
+            await _context.Movies.AddAsync(movie);
+            //return count;
         }
-        public int UpdateMovie(Movie movie)
+        public async Task UpdateMovie(Movie movie)
         {
-            int count = 0;
-            return count;
+            _context.Movies.Update(movie);
+            await _context.SaveChangesAsync();
         }
-        public int DeleteMovie(int id)
+        public async Task DeleteMovie(Movie movie)
         {
-            int count = 0;
-            return count;
+            _context.Movies.Remove(movie);
+            await _context.SaveChangesAsync();
         }
         public int Count()
         {
-            int count = 0;
+            int count = _context.Movies.Count();
             return count;
         }
 
@@ -135,6 +137,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     Duration = a.Duration,
                     RestrictedAge = a.RestrictedAge
                 })
+                //.AsNoTracking()
                 .Take(8);
             movies = query.ToList();
             return movies;
@@ -166,5 +169,21 @@ namespace Term7MovieRepository.Repositories.Implement
             return result;
         }
         /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
+        
+        /* ------------- START QUERYING PAGING MOVIE INTO LIST ----------------------------- */
+        //high end paging - flow: paging on database rather than the above shit
+        public async Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            List<Movie> movies = new List<Movie>();
+            var query = _context.Movies
+                                    .OrderBy(a => a.Id)
+                                    .Skip((page - 1) * pageCapacity)
+                                    .Take(pageCapacity);
+            movies = await query.ToListAsync();
+            return movies;
+        }
+        /* ------------- END QUERYING PAGING MOVIE INTO LIST ----------------------- */    
     }
 }

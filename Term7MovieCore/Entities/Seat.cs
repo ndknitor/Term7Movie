@@ -19,6 +19,7 @@ namespace Term7MovieCore.Entities
         [Required]
         public int SeatTypeId { set; get; }
         public SeatType SeatType { set; get; }
+        public bool Status { set; get; }
         public ICollection<Ticket> Tickets { set; get; }
     }
 }

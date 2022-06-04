@@ -5,11 +5,11 @@ namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ISeatRepository
     {
-        Task<IEnumerable<SeatDto>> GetAllSeat(int roomId);
+        Task<IEnumerable<SeatDto>> GetRoomSeats(int roomId);
         Task<SeatDto> GetSeatById(long id);
-        int CreateSeat(Seat seat);
-        int CreateSeat(Seat[] seat);
-        int UpdateSeat(Seat seat);
-        int DeleteSeat(long id);
+        Task CreateSeat(Seat seat);
+        Task CreateSeat(IEnumerable<Seat> seats);
+        Task UpdateSeat(Seat seat);
+        Task DeleteSeat(long id);
     }
 }
