@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Term7MovieCore.Data.Request
+﻿namespace Term7MovieCore.Data.Request
 {
     public class ParentFilterRequest
     {
@@ -21,6 +15,6 @@ namespace Term7MovieCore.Data.Request
             get => page; 
         }
 
-        public string? SearchKey { set; get; }
+        public string SearchKey { set; get; }
     }
 }

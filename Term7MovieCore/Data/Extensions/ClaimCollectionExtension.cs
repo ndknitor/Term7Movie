@@ -11,7 +11,7 @@ namespace Term7MovieCore.Data.Extensions
     {
         public static string FindFirstValue(this IEnumerable<Claim> list, string type)
         {
-            Claim? claim = list.FirstOrDefault(c => c.Type.Equals(type));
+            Claim claim = list.FirstOrDefault(c => c.Type.Equals(type));
 
             if (claim == null) return null;
 
