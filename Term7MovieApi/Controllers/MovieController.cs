@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
-using Term7MovieRepository.Repositories.Interfaces;
-using System.Text.Json;
 using System.Diagnostics;
-using Term7MovieCore.Data.Request;
+
 
 namespace Term7MovieApi.Controllers
 {

@@ -14,6 +14,7 @@ namespace Term7MovieApi.Extensions
             services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<ISeatService, SeatService>();
+            services.AddScoped<ISeatTypeService, SeatTypeService>();
             return services;
         }
 

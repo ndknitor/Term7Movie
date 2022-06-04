@@ -11,7 +11,7 @@ using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/auth")]
+    [Route("api/v1/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
