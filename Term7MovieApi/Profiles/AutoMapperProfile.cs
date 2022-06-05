@@ -36,6 +36,11 @@ namespace Term7MovieApi.Profiles
             CreateMap<SeatUpdateRequest, Seat>();
 
             CreateMap<SeatTypeUpdateRequest, SeatType>();
+
+            CreateMap<TheaterCreateRequest, Theater>()
+                .BeforeMap((src, des) => des.Status = true);
+
+            CreateMap<TheaterUpdateRequest, Theater>();
         }          
     }
 }

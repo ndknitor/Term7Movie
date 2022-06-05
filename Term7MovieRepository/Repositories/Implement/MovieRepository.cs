@@ -31,7 +31,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string query =
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
                     " FROM Movies " +
-                    " WHERE ReleaseDate BETWEEN ( GETDATE() - 30) AND (GETDATE() + 30)" +
+                    " WHERE ReleaseDate BETWEEN ( GETDATE() - 30) AND (GETDATE() + 30) " +
                     " ORDER BY ReleaseDate DESC " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";

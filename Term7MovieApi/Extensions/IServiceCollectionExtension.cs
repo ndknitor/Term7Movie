@@ -10,11 +10,21 @@ namespace Term7MovieApi.Extensions
         public static IServiceCollection InjectProjectServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
+
             services.AddScoped<ITokenService, TokenService>();
+
             services.AddScoped<IMovieService, MovieService>();
+
             services.AddScoped<IRoomService, RoomService>();
+
             services.AddScoped<ISeatService, SeatService>();
+
             services.AddScoped<ISeatTypeService, SeatTypeService>();
+
+            services.AddScoped<ITheaterService, TheaterService>();
+
+            services.AddScoped<ILocationService, LocationService>();
+
             return services;
         }
 
@@ -25,6 +35,8 @@ namespace Term7MovieApi.Extensions
             services.Configure<GoogleAuthOption>(config.GetSection(Constants.GOOGLE_CREDENTIAL));
 
             services.Configure<ConnectionOption>(config.GetSection(Constants.CONNECTION_STRING));
+
+            services.Configure<GoongOption>(config.GetSection(Constants.GOONG_IO));
 
             return services;
         }

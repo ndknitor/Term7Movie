@@ -25,7 +25,7 @@ namespace Term7MovieApi.Controllers
 
         }
 
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
         {
             var response = await _movieService.GetAllMovie(request);
@@ -34,7 +34,7 @@ namespace Term7MovieApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("incoming")]
-        public async Task<IActionResult> GetIncomingMovies()
+        private async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
             try
@@ -52,7 +52,7 @@ namespace Term7MovieApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("latest")]
-        public async Task<IActionResult> GetEightLatestMovies()
+        private async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
             try
@@ -74,7 +74,7 @@ namespace Term7MovieApi.Controllers
 
         [AllowAnonymous]
         [HttpGet(" ")]
-        public async Task<IActionResult> GetMoviesPaging(int pageIndex)
+        private async Task<IActionResult> GetMoviesPaging(int pageIndex)
         {
             try
             {

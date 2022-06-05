@@ -19,6 +19,24 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
+
+        public async Task<int> GetCompanyIdByManagerId(long managerId)
+        {
+            int companyId = -1;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " SELECT CompanyId " +
+                    " FROM Users " +
+                    " WHERE Id = @managerId ";
+                object param = new { managerId };
+
+                companyId = await con.QueryFirstOrDefaultAsync<int>(sql, param);
+            }
+
+            return companyId;
+        }
         public async Task CreateUserAsync(User user)
         {
             await _context.Users.AddAsync(user);

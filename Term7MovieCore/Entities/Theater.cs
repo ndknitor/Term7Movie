@@ -6,13 +6,13 @@ namespace Term7MovieCore.Entities
     public class Theater
     {
         public int Id { set; get; }
-        [Column(TypeName = "nvarchar(50)"), Required]
-        public string Name { set; get; }
         [Column(TypeName = "nvarchar(100)"), Required]
+        public string Name { set; get; }
+        [Column(TypeName = "nvarchar(200)"), Required]
         public string Address { set; get; }
-        [Column(TypeName = "varchar(10)")]
+        [Column(TypeName = "varchar(20)")]
         public string Latitude { set; get; } // North to South
-        [Column(TypeName = "varchar(10)")]
+        [Column(TypeName = "varchar(20)")]
         public string Longitude { set; get; } // West to East
         [Required]
         public int CompanyId { set; get; }

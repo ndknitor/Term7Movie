@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
@@ -8,7 +9,7 @@ using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/rooms")]
+    [Route("api/v1/rooms")]
     [ApiController]
     public class RoomController : ControllerBase
     {
@@ -35,8 +36,8 @@ namespace Term7MovieApi.Controllers
 
 
         [Authorize]
-        [HttpGet("theater-rooms/{theaterId:int}")]
-        public async Task<IActionResult> GetRoomsByTheaterId(int theaterId)
+        [HttpGet]
+        public async Task<IActionResult> GetRoomsByTheaterId([FromQuery][Required] int theaterId)
         {
             var response = await _roomService.GetRoomsByTheaterId(theaterId);
 

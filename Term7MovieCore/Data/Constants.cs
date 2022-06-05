@@ -36,6 +36,8 @@ namespace Term7MovieCore.Data
 
         public static DateTime JSON_START_DATE = new DateTime(1970, 1, 1);
 
+        public const string GOONG_IO = "Goong.io";
+
         public const string ROLE_ADMIN = "Admin";
         public const string ROLE_MANAGER = "Manager";
         public const string ROLE_CUSTOMER = "Customer";

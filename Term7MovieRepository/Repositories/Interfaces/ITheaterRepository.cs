@@ -1,13 +1,16 @@
-﻿using Term7MovieCore.Entities;
+﻿using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Request;
+using Term7MovieCore.Entities;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ITheaterRepository
     {
-        IEnumerable<Theater> GetAllTheater();
-        Theater GetTheaterById(int id);
-        int CreateTheater(Theater theater);
-        int UpdateTheater(Theater theater);
-        int DeleteTheater(int id);
+        Task<PagingList<TheaterDto>> GetAllTheaterAsync(TheaterFilterRequest request);
+        Task<TheaterDto> GetTheaterByIdAsync(int id);
+        Task CreateTheaterAsync(Theater theater);
+        Task UpdateTheaterAsync(Theater theater);
+        Task DeleteTheaterAsync(int id);
     }
 }
