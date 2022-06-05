@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
@@ -56,8 +57,8 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [HttpGet("room-seats/{roomId:int}")]
-        public async Task<IActionResult> GetRoomSeats(int roomId)
+        [HttpGet]
+        public async Task<IActionResult> GetRoomSeats([FromQuery][Required] int roomId)
         {
             var response = await _seatService.GetRoomSeats(roomId);
             return Ok(response);
