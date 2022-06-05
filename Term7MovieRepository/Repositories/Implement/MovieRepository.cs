@@ -50,8 +50,7 @@ namespace Term7MovieRepository.Repositories.Implement
         }
         public async Task<Movie> GetMovieById(int id)
         {
-            Movie movie = null;
-            movie = await _context.Movies.FindAsync(id);
+            Movie movie = await _context.Movies.FindAsync(id);
             return movie;
         }
         public async Task CreateMovie(Movie movie)
@@ -93,8 +92,8 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception();
-                //return null;
+                //throw new Exception();
+                return null;
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
                 .Where(a => a.ReleaseDate > DateTime.Now
@@ -116,7 +115,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetEightLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception();
+                return null;
             //return null;
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
@@ -147,7 +146,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception();
+                return null;
             Dictionary<int, IEnumerable<MovieType>> result = new Dictionary<int, IEnumerable<MovieType>>();
             foreach(int movieId in MovieIds)
             {
@@ -174,6 +173,7 @@ namespace Term7MovieRepository.Repositories.Implement
         //high end paging - flow: paging on database rather than the above shit
         public async Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity)
         {
+            if (page <= 0) return null;
             if (!await _context.Database.CanConnectAsync())
                 return null;
             List<Movie> movies = new List<Movie>();
@@ -184,6 +184,24 @@ namespace Term7MovieRepository.Repositories.Implement
             movies = await query.ToListAsync();
             return movies;
         }
-        /* ------------- END QUERYING PAGING MOVIE INTO LIST ----------------------- */    
+        /* ------------- END QUERYING PAGING MOVIE INTO LIST ----------------------- */
+
+        /* ------------- START QUERYING MOVIE FOR DETAIL ------------------------ */
+        public async Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception();
+            List<MovieType> result = new List<MovieType>();
+            var query = _context.MovieCategories
+                                        .Include(a => a.Category)
+                                        .Where(a => a.MovieId == movieId);
+                                        //.ToListAsync();
+            foreach(var category in query)
+            {
+                result.Add(new MovieType { CateId = category.CategoryId, CateName = category.Category.Name });
+            }
+            return result;
+        }
+        /* ------------- END QUERYING MOVIE FOR DETAIL ----------------------- */
     }
 }
