@@ -9,6 +9,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task UpdateUserAsync(User userUpdate);
         Task DeleteUserAsync(long id);
 
+        Task<int> GetCompanyIdByManagerId(long managerId);
         Task<long> GetUserIdByUserLoginAsync(UserInfo userInfo);
         Task<User> GetUserByIdAsync(long id);
 

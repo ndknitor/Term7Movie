@@ -18,7 +18,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
         public IActorRepository ActorRepository { get => new ActorRepository(_context); }
         public ICategoryRepository CategoryRepository { get => new CategoryRepository(_context); }
-        public ICompanyRepository CompanyRepository { get => new CompanyRepository(_context); }
+        public ICompanyRepository CompanyRepository { get => new CompanyRepository(_context, _connectionOption); }
         public ILanguageRepository LanguageRepository { get => new LanguageRepository(_context); }
         public IMovieActorRepository MovieActorRepository { get => new MovieActorRepository(_context); }
         public IMovieCategoryRepository MovieCategoryRepository { get => new MovieCategoryRepository(_context); }
@@ -29,7 +29,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public ISeatRepository SeatRepository { get => new SeatRepository(_context, _connectionOption); }
         public ISeatTypeRepository SeatTypeRepository { get => new SeatTypeRepository(_context, _connectionOption); }
         public IShowtimeRepository ShowtimeRepository { get => new ShowtimeRepository(_context); }
-        public ITheaterRepository TheaterRepository { get => new TheaterRepository(_context); }
+        public ITheaterRepository TheaterRepository { get => new TheaterRepository(_context, _connectionOption); }
         public ITicketRepository TicketRepository { get => new TicketRepository(_context); }
         public ITicketStatusRepository TicketStatusRepository { get => new TicketStatusRepository(_context); }
         public ITransactionHistoryRepository TransactionHistoryRepository { get => new TransactionHistoryRepository(_context); }
