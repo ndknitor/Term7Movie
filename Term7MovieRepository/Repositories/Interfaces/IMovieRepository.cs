@@ -17,5 +17,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<Movie>> GetEightLatestMovies();
         Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds);
         Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity);
+        Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId);
     }
 }

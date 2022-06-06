@@ -114,14 +114,14 @@ namespace Term7MovieService.Services.Implement
             IEnumerable<Movie> rawData = await movieRepo.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize);
             //checking database connection
             if (rawData == null)
-                return new TemptMoviePagingResponse { Message = "Unresponsible database" };
+                return new TemptMoviePagingResponse { Message = "Page index is smaller than 1" };
             //checking if there is any data in database
             if (!rawData.Any())
                 return new TemptMoviePagingResponse { Message = "Empty Data" };
             //checking input logical
             int maxpage = movieRepo.Count() / 16 + 1;
             if (request.PageIndex > maxpage) //madness shit
-                return new TemptMoviePagingResponse { Message = "Sao lại để hacker tràn dô nhà dị cha" };
+                return new TemptMoviePagingResponse { Message = "Page index is more than total page" };
 
             // ********* End validating or checking shet *********** //
             TemptMoviePagingResponse mlr = new TemptMoviePagingResponse();
@@ -157,6 +157,45 @@ namespace Term7MovieService.Services.Implement
             mlr.CurrentPage = request.PageIndex;
             mlr.TotalPages = maxpage;
             return mlr;
+        }
+
+        public async Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId)
+        {
+            IMovieRepository movieRepo = _unitOfWork.MovieRepository;
+            //checking singleton went wrong
+            if (movieRepo == null)
+                return new MovieDetailResponse { Message = "REPOSITORY IS NULL" };
+            Movie rawData = await movieRepo.GetMovieById(movieId);
+            //checking if there is any data in database
+            if (rawData == null)
+                return new MovieDetailResponse { Message = "Movie not found" };
+            MovieDetailResponse mdr = new MovieDetailResponse();
+            MovieDetailDTO dto = new MovieDetailDTO();
+            dto.Id = rawData.Id;
+            dto.Title = rawData.Title;
+            dto.ReleaseDate = rawData.ReleaseDate;
+            dto.Duration = rawData.Duration;
+            dto.RestrictedAge = rawData.RestrictedAge;
+            dto.PosterImageUrl = rawData.PosterImageUrl;
+            dto.CoverImageUrl = rawData.CoverImageUrl;
+            dto.TrailerUrl = rawData.TrailerUrl;
+            dto.Description = rawData.Description;
+            dto.ViewCount = rawData.ViewCount;
+            dto.TotalRating = rawData.TotalRating;
+            dto.DirectorId = rawData.DirectorId;
+            mdr.MovieDetail = dto;
+            //Sublime text 4 is the best. for this damn situation
+            //checking if there is any categories for this movie
+            IEnumerable<MovieType> categories = await movieRepo.GetCategoryFromSpecificMovieId(rawData.Id);
+            if (!categories.Any())
+            {
+                mdr.Message = "No category was found for this movie.";
+                return mdr;
+            }
+            dto.movieTypes = categories;
+            mdr.Message = "Successful";
+            return mdr;
+                
         }
     }
 }

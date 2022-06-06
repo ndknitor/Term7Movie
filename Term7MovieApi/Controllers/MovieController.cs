@@ -26,14 +26,29 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
+        private async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
         {
             var response = await _movieService.GetAllMovie(request);
             return Ok(response);
         }
 
-        [AllowAnonymous]
-        [HttpGet("incoming")]
+        //lmao
+        [HttpGet]//tôi mất 25p chỉ để hiểu rằng t sẽ làm thế này (:
+        public async Task<IActionResult> GetMoviesForSpecificAction([FromQuery] MovieActionRequest request)
+        {
+            if (request.Action == "incoming")
+                return await GetIncomingMovies();
+            if (request.Action == "latest")
+                return await GetEightLatestMovies();
+            if (request.Action == "page")
+                return await GetMoviesPaging(request.pageIndex);
+            if (request.Action == "detail")
+                return await GetMovieDetailById(request.movieId);
+            return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
+        }
+
+        /* ---------------- START PRIVATE METHODS ----------------- */
+        //i have used too many brain cell for this lol if i get it wrong then sorry
         private async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
@@ -50,8 +65,6 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        [AllowAnonymous]
-        [HttpGet("latest")]
         private async Task<IActionResult> GetEightLatestMovies()
         {
             //sr vì chưa handle lỗi tốt lắm. hmu hmu
@@ -72,13 +85,12 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        [AllowAnonymous]
-        [HttpGet(" ")]
         private async Task<IActionResult> GetMoviesPaging(int pageIndex)
         {
+            _logger.LogInformation("here is the page index: " + pageIndex);
             try
             {
-                MovieListPageRequest mlpr = new MovieListPageRequest(){PageIndex = pageIndex,};
+                MovieListPageRequest mlpr = new MovieListPageRequest() { PageIndex = pageIndex, };
                 var result = await _movieService.GetMovieListFollowPage(mlpr);
                 if (result == null)
                     return BadRequest(new ParentResponse { Message = "Singleton dead." });
@@ -86,8 +98,28 @@ namespace Term7MovieApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ParentResponse { Message = ex.Message });
+                _logger.LogInformation(ex.Message);
+                return BadRequest(new ParentResponse { Message = "oh sh*t not good" });
             }
         }
+
+
+        private async Task<IActionResult> GetMovieDetailById(int movieId)
+        {
+            try
+            {
+                var result = await _movieService.GetMovieDetailFromMovieId(movieId);
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "Singleton dead." });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return BadRequest(new ParentResponse { Message = "oh sh*t not good" });
+            }
+        }
+
+        /* ------------ END PRIVATE METHODS --------------- */
     }
 }

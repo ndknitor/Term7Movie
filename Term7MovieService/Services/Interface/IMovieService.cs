@@ -9,5 +9,6 @@ namespace Term7MovieService.Services.Interface
         Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage();
         Task<MovieHomePageResponse> GetEightLatestMovieForHomepage();
         Task<TemptMoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest mlpr);
+        Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId);
     }
 }
