@@ -72,15 +72,46 @@ namespace Term7MovieRepository.Repositories.Implement
                 //return false;
             }
         }
-        public async Task UpdateMovie(Movie movie)
+
+        public async Task<bool> UpdateMovie(Movie movie)
         {
-            _context.Movies.Update(movie);
-            await _context.SaveChangesAsync();
+            if (!await _context.Database.CanConnectAsync())
+                //throw new Exception();
+                return false;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                _context.Movies.Update(movie);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+                //return false;
+            }
         }
-        public async Task DeleteMovie(Movie movie)
+
+
+        public async Task<bool> DeleteMovie(Movie movie)
         {
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
+            if (!await _context.Database.CanConnectAsync())
+                //throw new Exception();
+                return false;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                _context.Movies.Remove(movie);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+                //return false;
+            }
         }
         public int Count()
         {

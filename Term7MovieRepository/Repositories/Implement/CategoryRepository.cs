@@ -1,4 +1,5 @@
-﻿using Term7MovieCore.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieRepository.Repositories.Implement
@@ -12,10 +13,12 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
         }
 
-        public IEnumerable<Category> GetAllCategory()
+        public async Task<IEnumerable<Category>> GetAllCategory()
         {
-
-            IEnumerable<Category> categories = new List<Category>();
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            List<Category> categories = new List<Category>();
+            categories = await _context.Categories.ToListAsync();
             return categories;
         }
     }

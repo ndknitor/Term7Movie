@@ -25,6 +25,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ILocationService, LocationService>();
 
+            services.AddScoped<ICategoryService, CategoryService>();
+
             return services;
         }
 
