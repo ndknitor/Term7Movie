@@ -6,7 +6,7 @@ namespace Term7MovieCore.Entities
     public class Movie
     {
         public int Id { get; set; }
-        public int ExternalId { set; get; }
+        public int? ExternalId { set; get; }
         [Column(TypeName = "nvarchar(300)")]
         public string Title { get; set; }
         public DateTime ReleaseDate { set; get; }
