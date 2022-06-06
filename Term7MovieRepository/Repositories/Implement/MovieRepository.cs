@@ -8,6 +8,7 @@ using Term7MovieCore.Data.Request;
 using Dapper;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
+using Term7MovieCore.Data.Request.CRUDMovie;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -296,7 +297,56 @@ namespace Term7MovieRepository.Repositories.Implement
                 throw new Exception(ex.Message);
             }
         }
-
         /* ------------- END CREATING MOVIE --------------------------- */
+
+        /* ----------------- START UPDATE MOVIE ---------------------- */
+        public async Task<bool> UpdateMovie(MovieUpdateRequest request)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            bool DoesItGood = true;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                Movie movie = new Movie();
+                movie.Id = request.MovieId;
+                movie.Title = request.Title;
+                movie.ReleaseDate = request.ReleasedDate;
+                movie.Duration = request.Duration;
+                movie.RestrictedAge = request.RestrictedAge;
+                movie.PosterImageUrl = request.PosterImgURL;
+                movie.CoverImageUrl = request.CoverImgURL;
+                movie.TrailerUrl = request.TrailerURL;
+                movie.Description = request.Description;
+                movie.DirectorId = request.DirectorId;
+                _context.Update(movie);
+                await _context.SaveChangesAsync();
+                //dark dark buh buh
+                _context.MovieCategories.RemoveRange(
+                    _context.MovieCategories.Where(a => a.MovieId == movie.Id));
+                await _context.SaveChangesAsync();
+                foreach (int cateID in request.CategoryIDs)
+                {
+                    Category category = await _context.Categories.FindAsync(cateID);
+                    if (category == null && DoesItGood == true)
+                    {
+                        DoesItGood = false;
+                        continue;
+                    }
+                    MovieCategory mc = new MovieCategory();
+                    mc.MovieId = movie.Id;
+                    mc.CategoryId = category.Id;
+                    await _context.MovieCategories.AddAsync(mc);
+                    await _context.SaveChangesAsync();
+                }
+                return DoesItGood;
+            }
+            catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+        /* ----------------- END UPDATE MOVIE ---------------------- */
     }
 }

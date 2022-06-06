@@ -3,6 +3,7 @@ using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
+using Term7MovieCore.Data.Request.CRUDMovie;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
@@ -20,5 +21,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity);
         Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId);
         Task<CreateMovieError> CreateMovieWithCategory(MovieCreateRequest request);
+        Task<bool> UpdateMovie(MovieUpdateRequest request);
     }
 }

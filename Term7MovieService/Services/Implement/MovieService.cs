@@ -8,6 +8,7 @@ using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Response.Movie;
+using Term7MovieCore.Data.Request.CRUDMovie;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -259,6 +260,24 @@ namespace Term7MovieService.Services.Implement
             else if (ErrorList.Any(a => a.Status == false))
                 response.Message = "Some movie was failed while adding";
             else response.Message = "Successfully";
+            return response;
+        }
+
+        public async Task<ParentResponse> UpdateMovie(MovieUpdateRequest request)
+        {
+            ParentResponse response = new ParentResponse();
+            try
+            {
+                if (await movieRepository.UpdateMovie(request))
+                    response.Message = "Succesful";
+                else response.Message = "Some of category was failed while updating movie";
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message == "DBCONNECTION")
+                    response.Message = "Data storage unaccessible.";
+                else response.Message = "Failed to update this movie";
+            }
             return response;
         }
     }

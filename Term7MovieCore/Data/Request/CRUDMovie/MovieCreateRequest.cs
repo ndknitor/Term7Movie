@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Term7MovieCore.Data.Request
+namespace Term7MovieCore.Data.Request.CRUDMovie
 {
     public class MovieCreateRequest
     {
