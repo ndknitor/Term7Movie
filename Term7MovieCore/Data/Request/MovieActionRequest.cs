@@ -11,6 +11,8 @@ namespace Term7MovieCore.Data.Request
 
         public int movieId { get; set; }
 
-        public int pageIndex { get; set; }
+        public int PageSize { get; set; }
+        public int PageIndex { get; set; }
+        public string SearchKey { get; set; }
     }
 }

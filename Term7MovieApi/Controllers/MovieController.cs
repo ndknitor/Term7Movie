@@ -41,14 +41,38 @@ namespace Term7MovieApi.Controllers
             if (request.Action == "latest")
                 return await GetEightLatestMovies();
             if (request.Action == "page")
-                return await GetMoviesPaging(request.pageIndex);
+            {
+                ParentFilterRequest pfr = new ParentFilterRequest()
+                {
+                    Page = request.PageIndex,
+                    PageSize = request.PageSize,
+                    SearchKey = request.SearchKey
+                };
+                return await GetAllMovie(pfr);
+            }
+                
             if (request.Action == "detail")
                 return await GetMovieDetailById(request.movieId);
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateMovie(MovieCreateRequest[] request)
+        {
+            try
+            {
+                var response = await _movieService.CreateMovieWithoutBusinessLogic(request);
+                return Ok(response);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return BadRequest(new ParentResponse { Message = "Business Logic went wrong." });
+            }
+        }
+
         /* ---------------- START PRIVATE METHODS ----------------- */
-        //i have used too many brain cell for this lol if i get it wrong then sorry
+        //I have used too many brain cell for this lol if i get it wrong then sorry
         private async Task<IActionResult> GetIncomingMovies()
         {
             //chưa dùng đến. (để dự phòng thôi)
