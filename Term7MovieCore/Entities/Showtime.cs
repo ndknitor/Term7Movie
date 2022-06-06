@@ -11,6 +11,8 @@ namespace Term7MovieCore.Entities
         [Required]
         public int RoomId { set; get; }
         public Room Room { set; get; }
+        public int? TheaterId { set; get; }
+        public Theater Theater { set; get; }
         [Required]
         public DateTime StartTime { set; get; }
         [Required]

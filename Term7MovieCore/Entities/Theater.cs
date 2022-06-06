@@ -22,5 +22,6 @@ namespace Term7MovieCore.Entities
         public User Manager { set; get; }
         public bool Status { set; get; }
         public ICollection<Room> Rooms { set; get; }
+        public ICollection<Showtime> Showtimes { set; get; }
     }
 }

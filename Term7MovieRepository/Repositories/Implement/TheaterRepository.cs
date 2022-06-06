@@ -50,6 +50,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
             return list;
         }
+
         public async Task<TheaterDto> GetTheaterByIdAsync(int id)
         {
             TheaterDto theater = null;

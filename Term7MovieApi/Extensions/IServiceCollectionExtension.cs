@@ -25,6 +25,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ILocationService, LocationService>();
 
+            services.AddScoped<IShowtimeService, ShowtimeService>();
+
             return services;
         }
 
