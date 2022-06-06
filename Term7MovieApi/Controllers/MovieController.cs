@@ -61,7 +61,8 @@ namespace Term7MovieApi.Controllers
         {
             try
             {
-                var response = await _movieService.CreateMovieWithoutBusinessLogic(request);
+                //var response = await _movieService.CreateMovieWithoutBusinessLogic(request);
+                var response = await _movieService.CreateMovie(request);
                 return Ok(response);
             }
             catch(Exception ex)

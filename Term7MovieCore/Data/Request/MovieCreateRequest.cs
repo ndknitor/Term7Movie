@@ -18,5 +18,6 @@ namespace Term7MovieCore.Data.Request
         [Required]
         public string Description { get; set; }
         public int? DirectorId { get; set; }
+        public int[] CategoryIDs { get; set; }
     }
 }

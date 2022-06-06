@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data.Request;
 using Dapper;
 using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto.Errors;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -235,7 +236,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception();
+                return null;
             List<MovieType> result = new List<MovieType>();
             var query = _context.MovieCategories
                                         .Include(a => a.Category)
@@ -248,5 +249,54 @@ namespace Term7MovieRepository.Repositories.Implement
             return result;
         }
         /* ------------- END QUERYING MOVIE FOR DETAIL ----------------------- */
+
+        /* ------------- START CREATING MOVIE ------------------------- */
+        public async Task<CreateMovieError> CreateMovieWithCategory(MovieCreateRequest request)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            CreateMovieError result = new CreateMovieError();
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                Movie movie = new Movie();
+                movie.Title = request.Title;
+                movie.ReleaseDate = request.ReleasedDate;
+                movie.Duration = request.Duration;
+                movie.RestrictedAge = request.RestrictedAge;
+                movie.PosterImageUrl = request.PosterImgURL;
+                movie.CoverImageUrl = request.CoverImgURL;
+                movie.TrailerUrl = request.TrailerURL;
+                movie.Description = request.Description;
+                movie.DirectorId = request.DirectorId;
+                await _context.Movies.AddAsync(movie);
+                await _context.SaveChangesAsync();
+                foreach(int cateID in request.CategoryIDs)
+                {
+                    Category category = await _context.Categories.FindAsync(cateID);
+                    if(category == null && result.Status == true)
+                    {
+                        result.Status = false;
+                        continue;
+                    }
+                    MovieCategory mc = new MovieCategory();
+                    mc.MovieId = movie.Id;
+                    mc.CategoryId = category.Id;
+                    await _context.MovieCategories.AddAsync(mc);
+                    await _context.SaveChangesAsync();
+                }
+                result.MovieId = movie.Id;
+                result.Title = movie.Title;
+                if (result.Status) result.Message = "Successfully added this film";
+                return result;
+            }
+            catch(Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /* ------------- END CREATING MOVIE --------------------------- */
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Response.Movie;
 
 namespace Term7MovieService.Services.Interface
 {
@@ -16,5 +17,7 @@ namespace Term7MovieService.Services.Interface
         Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId);
 
         Task<ParentResponse> CreateMovieWithoutBusinessLogic(MovieCreateRequest[] requests);
+
+        Task<MovieCreateResponse> CreateMovie(MovieCreateRequest[] requests);
     }
 }

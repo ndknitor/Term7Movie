@@ -3,9 +3,11 @@ using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Entities;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Errors;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieCore.Data.Options;
+using Term7MovieCore.Data.Response.Movie;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -224,6 +226,40 @@ namespace Term7MovieService.Services.Implement
                 throw new Exception(ex.Message);
             }
             
+        }
+
+        public async Task<MovieCreateResponse> CreateMovie(MovieCreateRequest[] requests)
+        {
+            MovieCreateResponse response = new MovieCreateResponse();
+            List<CreateMovieError> ErrorList = new List<CreateMovieError>();
+            foreach(var movie in requests)
+            {
+                try
+                {
+                    CreateMovieError error = await movieRepository.CreateMovieWithCategory(movie);
+                    if (error == null)
+                        return null;
+                    if (!error.Status)
+                        error.Message = "Some of category was failed to add in this film";
+                    ErrorList.Add(error);
+                }
+                catch
+                {
+                    CreateMovieError error = new CreateMovieError();
+                    error.Title = movie.Title;
+                    error.Status = false;
+                    error.Message = "Failed to create this movie";
+                    ErrorList.Add(error);
+                    continue;
+                }
+            }
+            response.Reports = ErrorList;
+            if (ErrorList.All(a => a.Status == false))
+                response.Message = "All movie was failed while adding";
+            else if (ErrorList.Any(a => a.Status == false))
+                response.Message = "Some movie was failed while adding";
+            else response.Message = "Successfully";
+            return response;
         }
     }
 }
