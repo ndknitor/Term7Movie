@@ -53,10 +53,24 @@ namespace Term7MovieRepository.Repositories.Implement
             Movie movie = await _context.Movies.FindAsync(id);
             return movie;
         }
-        public async Task CreateMovie(Movie movie)
+        public async Task<bool> CreateMovie(IEnumerable<Movie> movie)
         {
-            await _context.Movies.AddAsync(movie);
-            //return count;
+            if (!await _context.Database.CanConnectAsync())
+                //throw new Exception();
+                return false;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await _context.Movies.AddRangeAsync(movie);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+                //return false;
+            }
         }
         public async Task UpdateMovie(Movie movie)
         {

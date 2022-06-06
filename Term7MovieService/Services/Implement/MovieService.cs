@@ -37,7 +37,7 @@ namespace Term7MovieService.Services.Implement
             IMovieRepository movierepo = _unitOfWork.MovieRepository;
             if (movierepo == null) 
                 return new IncomingMovieResponse { Message = "REPOSITORY NULL" };
-            IEnumerable<Movie> rawData = await movierepo.GetLessThanThreeLosslessLatestMovies();
+            IEnumerable<Movie> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
             if (!rawData.Any()) 
                 return new IncomingMovieResponse { Message = "DATABASE IS EMPTY" };
 
@@ -65,7 +65,7 @@ namespace Term7MovieService.Services.Implement
             IMovieRepository movierepo = _unitOfWork.MovieRepository;
             if (movierepo == null)
                 return new MovieHomePageResponse { Message = "REPOSITORY NULL" };
-            IEnumerable<Movie> rawData = await movierepo.GetEightLatestMovies();
+            IEnumerable<Movie> rawData = await movieRepository.GetEightLatestMovies();
             if (!rawData.Any())
                 return new MovieHomePageResponse { Message = "DATABASE IS EMPTY" };
 
@@ -77,7 +77,7 @@ namespace Term7MovieService.Services.Implement
             {
                 movieIds[j] = rawData.ElementAt(j).Id;
             }
-            Dictionary<int, IEnumerable<MovieType>> categories = await movierepo.GetCategoriesFromMovieList(movieIds);
+            Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
             //The code below effect RAM only
             bool DoesItNull = false;
             MovieHomePageResponse mhpr = new MovieHomePageResponse();
@@ -107,11 +107,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<TemptMoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest request)
         {
-            IMovieRepository movieRepo = _unitOfWork.MovieRepository;
-            //checking singleton went wrong
-            if (movieRepo == null)
-                return new TemptMoviePagingResponse { Message = "REPOSITORY IS NULL" };
-            IEnumerable<Movie> rawData = await movieRepo.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize);
+            IEnumerable<Movie> rawData = await movieRepository.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize);
             //checking database connection
             if (rawData == null)
                 return new TemptMoviePagingResponse { Message = "Page index is smaller than 1" };
@@ -119,7 +115,7 @@ namespace Term7MovieService.Services.Implement
             if (!rawData.Any())
                 return new TemptMoviePagingResponse { Message = "Empty Data" };
             //checking input logical
-            int maxpage = movieRepo.Count() / 16 + 1;
+            int maxpage = movieRepository.Count() / 16 + 1;
             if (request.PageIndex > maxpage) //madness shit
                 return new TemptMoviePagingResponse { Message = "Page index is more than total page" };
 
@@ -130,7 +126,7 @@ namespace Term7MovieService.Services.Implement
             {
                 movieIds[j] = rawData.ElementAt(j).Id;
             }
-            Dictionary<int, IEnumerable<MovieType>> categories = await movieRepo.GetCategoriesFromMovieList(movieIds);
+            Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
             //The code below effect RAM only
             bool DoesItNull = false;
             List<MovieDTO> list = new List<MovieDTO>();
@@ -161,11 +157,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId)
         {
-            IMovieRepository movieRepo = _unitOfWork.MovieRepository;
-            //checking singleton went wrong
-            if (movieRepo == null)
-                return new MovieDetailResponse { Message = "REPOSITORY IS NULL" };
-            Movie rawData = await movieRepo.GetMovieById(movieId);
+            Movie rawData = await movieRepository.GetMovieById(movieId);
             //checking if there is any data in database
             if (rawData == null)
                 return new MovieDetailResponse { Message = "Movie not found" };
@@ -186,7 +178,7 @@ namespace Term7MovieService.Services.Implement
             mdr.MovieDetail = dto;
             //Sublime text 4 is the best. for this damn situation
             //checking if there is any categories for this movie
-            IEnumerable<MovieType> categories = await movieRepo.GetCategoryFromSpecificMovieId(rawData.Id);
+            IEnumerable<MovieType> categories = await movieRepository.GetCategoryFromSpecificMovieId(rawData.Id);
             if (!categories.Any())
             {
                 mdr.Message = "No category was found for this movie.";
@@ -196,6 +188,42 @@ namespace Term7MovieService.Services.Implement
             mdr.Message = "Successful";
             return mdr;
                 
+        }
+
+        public async Task<ParentResponse> CreateMovieWithoutBusinessLogic(MovieCreateRequest[] requests)
+        {
+            List<Movie> Movies = new List<Movie>();
+            foreach(var request in requests)
+            {
+                Movie movie = new Movie();
+                movie.Title = request.Title;
+                movie.ReleaseDate = request.ReleasedDate;
+                movie.Duration = request.Duration;
+                movie.RestrictedAge = request.RestrictedAge;
+                movie.PosterImageUrl = request.PosterImgURL;
+                movie.CoverImageUrl = request.CoverImgURL;
+                movie.TrailerUrl = request.TrailerURL;
+                movie.Description = request.Description;
+                movie.DirectorId = request.DirectorId;
+                Movies.Add(movie);
+            }
+            ParentResponse father = new ParentResponse();
+            try
+            {
+                bool result = await movieRepository.CreateMovie(Movies);
+                if (result)
+                {
+                    father.Message = "Successful";
+                    return father;
+                }
+                father.Message = "Create Movie Failed";
+                return father;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
         }
     }
 }
