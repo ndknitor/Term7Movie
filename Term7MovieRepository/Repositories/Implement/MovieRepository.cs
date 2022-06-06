@@ -272,7 +272,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.DirectorId = request.DirectorId;
                 await _context.Movies.AddAsync(movie);
                 await _context.SaveChangesAsync();
-                foreach(int cateID in request.CategoryIDs)
+                foreach(int cateID in request.CategoryIDs.Distinct()) //thank for reminding me to validate duplicated cateid
+                    //but am too lazy for that :D
                 {
                     Category category = await _context.Categories.FindAsync(cateID);
                     if(category == null && result.Status == true)

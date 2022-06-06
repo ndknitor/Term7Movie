@@ -193,6 +193,8 @@ namespace Term7MovieService.Services.Implement
                 
         }
 
+        /* --------------------- START CUD MOVIE ------------- */
+
         public async Task<ParentResponse> CreateMovieWithoutBusinessLogic(MovieCreateRequest[] requests)
         {
             List<Movie> Movies = new List<Movie>();
@@ -280,5 +282,18 @@ namespace Term7MovieService.Services.Implement
             }
             return response;
         }
+
+        /* --------------------- END CUD MOVIE ------------- */
+
+        /* --------------------- START PRIVATE FUNCTION -------------- */
+        private bool CheckingCreateMovieRequest(MovieCreateRequest[] Requests)
+        {
+            foreach(var request in Requests)
+            {
+                foreach(int cateid in request.CategoryIDs)
+            }
+        }
+
+        /* --------------------- END PRIVATE FUNCTION ------------ */
     }
 }
