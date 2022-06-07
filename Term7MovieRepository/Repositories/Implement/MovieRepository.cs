@@ -321,8 +321,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.CoverImageUrl = request.CoverImgURL;
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
-                movie.DirectorId = request.DirectorId;
-                //movie.ExternalId = null;
+                //movie.DirectorId = request.DirectorId;
+                movie.ExternalId = null;
                 _context.Update(movie);
                 await _context.SaveChangesAsync();
                 //dark dark buh buh

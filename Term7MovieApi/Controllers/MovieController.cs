@@ -78,6 +78,7 @@ namespace Term7MovieApi.Controllers
         {
             try
             {
+                //_logger.LogInformation(string.Join("", request.CategoryIDs));
                 var result = await _movieService.UpdateMovie(request);
                 return Ok(result);
             }

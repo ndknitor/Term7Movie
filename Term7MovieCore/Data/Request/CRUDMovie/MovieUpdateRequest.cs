@@ -16,15 +16,15 @@ namespace Term7MovieCore.Data.Request.CRUDMovie
         [Required]
         [Range(1, int.MaxValue)]
         public int Duration { get; set; }
-        [Range(1, 100)]
+        [Range(1, int.MaxValue)]
         public int? RestrictedAge { get; set; }
         public string PosterImgURL { get; set; }
         public string CoverImgURL { get; set; }
         public string TrailerURL { get; set; }
         [Required]
         public string Description { get; set; }
-        [Range(1, int.MaxValue)]
-        public int? DirectorId { get; set; }
-        public int[] CategoryIDs { get; set; }
+        //[Range(1, int.MaxValue)]
+        //public int? DirectorId { get; set; } = null;
+        public int[] CategoryIDs { get; set; } = null;
     }
 }
