@@ -22,5 +22,11 @@ namespace Term7MovieService.Services.Interface
         Task<MovieCreateResponse> CreateMovie(MovieCreateRequest[] requests);
 
         Task<ParentResponse> UpdateMovie(MovieUpdateRequest request);
+
+        IncomingMovieResponse FakeIncomingMovie();
+
+        MovieHomePageResponse FakeShowingMovie();
+
+        MovieDetailResponse FakeDetailMovieFor69(int movieId = 69);
     }
 }
