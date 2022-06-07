@@ -8,7 +8,7 @@ namespace Term7MovieCore.Data.Dto.Errors
 {
     public class CreateMovieError
     {
-        public int MovieId { get; set; }
+        //public int MovieId { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
         public bool Status { get; set; } = true;

@@ -71,9 +71,9 @@ namespace Term7MovieCore.Entities
             builder.Entity<MovieRating>()
                 .HasKey(mr => new { mr.MovieId, mr.UserId });
 
-            builder.Entity<Movie>()
-                .HasIndex(m => m.ExternalId)
-                .IsUnique();
+            // builder.Entity<Movie>()
+            //    .HasIndex(m => m.ExternalId)
+            //    .IsUnique();
 
             builder.Entity<Movie>()
                 .Property(m => m.TrailerUrl)

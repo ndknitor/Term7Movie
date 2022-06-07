@@ -14,7 +14,7 @@ namespace Term7MovieRepository.Repositories.Implement
 {
     public class MovieRepository : IMovieRepository
     {
-
+        private const int Index = -1;
         private AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
 
@@ -269,14 +269,14 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.CoverImageUrl = request.CoverImgURL;
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
-                movie.DirectorId = request.DirectorId;
+                //movie.DirectorId = request.DirectorId;
                 await _context.Movies.AddAsync(movie);
                 await _context.SaveChangesAsync();
-                foreach(int cateID in request.CategoryIDs.Distinct()) //thank for reminding me to validate duplicated cateid
-                    //but am too lazy for that :D
+                foreach (int cateID in request.CategoryIDs.Distinct()) //thank for reminding me to validate duplicated cateid
+                                                                       //but am too lazy for that :D
                 {
                     Category category = await _context.Categories.FindAsync(cateID);
-                    if(category == null && result.Status == true)
+                    if (category == null)
                     {
                         result.Status = false;
                         continue;
@@ -287,12 +287,13 @@ namespace Term7MovieRepository.Repositories.Implement
                     await _context.MovieCategories.AddAsync(mc);
                     await _context.SaveChangesAsync();
                 }
-                result.MovieId = movie.Id;
+                await transaction.CommitAsync();
+                //result.MovieId = movie.Id;
                 result.Title = movie.Title;
                 if (result.Status) result.Message = "Successfully added this film";
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 transaction.Rollback();
                 throw new Exception(ex.Message);
@@ -320,6 +321,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
                 movie.DirectorId = request.DirectorId;
+                movie.ExternalId = null;
                 _context.Update(movie);
                 await _context.SaveChangesAsync();
                 //dark dark buh buh
@@ -340,6 +342,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     await _context.MovieCategories.AddAsync(mc);
                     await _context.SaveChangesAsync();
                 }
+                await transaction.CommitAsync();
                 return DoesItGood;
             }
             catch(Exception ex)
@@ -349,5 +352,20 @@ namespace Term7MovieRepository.Repositories.Implement
             }
         }
         /* ----------------- END UPDATE MOVIE ---------------------- */
+
+        /* ----------------- START PRIVATE FUNCTION ------------------ */
+        private async Task<int> GetExternalId() //Don't use it
+        {
+            //it gonna cost medium performance for this but i have no choice
+            for(int i = 1; i <= int.MaxValue; i++)
+            {
+                var movie = _context.Movies.FirstOrDefault(a => a.Id == i);
+                if (movie == null) return i;
+            }
+            return Index;
+        }
+
+        /* ----------------- END PRIVATE FUNCTION --------------------- */
+
     }
 }

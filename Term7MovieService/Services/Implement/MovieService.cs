@@ -209,7 +209,7 @@ namespace Term7MovieService.Services.Implement
                 movie.CoverImageUrl = request.CoverImgURL;
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
-                movie.DirectorId = request.DirectorId;
+                //movie.DirectorId = request.DirectorId;
                 Movies.Add(movie);
             }
             ParentResponse father = new ParentResponse();
@@ -235,7 +235,7 @@ namespace Term7MovieService.Services.Implement
         {
             MovieCreateResponse response = new MovieCreateResponse();
             List<CreateMovieError> ErrorList = new List<CreateMovieError>();
-            foreach(var movie in requests)
+            foreach (var movie in requests)
             {
                 try
                 {
@@ -246,12 +246,12 @@ namespace Term7MovieService.Services.Implement
                         error.Message = "Some of category was failed to add in this film";
                     ErrorList.Add(error);
                 }
-                catch
+                catch (Exception ex)
                 {
                     CreateMovieError error = new CreateMovieError();
                     error.Title = movie.Title;
                     error.Status = false;
-                    error.Message = "Failed to create this movie";
+                    error.Message = ex.Message;
                     ErrorList.Add(error);
                     continue;
                 }
@@ -286,13 +286,6 @@ namespace Term7MovieService.Services.Implement
         /* --------------------- END CUD MOVIE ------------- */
 
         /* --------------------- START PRIVATE FUNCTION -------------- */
-        private bool CheckingCreateMovieRequest(MovieCreateRequest[] Requests)
-        {
-            foreach(var request in Requests)
-            {
-                foreach(int cateid in request.CategoryIDs)
-            }
-        }
 
         /* --------------------- END PRIVATE FUNCTION ------------ */
     }

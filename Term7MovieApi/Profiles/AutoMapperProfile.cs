@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -41,6 +40,10 @@ namespace Term7MovieApi.Profiles
                 .BeforeMap((src, des) => des.Status = true);
 
             CreateMap<TheaterUpdateRequest, Theater>();
+
+            CreateMap<ShowtimeCreateRequest, Showtime>();
+
+            CreateMap<ShowtimeUpdateRequest, Showtime>();
         }          
     }
 }
