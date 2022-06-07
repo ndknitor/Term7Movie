@@ -89,5 +89,23 @@ namespace Term7MovieRepository.Repositories.Implement
 
             dbRoom.Status = false;
         }
+
+        public async Task<bool> CheckRoomExist(long managerId, int theaterId, int roomId)
+        {
+            bool isExist = false;
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " SELECT 1 " +
+                    " FROM Theaters t JOIN Rooms r ON t.Id = r.TheaterId " +
+                    " WHERE t.ManagerId = @managerId AND t.Id = @theaterId AND r.Id = @roomId ";
+
+                object param = new { managerId, theaterId, roomId };
+                int count = await con.ExecuteScalarAsync<int>(sql, param);
+
+                if (count > 0) isExist = true;
+            }
+            return isExist;
+        }
     }
 }

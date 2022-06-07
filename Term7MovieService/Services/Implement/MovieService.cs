@@ -3,9 +3,12 @@ using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Entities;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Errors;
 using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieCore.Data.Options;
+using Term7MovieCore.Data.Response.Movie;
+using Term7MovieCore.Data.Request.CRUDMovie;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -190,6 +193,8 @@ namespace Term7MovieService.Services.Implement
                 
         }
 
+        /* --------------------- START CUD MOVIE ------------- */
+
         public async Task<ParentResponse> CreateMovieWithoutBusinessLogic(MovieCreateRequest[] requests)
         {
             List<Movie> Movies = new List<Movie>();
@@ -204,7 +209,7 @@ namespace Term7MovieService.Services.Implement
                 movie.CoverImageUrl = request.CoverImgURL;
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
-                movie.DirectorId = request.DirectorId;
+                //movie.DirectorId = request.DirectorId;
                 Movies.Add(movie);
             }
             ParentResponse father = new ParentResponse();
@@ -225,5 +230,63 @@ namespace Term7MovieService.Services.Implement
             }
             
         }
+
+        public async Task<MovieCreateResponse> CreateMovie(MovieCreateRequest[] requests)
+        {
+            MovieCreateResponse response = new MovieCreateResponse();
+            List<CreateMovieError> ErrorList = new List<CreateMovieError>();
+            foreach (var movie in requests)
+            {
+                try
+                {
+                    CreateMovieError error = await movieRepository.CreateMovieWithCategory(movie);
+                    if (error == null)
+                        return null;
+                    if (!error.Status)
+                        error.Message = "Some of category was failed to add in this film";
+                    ErrorList.Add(error);
+                }
+                catch (Exception ex)
+                {
+                    CreateMovieError error = new CreateMovieError();
+                    error.Title = movie.Title;
+                    error.Status = false;
+                    error.Message = ex.Message;
+                    ErrorList.Add(error);
+                    continue;
+                }
+            }
+            response.Reports = ErrorList;
+            if (ErrorList.All(a => a.Status == false))
+                response.Message = "All movie was failed while adding";
+            else if (ErrorList.Any(a => a.Status == false))
+                response.Message = "Some movie was failed while adding";
+            else response.Message = "Successfully";
+            return response;
+        }
+
+        public async Task<ParentResponse> UpdateMovie(MovieUpdateRequest request)
+        {
+            ParentResponse response = new ParentResponse();
+            try
+            {
+                if (await movieRepository.UpdateMovie(request))
+                    response.Message = "Succesful";
+                else response.Message = "Some of category was failed while updating movie";
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message == "DBCONNECTION")
+                    response.Message = "Data storage unaccessible.";
+                else response.Message = "Failed to update this movie";
+            }
+            return response;
+        }
+
+        /* --------------------- END CUD MOVIE ------------- */
+
+        /* --------------------- START PRIVATE FUNCTION -------------- */
+
+        /* --------------------- END PRIVATE FUNCTION ------------ */
     }
 }

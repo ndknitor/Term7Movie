@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Term7MovieApi.Extensions;
 using Term7MovieApi.Profiles;
+using Term7MovieApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,7 @@ var config = builder.Configuration;
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection"), b => b.MigrationsAssembly("Term7MovieApi")));

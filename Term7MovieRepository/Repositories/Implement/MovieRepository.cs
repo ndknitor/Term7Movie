@@ -7,12 +7,14 @@ using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data.Request;
 using Dapper;
 using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto.Errors;
+using Term7MovieCore.Data.Request.CRUDMovie;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
     public class MovieRepository : IMovieRepository
     {
-
+        private const int Index = -1;
         private AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
 
@@ -72,15 +74,46 @@ namespace Term7MovieRepository.Repositories.Implement
                 //return false;
             }
         }
-        public async Task UpdateMovie(Movie movie)
+
+        public async Task<bool> UpdateMovie(Movie movie)
         {
-            _context.Movies.Update(movie);
-            await _context.SaveChangesAsync();
+            if (!await _context.Database.CanConnectAsync())
+                //throw new Exception();
+                return false;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                _context.Movies.Update(movie);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+                //return false;
+            }
         }
-        public async Task DeleteMovie(Movie movie)
+
+
+        public async Task<bool> DeleteMovie(Movie movie)
         {
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
+            if (!await _context.Database.CanConnectAsync())
+                //throw new Exception();
+                return false;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                _context.Movies.Remove(movie);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+                //return false;
+            }
         }
         public int Count()
         {
@@ -204,7 +237,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception();
+                return null;
             List<MovieType> result = new List<MovieType>();
             var query = _context.MovieCategories
                                         .Include(a => a.Category)
@@ -217,5 +250,123 @@ namespace Term7MovieRepository.Repositories.Implement
             return result;
         }
         /* ------------- END QUERYING MOVIE FOR DETAIL ----------------------- */
+
+        /* ------------- START CREATING MOVIE ------------------------- */
+        public async Task<CreateMovieError> CreateMovieWithCategory(MovieCreateRequest request)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            CreateMovieError result = new CreateMovieError();
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                Movie movie = new Movie();
+                movie.Title = request.Title;
+                movie.ReleaseDate = request.ReleasedDate;
+                movie.Duration = request.Duration;
+                movie.RestrictedAge = request.RestrictedAge;
+                movie.PosterImageUrl = request.PosterImgURL;
+                movie.CoverImageUrl = request.CoverImgURL;
+                movie.TrailerUrl = request.TrailerURL;
+                movie.Description = request.Description;
+                //movie.DirectorId = request.DirectorId;
+                movie.ExternalId = null;
+                await _context.Movies.AddAsync(movie);
+                await _context.SaveChangesAsync();
+                foreach (int cateID in request.CategoryIDs.Distinct()) //thank for reminding me to validate duplicated cateid
+                                                                       //but am too lazy for that :D
+                {
+                    Category category = await _context.Categories.FindAsync(cateID);
+                    if (category == null)
+                    {
+                        result.Status = false;
+                        continue;
+                    }
+                    MovieCategory mc = new MovieCategory();
+                    mc.MovieId = movie.Id;
+                    mc.CategoryId = category.Id;
+                    await _context.MovieCategories.AddAsync(mc);
+                    await _context.SaveChangesAsync();
+                }
+                await transaction.CommitAsync();
+                //result.MovieId = movie.Id;
+                result.Title = movie.Title;
+                if (result.Status) result.Message = "Successfully added this film";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception(ex.Message);
+            }
+        }
+        /* ------------- END CREATING MOVIE --------------------------- */
+
+        /* ----------------- START UPDATE MOVIE ---------------------- */
+        public async Task<bool> UpdateMovie(MovieUpdateRequest request)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            bool DoesItGood = true;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                Movie movie = new Movie();
+                movie.Id = request.MovieId;
+                movie.Title = request.Title;
+                movie.ReleaseDate = request.ReleasedDate;
+                movie.Duration = request.Duration;
+                movie.RestrictedAge = request.RestrictedAge;
+                movie.PosterImageUrl = request.PosterImgURL;
+                movie.CoverImageUrl = request.CoverImgURL;
+                movie.TrailerUrl = request.TrailerURL;
+                movie.Description = request.Description;
+                //movie.DirectorId = request.DirectorId;
+                movie.ExternalId = null;
+                _context.Update(movie);
+                await _context.SaveChangesAsync();
+                //dark dark buh buh
+                _context.MovieCategories.RemoveRange(
+                    _context.MovieCategories.Where(a => a.MovieId == movie.Id));
+                await _context.SaveChangesAsync();
+                foreach (int cateID in request.CategoryIDs)
+                {
+                    Category category = await _context.Categories.FindAsync(cateID);
+                    if (category == null && DoesItGood == true)
+                    {
+                        DoesItGood = false;
+                        continue;
+                    }
+                    MovieCategory mc = new MovieCategory();
+                    mc.MovieId = movie.Id;
+                    mc.CategoryId = category.Id;
+                    await _context.MovieCategories.AddAsync(mc);
+                    await _context.SaveChangesAsync();
+                }
+                await transaction.CommitAsync();
+                return DoesItGood;
+            }
+            catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+        /* ----------------- END UPDATE MOVIE ---------------------- */
+
+        /* ----------------- START PRIVATE FUNCTION ------------------ */
+        //private async Task<int> GetExternalId() //Don't use it
+        //{
+        //    //it gonna cost medium performance for this but i have no choice
+        //    for(int i = 1; i <= int.MaxValue; i++)
+        //    {
+        //        var movie = _context.Movies.FirstOrDefault(a => a.Id == i);
+        //        if (movie == null) return i;
+        //    }
+        //    return Index;
+        //}
+
+        /* ----------------- END PRIVATE FUNCTION --------------------- */
+
     }
 }

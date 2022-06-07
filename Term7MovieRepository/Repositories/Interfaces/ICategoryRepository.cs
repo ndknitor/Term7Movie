@@ -4,7 +4,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ICategoryRepository
     {
-        IEnumerable<Category> GetAllCategory();
+        Task<IEnumerable<Category>> GetAllCategory();
 
     }
 }

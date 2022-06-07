@@ -1,20 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using Term7MovieCore.Data.ValidationAttributes;
 
 namespace Term7MovieCore.Data.Request
 {
-    public class RoomUpdateRequest
+    public class ShowtimeCreateRequest
     {
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO)]
-        public int No { set; get; }
+        public int MovieId { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO)]
-        public int NumberOfRow { set; get; }
+        public int RoomId { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO)]
-        public int NumberOfColumn { set; get; }
+        public int TheaterId { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        public bool Status { set; get; }
+        [FutureDatetime(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_START_TIME_NOT_VALID)]
+        public DateTime StartTime { set; get; }
     }
 }

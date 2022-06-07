@@ -10,5 +10,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task CreateRoom(Room room);
         Task UpdateRoom(Room room);
         Task DeleteRoom(int roomId);
+
+        Task<bool> CheckRoomExist(long managerId, int theaterId, int roomId);
     }
 }

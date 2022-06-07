@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Term7MovieCore.Entities;
 
@@ -11,9 +12,10 @@ using Term7MovieCore.Entities;
 namespace Term7MovieApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220606063922_add_showtimes_theaterId")]
+    partial class add_showtimes_theaterId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,7 +179,7 @@ namespace Term7MovieApi.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ExternalId")
+                    b.Property<int>("ExternalId")
                         .HasColumnType("int");
 
                     b.Property<string>("PosterImageUrl")
@@ -204,6 +206,9 @@ namespace Term7MovieApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DirectorId");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
 
                     b.ToTable("Movies");
                 });

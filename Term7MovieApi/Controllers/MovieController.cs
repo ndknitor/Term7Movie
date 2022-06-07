@@ -6,7 +6,7 @@ using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using System.Diagnostics;
-
+using Term7MovieCore.Data.Request.CRUDMovie;
 
 namespace Term7MovieApi.Controllers
 {
@@ -61,13 +61,31 @@ namespace Term7MovieApi.Controllers
         {
             try
             {
-                var response = await _movieService.CreateMovieWithoutBusinessLogic(request);
+                //thế là chúng ta có 2 version ez pz
+                //var response = await _movieService.CreateMovieWithoutBusinessLogic(request);
+                var response = await _movieService.CreateMovie(request);
                 return Ok(response);
             }
             catch(Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Business Logic went wrong." });
+                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
+        {
+            try
+            {
+                //_logger.LogInformation(string.Join("", request.CategoryIDs));
+                var result = await _movieService.UpdateMovie(request);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
             }
         }
 
@@ -123,7 +141,7 @@ namespace Term7MovieApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "oh sh*t not good" });
+                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
             }
         }
 
@@ -140,7 +158,7 @@ namespace Term7MovieApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "oh sh*t not good" });
+                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
             }
         }
 

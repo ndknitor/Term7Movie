@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Term7MovieCore.Data.Request
+namespace Term7MovieCore.Data.Request.CRUDMovie
 {
     public class MovieCreateRequest
     {
@@ -17,6 +17,8 @@ namespace Term7MovieCore.Data.Request
         public string TrailerURL { get; set; }
         [Required]
         public string Description { get; set; }
-        public int? DirectorId { get; set; }
+        //public int? DirectorId { get; set; }
+        [Required]
+        public int[] CategoryIDs { get; set; }
     }
 }

@@ -53,11 +53,14 @@ namespace Term7MovieCore.Data
 
         public const string MESSAGE_NOT_FOUND = "Not found";
         public const string MESSAGE_OPERATION_FAILED = "Operation failed";
+        public const string MESSAGE_FORBIDDEN = "Forbidden";
 
-        public const string CONSTRAIN_REQUEST_MESSAGE_REQUIRED = "Required";
-        public const string CONSTRAIN_REQUEST_MESSAGE_INVALID_FIELD = "Invalid field";
-        public const string CONSTRAIN_REQUEST_MESSAGE_GREATER_THAN_ZERO = "Must be greater than zero";
-        public const string CONSTRANT_REQUEST_MESSAGE_MAX_LENGTH = "Max length {1}";
+        public const string CONSTRAINT_REQUEST_MESSAGE_REQUIRED = "Required";
+        public const string CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD = "Invalid field";
+        public const string CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO = "Must be greater than zero";
+        public const string CONSTRAINT_REQUEST_MESSAGE_MAX_LENGTH = "Max length {1}";
+        public const string CONSTRAINT_REQUEST_MESSAGE_START_TIME_NOT_VALID = "Start time not valid";
+        public const string CONSTRAINT_REQUEST_MESSAGE_END_TIME_NOT_VALID = "End time not valid";
 
         public const int DefaultPageSize = 10;
         public const int DefaultPage = 1;
