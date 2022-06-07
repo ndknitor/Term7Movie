@@ -54,6 +54,7 @@ namespace Term7MovieCore.Data
         public const string MESSAGE_NOT_FOUND = "Not found";
         public const string MESSAGE_OPERATION_FAILED = "Operation failed";
         public const string MESSAGE_FORBIDDEN = "Forbidden";
+        public const string MESSAGE_BAD_REQUEST = "Bad request";
 
         public const string CONSTRAINT_REQUEST_MESSAGE_REQUIRED = "Required";
         public const string CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD = "Invalid field";

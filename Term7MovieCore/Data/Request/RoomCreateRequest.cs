@@ -17,7 +17,5 @@ namespace Term7MovieCore.Data.Request
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD)]
         public int NumberOfColumn { set; get; }
-        [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        public List<SeatDto> Seats { set; get; }
     }
 }
