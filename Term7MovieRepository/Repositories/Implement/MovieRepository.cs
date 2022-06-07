@@ -270,6 +270,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
                 //movie.DirectorId = request.DirectorId;
+                movie.ExternalId = null;
                 await _context.Movies.AddAsync(movie);
                 await _context.SaveChangesAsync();
                 foreach (int cateID in request.CategoryIDs.Distinct()) //thank for reminding me to validate duplicated cateid
@@ -321,7 +322,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
                 movie.DirectorId = request.DirectorId;
-                movie.ExternalId = null;
+                //movie.ExternalId = null;
                 _context.Update(movie);
                 await _context.SaveChangesAsync();
                 //dark dark buh buh
@@ -354,16 +355,16 @@ namespace Term7MovieRepository.Repositories.Implement
         /* ----------------- END UPDATE MOVIE ---------------------- */
 
         /* ----------------- START PRIVATE FUNCTION ------------------ */
-        private async Task<int> GetExternalId() //Don't use it
-        {
-            //it gonna cost medium performance for this but i have no choice
-            for(int i = 1; i <= int.MaxValue; i++)
-            {
-                var movie = _context.Movies.FirstOrDefault(a => a.Id == i);
-                if (movie == null) return i;
-            }
-            return Index;
-        }
+        //private async Task<int> GetExternalId() //Don't use it
+        //{
+        //    //it gonna cost medium performance for this but i have no choice
+        //    for(int i = 1; i <= int.MaxValue; i++)
+        //    {
+        //        var movie = _context.Movies.FirstOrDefault(a => a.Id == i);
+        //        if (movie == null) return i;
+        //    }
+        //    return Index;
+        //}
 
         /* ----------------- END PRIVATE FUNCTION --------------------- */
 
