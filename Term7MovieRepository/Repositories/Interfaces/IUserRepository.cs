@@ -14,5 +14,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<User> GetUserByIdAsync(long id);
 
         Task<User> GetUserWithRoleByIdAsync(long id);
+
+        Task<User> GetUserById(int id);
     }
 }

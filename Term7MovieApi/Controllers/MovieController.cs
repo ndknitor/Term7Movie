@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data.Response;
@@ -34,25 +34,25 @@ namespace Term7MovieApi.Controllers
 
         //lmao
         [HttpGet]//tôi mất 25p chỉ để hiểu rằng t sẽ làm thế này (:
-        public async Task<IActionResult> GetMoviesForSpecificAction([FromQuery] MovieActionRequest request)
+        public IActionResult GetMoviesForSpecificAction([FromQuery] MovieActionRequest request)
         {
             if (request.Action == "incoming")
-                return await GetIncomingMovies();
+                return GetIncomingMovies();
             if (request.Action == "latest")
-                return await GetEightLatestMovies();
-            if (request.Action == "page")
-            {
-                ParentFilterRequest pfr = new ParentFilterRequest()
-                {
-                    Page = request.PageIndex,
-                    PageSize = request.PageSize,
-                    SearchKey = request.SearchKey
-                };
-                return await GetAllMovie(pfr);
-            }
+                return GetEightLatestMovies();
+            //if (request.Action == "page")
+            //{
+            //    ParentFilterRequest pfr = new ParentFilterRequest()
+            //    {
+            //        Page = request.PageIndex,
+            //        PageSize = request.PageSize,
+            //        SearchKey = request.SearchKey
+            //    };
+            //    return await GetAllMovie(pfr);
+            //}
                 
             if (request.Action == "detail")
-                return await GetMovieDetailById(request.movieId);
+                return GetMovieDetailById(request.movieId);
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 
@@ -61,10 +61,15 @@ namespace Term7MovieApi.Controllers
         {
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 //thế là chúng ta có 2 version ez pz
                 //var response = await _movieService.CreateMovieWithoutBusinessLogic(request);
+                stopwatch.Start();
                 var response = await _movieService.CreateMovie(request);
-                return Ok(response);
+                stopwatch.Stop();
+                //_logger.LogInformation("duration: " + stopwatch.ElapsedMilliseconds);
+                //return Ok(response);
+                return Ok(new ParentResponse { Message = "Cost " + stopwatch.ElapsedMilliseconds + " mili seconds for this action." });
             }
             catch(Exception ex)
             {
@@ -78,9 +83,13 @@ namespace Term7MovieApi.Controllers
         {
             try
             {
+                Stopwatch stopwatch = new Stopwatch();
                 //_logger.LogInformation(string.Join("", request.CategoryIDs));
+                stopwatch.Start();
                 var result = await _movieService.UpdateMovie(request);
-                return Ok(result);
+                stopwatch.Stop();
+                //return Ok(result);
+                return Ok(new ParentResponse { Message = "Cost " + stopwatch.ElapsedMilliseconds + " mili seconds for this action." });
             }
             catch(Exception ex)
             {
@@ -91,75 +100,28 @@ namespace Term7MovieApi.Controllers
 
         /* ---------------- START PRIVATE METHODS ----------------- */
         //I have used too many brain cell for this lol if i get it wrong then sorry
-        private async Task<IActionResult> GetIncomingMovies()
+        private IActionResult GetIncomingMovies()
         {
-            //chưa dùng đến. (để dự phòng thôi)
-            try
-            {
-                var result = await _movieService.GetEightLosslessLatestMovieForHomepage();
-                if (result == null)
-                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
-            }
+            var result = _movieService.FakeIncomingMovie();
+            return Ok(result);
         }
 
-        private async Task<IActionResult> GetEightLatestMovies()
+        private IActionResult GetEightLatestMovies()
         {
-            //sr vì chưa handle lỗi tốt lắm. hmu hmu
-            try
-            {
-                Stopwatch zaWarudo = new Stopwatch();
-                zaWarudo.Start();
-                var result = await _movieService.GetEightLatestMovieForHomepage();
-                zaWarudo.Stop();
-                _logger.LogInformation("The power of Dio has stopped the world for: " + zaWarudo.ElapsedMilliseconds);
-                if (result == null)
-                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
-            }
+            var result = _movieService.FakeShowingMovie();
+            return Ok(result);
         }
 
-        private async Task<IActionResult> GetMoviesPaging(int pageIndex)
+        private IActionResult GetMoviesPaging(int pageIndex)
         {
-            _logger.LogInformation("here is the page index: " + pageIndex);
-            try
-            {
-                MovieListPageRequest mlpr = new MovieListPageRequest() { PageIndex = pageIndex, };
-                var result = await _movieService.GetMovieListFollowPage(mlpr);
-                if (result == null)
-                    return BadRequest(new ParentResponse { Message = "Singleton dead." });
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
-            }
+            return Ok(new ParentResponse { Message = "bảo trì hệ thúm" });
         }
 
 
-        private async Task<IActionResult> GetMovieDetailById(int movieId)
+        private IActionResult GetMovieDetailById(int movieId)
         {
-            try
-            {
-                var result = await _movieService.GetMovieDetailFromMovieId(movieId);
-                if (result == null)
-                    return BadRequest(new ParentResponse { Message = "Singleton dead." });
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
-            }
+            var result = _movieService.FakeDetailMovieFor69();
+            return Ok(result);
         }
 
         /* ------------ END PRIVATE METHODS --------------- */

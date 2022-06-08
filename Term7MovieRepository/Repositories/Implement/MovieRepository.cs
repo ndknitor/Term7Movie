@@ -65,7 +65,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 await _context.Movies.AddRangeAsync(movie);
                 await _context.SaveChangesAsync();
-                transaction.Commit();
+                //transaction.Commit();
                 return true;
             }
             catch(Exception ex)
@@ -85,7 +85,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 _context.Movies.Update(movie);
                 await _context.SaveChangesAsync();
-                transaction.Commit();
+                //transaction.Commit();
                 return true;
             }
             catch (Exception ex)
@@ -106,7 +106,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 _context.Movies.Remove(movie);
                 await _context.SaveChangesAsync();
-                transaction.Commit();
+                //transaction.Commit();
                 return true;
             }
             catch (Exception ex)
@@ -288,7 +288,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     await _context.MovieCategories.AddAsync(mc);
                     await _context.SaveChangesAsync();
                 }
-                await transaction.CommitAsync();
+                //await transaction.CommitAsync();
                 //result.MovieId = movie.Id;
                 result.Title = movie.Title;
                 if (result.Status) result.Message = "Successfully added this film";
@@ -343,7 +343,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     await _context.MovieCategories.AddAsync(mc);
                     await _context.SaveChangesAsync();
                 }
-                await transaction.CommitAsync();
+                //await transaction.CommitAsync();
                 return DoesItGood;
             }
             catch(Exception ex)

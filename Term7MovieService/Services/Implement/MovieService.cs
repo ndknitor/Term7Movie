@@ -288,5 +288,235 @@ namespace Term7MovieService.Services.Implement
         /* --------------------- START PRIVATE FUNCTION -------------- */
 
         /* --------------------- END PRIVATE FUNCTION ------------ */
+
+        /* ------------ START FAKE DATA ZONE ------------------ */
+        public IncomingMovieResponse FakeIncomingMovie()
+        {
+            IncomingMovieResponse response = new IncomingMovieResponse();
+            List<SmallMovieHomePageDTO> list = new List<SmallMovieHomePageDTO>();
+            SmallMovieHomePageDTO dto = new SmallMovieHomePageDTO();
+            dto.MovieId = 2629;
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/2eLVCBcMyDjGi7uxAoGZYKjR1NE.jpg";
+            list.Add(dto);
+            dto.MovieId = 2638;
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/a88afINFZ7afG4PjgRtwG9JdWQ7.jpg";
+            list.Add(dto);
+            dto.MovieId = 2667;
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/2MiG2aG2OrOgnPpbv8xnuS984xQ.jpg";
+            list.Add(dto);
+            response.LosslessMovieList = list;
+            response.Message = "hàng pha ke";
+            return response;
+        }
+
+        public MovieHomePageResponse FakeShowingMovie()
+        {
+            MovieHomePageResponse response = new MovieHomePageResponse();
+            List<MovieDTO> list = new List<MovieDTO>();
+            MovieDTO dto = new MovieDTO();
+            dto.MovieId = 4324;
+            dto.Title = "Be Mine, Valentine";
+            List<MovieType> tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 10770,
+                    CateName = "TV Movie"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 90;
+            dto.ReleaseDate = "Jun 07, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/9ybX2cR1sgSABJbFoWZT0XBK1XB.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/zrNnWwVZTt1nwlrJr7OvqokZYZG.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4327;
+            dto.Title = "As a Prelude to Fear";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 27,
+                    CateName = "Horror"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 97;
+            dto.ReleaseDate = "Jun 07, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/jvUt8hC3K5B6kQ8rXFNhCo1XNDw.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/1JgJo3MU8HcgacjrRYzPrhNMSYz.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4387;
+            dto.Title = "Father of the Bride";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 10749,
+                    CateName = "Romance"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 117;
+            dto.ReleaseDate = "Jun 05, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/oQMqMLIJXZAVMplga9RhDyZInAW.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/aRvwJoqO7121AIpEnIMgP0omNj6.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4418;
+            dto.Title = "Buried In Barstow";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 53,
+                    CateName = "Thriller"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 90;
+            dto.ReleaseDate = "Jun 04, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/xY6smX9kNLNqODRjT7pWwTHpRiH.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/6wnxj7jPpANISwMlfQ0Z09VViYv.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4421;
+            dto.Title = "Hidden Gems";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 10770,
+                    CateName = "TV Movie"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 90;
+            dto.ReleaseDate = "Jun 04, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/4z6k3BuINspRCVEQT5vg2RBj29m.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/vgcxiduPt1siWT5E2QnQDZGNExF.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4424;
+            dto.Title = "Met Opera 2021/22: Brett Dean HAMLET";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 10402,
+                    CateName = "Music"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 195;
+            dto.ReleaseDate = "Jun 04, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/zCdGgTL5LmsmXc0mNUa4zl5cS4w.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/e7Ei7pwkw4X00lZT7QTzJqaB29V.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4450;
+            dto.Title = "Hollywood Stargirl";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 10402,
+                    CateName = "Music"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 90;
+            dto.ReleaseDate = "Jun 03, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/dOxFhcigrZQLlKglX958yjcaCo0.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/jaqb26TPRjyRJmJHMQW2E3eoI56.jpg";
+            list.Add(dto);
+            dto = new MovieDTO();
+
+
+            dto.MovieId = 4460;
+            dto.Title = "Fire Island";
+            tempList = new List<MovieType>()
+            {
+                new MovieType()
+                {
+                    CateId = 35,
+                    CateName = "Comedy"
+                },
+            };
+            dto.Categories = tempList;
+            dto.AgeRestrict = 0;
+            dto.Duration = 105;
+            dto.ReleaseDate = "Jun 03, 2022";
+            dto.CoverImgURL = "https://image.tmdb.org/t/p/w500/iac7xBu5T8hLK4DadOhFzqgglCB.jpg";
+            dto.PosterImgURL = "https://image.tmdb.org/t/p/w500/2vVUdYoqUX5rK8plxPGERGGjQLI.jpg";
+            list.Add(dto);
+            response.movieList = list;
+            response.Message = "Hàng pha ke";
+            return response;
+        }
+
+        public MovieDetailResponse FakeDetailMovieFor69(int movieId = 69)
+        {
+            MovieDetailResponse response = new MovieDetailResponse();
+            MovieDetailDTO dto = new MovieDetailDTO();
+            dto.Id = 69;
+            dto.Title = "Scream: Legacy";
+            dto.ReleaseDate = new DateTime(2022, 3, 25);
+            dto.Duration = 65;
+            dto.RestrictedAge = 0;
+            dto.PosterImageUrl = "https://image.tmdb.org/t/p/w500/CJwKE5dVGCEYB26PXgCSqQqrit.jpg";
+            dto.CoverImageUrl = "";
+            dto.TrailerUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+            dto.Description = "";
+            dto.ViewCount = 1;
+            dto.TotalRating = 5;
+            dto.DirectorId = null;
+            List<MovieType> list = new List<MovieType>()
+            {
+                new MovieType
+                {
+                    CateId = 27,
+                    CateName = "Horror"
+                },
+                new MovieType
+                {
+                    CateId = 53,
+                    CateName = "Thriller"
+                },
+                new MovieType
+                {
+                    CateId = 9648,
+                    CateName = "Mystery"
+                }
+            };
+
+            dto.movieTypes = list;
+
+            response.MovieDetail = dto;
+            response.Message = "Hàng pha ke";
+            return response;
+        }
+        /* ------------ END FAKE DATA ZONE ------------------- */
     }
 }

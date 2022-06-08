@@ -45,6 +45,8 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             User user = await _context.Users.FindAsync(userUpdate.Id);
             user.UserName = userUpdate.UserName;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
         public async Task DeleteUserAsync(long id)
         {
@@ -112,6 +114,14 @@ namespace Term7MovieRepository.Repositories.Implement
                 }
             }
 
+            return user;
+        }
+
+        public async Task<User> GetUserById(int id)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            var user = await _context.Users.FirstOrDefaultAsync(a => a.Id == id);
             return user;
         }
     }
