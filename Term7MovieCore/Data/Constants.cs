@@ -66,6 +66,8 @@ namespace Term7MovieCore.Data
         public const int DefaultPageSize = 10;
         public const int DefaultPage = 1;
 
-        public const string POLICY_ROOM_SAME_THEATER = "OnlyRoomWithSameTheater";
+        public const string POLICY_CREATE_ROOM_SAME_THEATER = "OnlyCreateRoomWithSameTheater";
+        public const string POLICY_UPDATE_ROOM_SAME_THEATER = "OnlyUpdateRoomWithSameTheater";
+        public const string POLICY_DELETE_ROOM_SAME_THEATER = "OnlyDeleteRoomWithSameTheater";
     }
 }

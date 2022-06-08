@@ -48,7 +48,7 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}", Policy = Constants.POLICY_ROOM_SAME_THEATER)]
+        [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_CREATE_ROOM_SAME_THEATER)]
         [HttpPost]
         public async Task<IActionResult> CreateRoom(RoomCreateRequest request)
         {
@@ -61,7 +61,7 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
+        [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_UPDATE_ROOM_SAME_THEATER)]
         [HttpPut]
         public async Task<IActionResult> UpdateRoom(RoomUpdateRequest request)
         {
@@ -74,7 +74,7 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
+        [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_DELETE_ROOM_SAME_THEATER)]
         [HttpDelete("{roomId:int}")]
         public async Task<IActionResult> DeleteRoom(int roomId)
         {
