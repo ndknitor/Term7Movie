@@ -12,5 +12,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task CreateTheaterAsync(Theater theater);
         Task UpdateTheaterAsync(Theater theater);
         Task DeleteTheaterAsync(int id);
+        Task<IEnumerable<TheaterDto>> GetTheaterByManagerIdAsync(long managerId);
     }
 }

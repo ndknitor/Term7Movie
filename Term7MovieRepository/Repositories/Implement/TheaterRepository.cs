@@ -94,6 +94,23 @@ namespace Term7MovieRepository.Repositories.Implement
             theater.Status = false;
         }
 
+        public async Task<IEnumerable<TheaterDto>> GetTheaterByManagerIdAsync(long managerId)
+        {
+            IEnumerable<TheaterDto> theaters = new List<TheaterDto>();
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = 
+                    " SELECT Id " +
+                    " FROM Theaters " +
+                    " WHERE ManagerId = @managerId ";
+                object param = new { managerId };
+                theaters = await con.QueryAsync<TheaterDto>(sql, param);
+            }
+
+            return theaters;
+        }
+
         private string ConcatQueryWithFilter(string query, string count, TheaterFilterRequest request)
         {
             if (request.CompanyId != null)
