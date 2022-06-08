@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Term7MovieApi.Extensions;
-using Term7MovieApi.Requirements;
+using Term7MovieApi.Requirements.RoomRequirement;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Extensions;
 using Term7MovieCore.Data.Request;
@@ -12,7 +12,7 @@ namespace Term7MovieApi.Handlers
     public class GeneralAuthorizationHandler : IAuthorizationHandler
     {
         private readonly IUnitOfWork _unitOfWork;
-        private ILogger<GeneralAuthorizationHandler> _logger;
+        private readonly ILogger<GeneralAuthorizationHandler> _logger;
         public GeneralAuthorizationHandler(ILogger<GeneralAuthorizationHandler>  logger, IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -23,22 +23,35 @@ namespace Term7MovieApi.Handlers
         {
             IEnumerable<Claim> claims = context.User.Claims;
 
+            var httpContext = context.Resource as HttpContext;
+
             var pendingRequirements = context.PendingRequirements.ToList();
             foreach (var requirement in pendingRequirements)
             {
                 switch(requirement)
                 {
-                    case RoomWithSameTheaterRequirement:
+                    case CreateRoomWithSameTheaterRequirement:
 
-                        var httpContext = context.Resource as HttpContext;
+                        RoomCreateRequest roomCreateReq = await httpContext.Request.ToObjectAsync<RoomCreateRequest>();
 
-                        RoomCreateRequest request = await httpContext.Request.ToObjectAsync<RoomCreateRequest>();
+                        if(await IsManagerCreateRoomRequestValid(claims, roomCreateReq)) context.Succeed(requirement);
+                        break;
 
-                        bool valid = await IsManagerRequestValid(claims, request);
-                        
-                        if(valid) context.Succeed(requirement);
+                    case UpdateRoomWithSameTheaterRequirement:
+
+                        RoomUpdateRequest roomUpdateReq = await httpContext.Request.ToObjectAsync<RoomUpdateRequest>();
+
+                        if (await IsManagerUpdateRoomRequestValid(claims, roomUpdateReq)) context.Succeed(requirement);
+                        break;
+
+                    case DeleteRoomWithSameTheaterRequirement:
+
+                        var roomId = httpContext.Request.RouteValues["roomId"];
+
+                        if (await IsManagerUpdateRoomRequestValid(claims, new RoomUpdateRequest { Id = Convert.ToInt32(roomId)})) context.Succeed(requirement);
 
                         break;
+
                 }
             }
         }
@@ -55,7 +68,7 @@ namespace Term7MovieApi.Handlers
         //    }
         //}
 
-        private async Task<bool> IsManagerRequestValid(IEnumerable<Claim> claims, RoomCreateRequest resource)
+        private async Task<bool> IsManagerCreateRoomRequestValid(IEnumerable<Claim> claims, RoomCreateRequest resource)
         {
             long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
 
@@ -66,6 +79,21 @@ namespace Term7MovieApi.Handlers
             var theater = theaters.FirstOrDefault(t => t.Id == resource.TheaterId);
 
             if (theater == null) return false;
+
+            return true;
+        }
+
+        private async Task<bool> IsManagerUpdateRoomRequestValid(IEnumerable<Claim> claims, RoomUpdateRequest resource)
+        {
+            IRoomRepository theaterRepo = _unitOfWork.RoomRepository;
+
+            long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+
+            var rooms = await theaterRepo.GetRoomByManagerIdAsync(managerId);
+
+            var room = rooms.FirstOrDefault(r => r.Id == resource.Id);
+
+            if (room == null) return false;
 
             return true;
         }

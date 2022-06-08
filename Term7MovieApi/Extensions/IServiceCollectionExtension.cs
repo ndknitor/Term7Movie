@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Term7MovieApi.Handlers;
-using Term7MovieApi.Requirements;
+using Term7MovieApi.Requirements.RoomRequirement;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Options;
 using Term7MovieService.Services.Implement;
@@ -54,7 +54,10 @@ namespace Term7MovieApi.Extensions
         {
             services.AddAuthorization(option =>
             {
-                option.AddPolicy(Constants.POLICY_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new RoomWithSameTheaterRequirement()));
+                option.AddPolicy(Constants.POLICY_CREATE_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new CreateRoomWithSameTheaterRequirement()));
+                option.AddPolicy(Constants.POLICY_UPDATE_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new UpdateRoomWithSameTheaterRequirement()));
+                option.AddPolicy(Constants.POLICY_DELETE_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new DeleteRoomWithSameTheaterRequirement()));
+
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();

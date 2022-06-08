@@ -107,5 +107,23 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return isExist;
         }
+
+        public async Task<IEnumerable<RoomDto>> GetRoomByManagerIdAsync(long managerId)
+        {
+            IEnumerable<RoomDto> list = new List<RoomDto>();
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " SELECT r.Id " +
+                    " FROM Theaters t JOIN Rooms r ON t.Id = r.TheaterId " +
+                    " WHERE t.ManagerId = @managerId ";
+
+                object param = new { managerId };
+
+                list = await con.QueryAsync<RoomDto>(sql, param);
+
+            }
+            return list;
+        }
     }
 }
