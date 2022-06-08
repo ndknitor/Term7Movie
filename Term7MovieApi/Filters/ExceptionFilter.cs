@@ -9,7 +9,7 @@ namespace Term7MovieApi.Filters
 {
     public class ExceptionFilter: IExceptionFilter
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ExceptionFilter> _logger;
         public ExceptionFilter(ILogger<ExceptionFilter> logger)
         {
             _logger = logger;

@@ -48,7 +48,7 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}")]
+        [Authorize(Roles = $"{Constants.ROLE_ADMIN}, {Constants.ROLE_MANAGER}", Policy = Constants.POLICY_ROOM_SAME_THEATER)]
         [HttpPost]
         public async Task<IActionResult> CreateRoom(RoomCreateRequest request)
         {

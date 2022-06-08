@@ -65,6 +65,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.ConfigureAuthorization();
 
 builder.Services.AddDistributedRedisCache(option =>
 {
