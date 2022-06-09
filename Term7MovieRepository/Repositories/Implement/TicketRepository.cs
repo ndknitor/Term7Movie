@@ -1,4 +1,5 @@
-﻿using Term7MovieCore.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieRepository.Repositories.Implement
@@ -11,40 +12,52 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
         }
 
-        public IEnumerable<Ticket> GetAllTicketByShowtime(Showtime showtime)
+        public async Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid)
         {
-            IEnumerable<Ticket> list = new List<Ticket>();
+            if(!await _context.Database.CanConnectAsync())
+                return null;
+            List<Ticket> list = new List<Ticket>();
+            var query = _context.Tickets.Where(a => a.ShowTimeId == showtimeid);
+            list = await query.ToListAsync();
             return list;
         }
-        public IEnumerable<Ticket> GetAllTicketByTransactionId(long id)
+        public async Task<IEnumerable<Ticket>> GetAllTicketByTransactionId(Guid id)
         {
+            if(!await _context.Database.CanConnectAsync())
+                return null;
             IEnumerable<Ticket> list = new List<Ticket>();
+            var query = _context.Tickets.Where(a => a.TransactionId == id);
+            list = await query.ToListAsync();
             return list;
         }
-        public Ticket GetTicketById(long id)
+        public async Task<Ticket> GetTicketById(long id)
         {
-            Ticket ticket = null;
+            if(!await _context.Database.CanConnectAsync())
+                return null;
+            Ticket? ticket = await _context.Tickets.FindAsync(id);
             return ticket;
         }
-        public int BuyTicket(long transactionId)
+        public async Task BuyTicket(long transactionId)
         {
-            int count = 0;
-            return count;
+            throw new NotImplementedException();
         }
-        public int CreateTicket(Ticket ticket)
+        public async Task CreateTicket(Ticket ticket)
         {
-            int count = 0;
-            return count;
+            if (!await _context.Database.CanConnectAsync())
+                return;
+            await _context.Tickets.AddAsync(ticket);
+            await _context.SaveChangesAsync();
         }
-        public int CreateTicket(Ticket[] tickets)
+        public async Task CreateTicket(Ticket[] tickets)
         {
-            int count = 0;
-            return count;
+            if (!await _context.Database.CanConnectAsync())
+                return;
+            await _context.Tickets.AddRangeAsync(tickets);
+            await _context.SaveChangesAsync();
         }
-        public int DeleteExpiredTicket()
+        public async Task DeleteExpiredTicket()
         {
-            int count = 0;
-            return count;
+            throw new NotImplementedException();
         }
     }
 }

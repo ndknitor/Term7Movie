@@ -2,7 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Term7MovieCore.Data.Request.CRUDMovie
+namespace Term7MovieCore.Data.Request.Movie
 {
     public class MovieUpdateRequest
     {

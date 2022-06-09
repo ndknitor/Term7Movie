@@ -8,7 +8,8 @@ using Term7MovieCore.Data.Request;
 using Dapper;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
+using Term7MovieCore.Data.Dto.Movie;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -34,7 +35,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
                     " FROM Movies " +
                     " WHERE ReleaseDate BETWEEN ( GETDATE() - 30) AND (GETDATE() + 30) " +
-                    " ORDER BY ReleaseDate DESC " +
+                    " ORDER BY Id " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
                 string count = " SELECT COUNT(1) FROM Movies ";

@@ -8,7 +8,8 @@ using Term7MovieService.Services.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Response.Movie;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
+using Term7MovieCore.Data.Dto.Movie;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -517,6 +518,7 @@ namespace Term7MovieService.Services.Implement
             response.Message = "Hàng pha ke";
             return response;
         }
+
         /* ------------ END FAKE DATA ZONE ------------------- */
     }
 }

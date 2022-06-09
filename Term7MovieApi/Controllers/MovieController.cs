@@ -6,7 +6,7 @@ using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using System.Diagnostics;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
 
 namespace Term7MovieApi.Controllers
 {
@@ -50,11 +50,19 @@ namespace Term7MovieApi.Controllers
             //    };
             //    return await GetAllMovie(pfr);
             //}
-                
-            if (request.Action == "detail")
-                return GetMovieDetailById(request.movieId);
+
+            //if (request.Action == "detail")
+            //    return GetMovieDetailById(request.movieId);
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
+
+        [HttpGet("{id:int}")]
+        public IActionResult GetMoviesDetailFromID(int id)
+        {
+            var result = _movieService.FakeDetailMovieFor69();
+            return Ok(result);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CreateMovie(MovieCreateRequest[] request)
@@ -115,13 +123,6 @@ namespace Term7MovieApi.Controllers
         private IActionResult GetMoviesPaging(int pageIndex)
         {
             return Ok(new ParentResponse { Message = "bảo trì hệ thúm" });
-        }
-
-
-        private IActionResult GetMovieDetailById(int movieId)
-        {
-            var result = _movieService.FakeDetailMovieFor69();
-            return Ok(result);
         }
 
         /* ------------ END PRIVATE METHODS --------------- */
