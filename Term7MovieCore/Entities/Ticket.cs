@@ -9,7 +9,7 @@ namespace Term7MovieCore.Entities
         [Required]
         public long SeatId { get; set; }
         public Seat Seat { set; get; }
-        public long? TransactionId { get; set; }
+        public Guid? TransactionId { get; set; }
         public Transaction Transaction { set; get; }
         public long? ShowTimeId { get; set; }
         public Showtime ShowTime { set; get; }
