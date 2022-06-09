@@ -5,7 +5,7 @@ namespace Term7MovieCore.Entities
     public class TransactionHistory
     {
         public long Id { get; set; }
-        public long TransactionId { get; set; }
+        public Guid TransactionId { get; set; }
         public long UserId { set; get; }
         public User User { get; set; }
         public int MovieId { set; get; }

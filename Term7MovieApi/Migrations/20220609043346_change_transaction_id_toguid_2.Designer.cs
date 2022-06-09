@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Term7MovieCore.Entities;
 
@@ -11,9 +12,10 @@ using Term7MovieCore.Entities;
 namespace Term7MovieApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220609043346_change_transaction_id_toguid_2")]
+    partial class change_transaction_id_toguid_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,7 +105,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Actors", (string)null);
+                    b.ToTable("Actors");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Category", b =>
@@ -120,7 +122,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Director", b =>
@@ -137,7 +139,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Directors", (string)null);
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Language", b =>
@@ -154,7 +156,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages", (string)null);
+                    b.ToTable("Languages");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Movie", b =>
@@ -205,7 +207,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("DirectorId");
 
-                    b.ToTable("Movies", (string)null);
+                    b.ToTable("Movies");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.MovieActor", b =>
@@ -220,7 +222,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("ActorId");
 
-                    b.ToTable("MovieActors", (string)null);
+                    b.ToTable("MovieActors");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.MovieCategory", b =>
@@ -235,7 +237,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("MovieCategories", (string)null);
+                    b.ToTable("MovieCategories");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.MovieLanguage", b =>
@@ -250,7 +252,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("LanguageId");
 
-                    b.ToTable("MovieLanguages", (string)null);
+                    b.ToTable("MovieLanguages");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.MovieRating", b =>
@@ -268,7 +270,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("MovieRating", (string)null);
+                    b.ToTable("MovieRating");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.PromotionCode", b =>
@@ -313,7 +315,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("PromotionTypeId");
 
-                    b.ToTable("PromotionCode", (string)null);
+                    b.ToTable("PromotionCode");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.PromotionType", b =>
@@ -332,7 +334,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PromotionType", (string)null);
+                    b.ToTable("PromotionType");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.RefreshToken", b =>
@@ -366,7 +368,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Role", b =>
@@ -429,7 +431,7 @@ namespace Term7MovieApi.Migrations
                     b.HasIndex("No", "TheaterId")
                         .IsUnique();
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Seat", b =>
@@ -466,7 +468,7 @@ namespace Term7MovieApi.Migrations
                     b.HasIndex("RoomId", "RowPos", "ColumnPos")
                         .IsUnique();
 
-                    b.ToTable("Seats", (string)null);
+                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.SeatType", b =>
@@ -486,7 +488,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SeatTypes", (string)null);
+                    b.ToTable("SeatTypes");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Showtime", b =>
@@ -520,7 +522,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("TheaterId");
 
-                    b.ToTable("Showtimes", (string)null);
+                    b.ToTable("Showtimes");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Theater", b =>
@@ -560,7 +562,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Theaters", (string)null);
+                    b.ToTable("Theaters");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.TheaterCompany", b =>
@@ -583,7 +585,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Ticket", b =>
@@ -631,7 +633,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.TicketStatus", b =>
@@ -648,7 +650,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TicketStatuses", (string)null);
+                    b.ToTable("TicketStatuses");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.Transaction", b =>
@@ -678,7 +680,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.TransactionHistory", b =>
@@ -717,7 +719,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TransactionHistories", (string)null);
+                    b.ToTable("TransactionHistories");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.TransactionStatus", b =>
@@ -733,7 +735,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TransactionStatuses", (string)null);
+                    b.ToTable("TransactionStatuses");
                 });
 
             modelBuilder.Entity("Term7MovieCore.Entities.User", b =>
@@ -875,7 +877,7 @@ namespace Term7MovieApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserStatus", (string)null);
+                    b.ToTable("UserStatus");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>

@@ -5,7 +5,7 @@ namespace Term7MovieCore.Entities
 {
     public class Transaction
     {
-        public long Id { get; set; }
+        public Guid Id { set; get; }
         [Required]
         public long CustomerId { set; get; }
         public User Customer { set; get; }
