@@ -13,6 +13,7 @@ using System.Text;
 using Term7MovieApi.Extensions;
 using Term7MovieApi.Profiles;
 using Term7MovieApi.Filters;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,7 +80,11 @@ builder.Services.AddCors(option =>
     });
 });
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1"});
+    c.OperationFilter<SnakeCaseSchemaFilter>();
+});
 builder.Services.AddDistributedMemoryCache();
 
 if (builder.Environment.IsProduction())
