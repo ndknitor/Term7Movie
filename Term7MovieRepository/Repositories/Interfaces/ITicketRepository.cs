@@ -9,7 +9,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<Ticket> GetTicketById(long id);
         Task BuyTicket(long transactionId); //chưa cần
         Task CreateTicket(Ticket ticket);
-        Task CreateTicket(Ticket[] tickets);
+        Task CreateTicket(IEnumerable<Ticket> tickets);
         Task DeleteExpiredTicket();
     }
 }

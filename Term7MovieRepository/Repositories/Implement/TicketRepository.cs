@@ -44,14 +44,14 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task CreateTicket(Ticket ticket)
         {
             if (!await _context.Database.CanConnectAsync())
-                return;
+                throw new Exception("DBCONNECT");
             await _context.Tickets.AddAsync(ticket);
             await _context.SaveChangesAsync();
         }
-        public async Task CreateTicket(Ticket[] tickets)
+        public async Task CreateTicket(IEnumerable<Ticket> tickets)
         {
             if (!await _context.Database.CanConnectAsync())
-                return;
+                throw new Exception("DBCONNECT");
             await _context.Tickets.AddRangeAsync(tickets);
             await _context.SaveChangesAsync();
         }

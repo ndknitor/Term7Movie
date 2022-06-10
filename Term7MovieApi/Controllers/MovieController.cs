@@ -40,16 +40,11 @@ namespace Term7MovieApi.Controllers
                 return GetIncomingMovies();
             if (request.Action == "latest")
                 return GetEightLatestMovies();
-            //if (request.Action == "page")
-            //{
-            //    ParentFilterRequest pfr = new ParentFilterRequest()
-            //    {
-            //        Page = request.PageIndex,
-            //        PageSize = request.PageSize,
-            //        SearchKey = request.SearchKey
-            //    };
-            //    return await GetAllMovie(pfr);
-            //}
+            if (request.Action == "page")
+            {
+                return GetMoviesPaging(request.PageIndex);
+                //return await GetAllMovie(pfr);
+            }
 
             //if (request.Action == "detail")
             //    return GetMovieDetailById(request.movieId);

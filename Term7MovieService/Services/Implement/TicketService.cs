@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Term7MovieCore.Data.Dto.Ticket;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
+using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
 
@@ -21,7 +23,26 @@ namespace Term7MovieService.Services.Implement
             tiktokRepository = _unitOfWork.TicketRepository;
         }
 
-        public async Task<TicketResponse> GetTicketForAShowTime(int showtimeid)
+        public async Task<TicketResponse> GetTicketForSomething(TicketRequest request)
+        {
+            if(!request.TransactionId.HasValue && !request.ShowTimeId.HasValue)
+                return new TicketResponse { Message = "Parameter is missing, need at least one parameter" };
+            if (request.TransactionId.HasValue && request.ShowTimeId.HasValue)
+                return new TicketResponse { Message = "One parameter at a time only" };
+            if (request.TransactionId.HasValue)
+            {
+                Guid dummy = request.TransactionId.Value;
+                return await GetTicketForATransaction(dummy);
+            }
+            if(request.ShowTimeId.HasValue)
+            {
+                int id = request.ShowTimeId.Value;
+                return await GetTicketForAShowTime(id);
+            }
+            throw new Exception("MEDIC MEDICCCCCCCCCCC");
+        }
+
+        private async Task<TicketResponse> GetTicketForAShowTime(int showtimeid)
         {
             var rawdata = await tiktokRepository.GetAllTicketByShowtime(showtimeid);
             if (rawdata == null) 
@@ -51,7 +72,7 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<TicketResponse> GetTicketForATransaction(Guid transactionid)
+        private async Task<TicketResponse> GetTicketForATransaction(Guid transactionid)
         {
             var rawdata = await tiktokRepository.GetAllTicketByTransactionId(transactionid);
             if (rawdata == null)
@@ -105,6 +126,68 @@ namespace Term7MovieService.Services.Implement
                     }
                 }
             }; //how to C#
+        }
+
+        public async Task<ParentResponse> CreateTicket(TicketCreateRequest request)
+        {
+            try
+            {
+                Ticket tiktok = new Ticket();
+                tiktok.SeatId = request.SeatId;
+                tiktok.TransactionId = request.TransactionId;
+                tiktok.ShowTimeId = request.ShowTimeId;
+                tiktok.ShowStartTime = request.ShowStartTime;
+                tiktok.OriginalPrice = request.OriginalPrice;
+                tiktok.ReceivePrice = request.ReceivePrice;
+                tiktok.SellingPrice = request.SellingPrice;
+                tiktok.StatusId = request.StatusId;
+                tiktok.LockedTime = request.LockedTime;
+                await tiktokRepository.CreateTicket(tiktok);
+                return new ParentResponse { Message = "A ticket has created" };
+            }
+            catch(Exception ex)
+            {
+                if(ex.Message == "DBCONNECT")
+                {
+                    return new ParentResponse { Message = "Can't access database" };
+                }
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ParentResponse> CreateALotOfTicket(TicketCreateRequest[] request)
+        {//tập trung làm cái khác quan trọng hơn thay vì cache lỗi
+            List<Ticket> tiktokList = new List<Ticket>();
+            foreach(var ticket in request)
+            {
+                Ticket tiktok = new Ticket();
+                tiktok.SeatId = ticket.SeatId;
+                tiktok.TransactionId = ticket.TransactionId;
+                tiktok.ShowTimeId = ticket.ShowTimeId;
+                tiktok.ShowStartTime = ticket.ShowStartTime;
+                tiktok.OriginalPrice = ticket.OriginalPrice;
+                tiktok.ReceivePrice = ticket.ReceivePrice;
+                tiktok.SellingPrice = ticket.SellingPrice;
+                tiktok.StatusId = ticket.StatusId;
+                tiktok.LockedTime = ticket.LockedTime;
+                tiktokList.Add(tiktok);
+            }
+            try
+            {
+                await tiktokRepository.CreateTicket(tiktokList);
+                return new ParentResponse { Message = "A lot of ticket has created but don't know if there is any errors :v" };
+#warning có time thì nên response cái list status add thành công cho từng ticket huhu tôi lười
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "DBCONNECT")
+                {
+                    return new ParentResponse { Message = "Can't access database" };
+                }
+                throw new Exception(ex.Message);
+            }
+
+
         }
     }
 }
