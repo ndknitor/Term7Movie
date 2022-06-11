@@ -8,7 +8,8 @@ using Term7MovieCore.Data.Request;
 using Dapper;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
+using Term7MovieCore.Data.Dto.Movie;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -34,7 +35,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
                     " FROM Movies " +
                     " WHERE ReleaseDate BETWEEN ( GETDATE() - 30) AND (GETDATE() + 30) " +
-                    " ORDER BY ReleaseDate DESC " +
+                    " ORDER BY Id " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
                 string count = " SELECT COUNT(1) FROM Movies ";
@@ -65,7 +66,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 await _context.Movies.AddRangeAsync(movie);
                 await _context.SaveChangesAsync();
-                //transaction.Commit();
+                transaction.Commit();
                 return true;
             }
             catch(Exception ex)
@@ -85,7 +86,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 _context.Movies.Update(movie);
                 await _context.SaveChangesAsync();
-                //transaction.Commit();
+                transaction.Commit();
                 return true;
             }
             catch (Exception ex)
@@ -96,7 +97,7 @@ namespace Term7MovieRepository.Repositories.Implement
         }
 
 
-        public async Task<bool> DeleteMovie(Movie movie)
+        public async Task<bool> DeleteMovie(int movieid)
         {
             if (!await _context.Database.CanConnectAsync())
                 //throw new Exception();
@@ -104,9 +105,16 @@ namespace Term7MovieRepository.Repositories.Implement
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Movies.Remove(movie);
+                Movie? movie = await _context.Movies.FindAsync(movieid);
+                if (movie == null)
+                    throw new Exception("MOVIENOTFOUND");
+                var categories = _context.MovieCategories.Where(a => a.MovieId == movieid);
+                _context.MovieCategories.RemoveRange(categories);
+                await _context.SaveChangesAsync(); 
+                _context.Movies.Remove
+                    (movie);
                 await _context.SaveChangesAsync();
-                //transaction.Commit();
+                transaction.Commit();
                 return true;
             }
             catch (Exception ex)
@@ -288,7 +296,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     await _context.MovieCategories.AddAsync(mc);
                     await _context.SaveChangesAsync();
                 }
-                //await transaction.CommitAsync();
+                await transaction.CommitAsync();
                 //result.MovieId = movie.Id;
                 result.Title = movie.Title;
                 if (result.Status) result.Message = "Successfully added this film";
@@ -307,6 +315,8 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception("DBCONNECTION");
+            if (await _context.Movies.FindAsync(request.MovieId) == null)
+                throw new Exception("MOVIENOTFOUND");
             bool DoesItGood = true;
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -343,7 +353,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     await _context.MovieCategories.AddAsync(mc);
                     await _context.SaveChangesAsync();
                 }
-                //await transaction.CommitAsync();
+                await transaction.CommitAsync();
                 return DoesItGood;
             }
             catch(Exception ex)

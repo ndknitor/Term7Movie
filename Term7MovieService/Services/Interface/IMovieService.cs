@@ -1,5 +1,5 @@
 ﻿using Term7MovieCore.Data.Request;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Data.Response.Movie;
 
@@ -22,6 +22,8 @@ namespace Term7MovieService.Services.Interface
         Task<MovieCreateResponse> CreateMovie(MovieCreateRequest[] requests);
 
         Task<ParentResponse> UpdateMovie(MovieUpdateRequest request);
+
+        Task<ParentResponse> DeleteMovie(int movieid);
 
         IncomingMovieResponse FakeIncomingMovie();
 

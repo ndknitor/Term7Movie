@@ -6,7 +6,7 @@ using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using System.Diagnostics;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
 
 namespace Term7MovieApi.Controllers
 {
@@ -52,7 +52,7 @@ namespace Term7MovieApi.Controllers
             }
 
             if (request.Action == "detail")
-                return await GetMovieDetailById(request.movieId);
+                return await GetMovieDetailById(request.MovieId);
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 

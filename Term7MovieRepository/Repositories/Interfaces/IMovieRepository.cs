@@ -3,7 +3,8 @@ using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
-using Term7MovieCore.Data.Request.CRUDMovie;
+using Term7MovieCore.Data.Request.Movie;
+using Term7MovieCore.Data.Dto.Movie;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
@@ -13,7 +14,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<Movie> GetMovieById(int id);
         Task<bool> CreateMovie(IEnumerable<Movie> movie);
         Task<bool> UpdateMovie(Movie movie);
-        Task<bool> DeleteMovie(Movie movie);
+        Task<bool> DeleteMovie(int movieid);
         int Count();
         Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies();
         Task<IEnumerable<Movie>> GetEightLatestMovies();

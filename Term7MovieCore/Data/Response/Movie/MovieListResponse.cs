@@ -1,7 +1,7 @@
 ﻿using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 
-namespace Term7MovieCore.Data.Response
+namespace Term7MovieCore.Data.Response.Movie
 {
     public class MovieListResponse : ParentResponse
     {

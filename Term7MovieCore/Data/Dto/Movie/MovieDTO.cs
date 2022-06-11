@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 #nullable disable
 
-namespace Term7MovieCore.Data.Dto
+namespace Term7MovieCore.Data.Dto.Movie
 {
     public class MovieDTO
     {

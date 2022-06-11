@@ -34,6 +34,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<ITicketService, TicketService>();
+
             return services;
         }
 

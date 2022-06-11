@@ -4,12 +4,12 @@ namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ITicketRepository
     {
-        IEnumerable<Ticket> GetAllTicketByShowtime(Showtime showtime);
-        IEnumerable<Ticket> GetAllTicketByTransactionId(long id);
-        Ticket GetTicketById(long id);
-        int BuyTicket(long transactionId);
-        int CreateTicket(Ticket ticket);
-        int CreateTicket(Ticket[] tickets);
-        int DeleteExpiredTicket();
+        Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid);
+        Task<IEnumerable<Ticket>> GetAllTicketByTransactionId(Guid id);
+        Task<Ticket> GetTicketById(long id);
+        Task BuyTicket(long transactionId); //chưa cần
+        Task CreateTicket(Ticket ticket);
+        Task CreateTicket(IEnumerable<Ticket> tickets);
+        Task DeleteExpiredTicket();
     }
 }

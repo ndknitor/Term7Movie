@@ -1,6 +1,6 @@
-﻿using Term7MovieCore.Data.Dto;
+﻿using Term7MovieCore.Data.Dto.Movie;
 
-namespace Term7MovieCore.Data.Response
+namespace Term7MovieCore.Data.Response.Movie
 {
     public class MovieHomePageResponse : ParentResponse
     {
