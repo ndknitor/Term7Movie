@@ -107,6 +107,15 @@ namespace Term7MovieCore.Entities
                 .Property(t => t.Longitude)
                 .IsRequired(false);
 
+            builder.Entity<User>()
+                .Property(t => t.CompanyId)
+                .IsRequired(false);
+
+            builder.Entity<TheaterCompany>()
+                .HasOne(t => t.Manager)
+                .WithOne(u => u.Company)
+                .HasForeignKey<User>(u => u.CompanyId);
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();
