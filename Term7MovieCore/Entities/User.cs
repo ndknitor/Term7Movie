@@ -15,7 +15,7 @@ namespace Term7MovieCore.Entities
         public string PictureUrl { set; get; }
         public int? Point { set; get; }
         public int? CompanyId { set; get; }
-        public TheaterCompany Company { set; get; }
+        public virtual TheaterCompany Company { set; get; }
         [Required]
         public int StatusId { set; get; } = (int) UserStatusEnum.Active;
         public UserStatus Status {set; get;}

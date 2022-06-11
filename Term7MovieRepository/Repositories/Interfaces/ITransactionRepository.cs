@@ -5,7 +5,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
     public interface ITransactionRepository
     {
         Transaction GetTransactionById(long id);
-        int CreateTransaction(Transaction transaction);
-        int UpdateTransaction(Transaction transaction);
+        Task CreateTransaction(Transaction transaction);
+        Task UpdateTransaction(Transaction transaction);
     }
 }

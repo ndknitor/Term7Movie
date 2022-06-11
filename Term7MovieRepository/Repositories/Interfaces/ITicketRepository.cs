@@ -11,5 +11,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task CreateTicket(Ticket ticket);
         Task CreateTicket(IEnumerable<Ticket> tickets);
         Task DeleteExpiredTicket();
+        Task<IEnumerable<Ticket>> GetTicketByIdListAsync(IEnumerable<long> idList);
+        Task<bool> IsTicketInShowtimeValid(long showtimeId, IEnumerable<long> ticketId);
+        Task LockTicketAsync(IEnumerable<long> idList);
     }
 }

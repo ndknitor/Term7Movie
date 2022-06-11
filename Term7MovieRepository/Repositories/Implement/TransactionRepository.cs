@@ -1,4 +1,5 @@
-﻿using Term7MovieCore.Entities;
+﻿using Term7MovieCore.Data.Exceptions;
+using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieRepository.Repositories.Implement
@@ -15,15 +16,18 @@ namespace Term7MovieRepository.Repositories.Implement
             Transaction transaction = null;
             return transaction;
         }
-        public int CreateTransaction(Transaction transaction)
+        public async Task CreateTransaction(Transaction transaction)
         {
-            int count = 0;
-            return count;
+            await _context.Transactions.AddAsync(transaction);
         }
-        public int UpdateTransaction(Transaction transaction)
+        public async Task UpdateTransaction(Transaction transaction)
         {
-            int count = 0;
-            return count;
+            Transaction dbTransaction = await _context.Transactions.FindAsync(transaction.Id);
+
+            if (dbTransaction == null) throw new DbNotFoundException();
+
+            dbTransaction.StatusId = transaction.StatusId;
+            dbTransaction.MomoResultCode = transaction.MomoResultCode;
         }
     }
 }

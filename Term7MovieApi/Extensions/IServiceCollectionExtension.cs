@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Term7MovieApi.Handlers;
+using Term7MovieApi.Requirements;
 using Term7MovieApi.Requirements.RoomRequirement;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Options;
@@ -36,6 +37,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ITicketService, TicketService>();
 
+            services.AddScoped<ITransactionService, TransactionService>();
+
             return services;
         }
 
@@ -49,6 +52,8 @@ namespace Term7MovieApi.Extensions
 
             services.Configure<GoongOption>(config.GetSection(Constants.GOONG_IO));
 
+            services.Configure<MomoOption>(config.GetSection(Constants.MOMO_API));
+
             return services;
         }
 
@@ -60,6 +65,7 @@ namespace Term7MovieApi.Extensions
                 option.AddPolicy(Constants.POLICY_UPDATE_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new UpdateRoomWithSameTheaterRequirement()));
                 option.AddPolicy(Constants.POLICY_DELETE_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new DeleteRoomWithSameTheaterRequirement()));
 
+                option.AddPolicy(Constants.POLICY_CREATE_TRANSACTION_TICKET_SAME_SHOWTIME, policy => policy.Requirements.Add(new CreateTransactionTicketSameShowtimeRequirement()));
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();

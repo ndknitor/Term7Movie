@@ -30,7 +30,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public ISeatTypeRepository SeatTypeRepository { get => new SeatTypeRepository(_context, _connectionOption); }
         public IShowtimeRepository ShowtimeRepository { get => new ShowtimeRepository(_context, _connectionOption); }
         public ITheaterRepository TheaterRepository { get => new TheaterRepository(_context, _connectionOption); }
-        public ITicketRepository TicketRepository { get => new TicketRepository(_context); }
+        public ITicketRepository TicketRepository { get => new TicketRepository(_context, _connectionOption); }
         public ITicketStatusRepository TicketStatusRepository { get => new TicketStatusRepository(_context); }
         public ITransactionHistoryRepository TransactionHistoryRepository { get => new TransactionHistoryRepository(_context); }
         public ITransactionRepository TransactionRepository { get => new TransactionRepository(_context); }
