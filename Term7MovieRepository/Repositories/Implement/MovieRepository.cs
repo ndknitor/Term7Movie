@@ -225,14 +225,14 @@ namespace Term7MovieRepository.Repositories.Implement
         /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
         
         /* ------------- START QUERYING PAGING MOVIE INTO LIST ----------------------------- */
-        //high end paging - flow: paging on database rather than the above shit
-        public async Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity)
+        public async Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity, string searchtitle)
         {
-            if (page <= 0) return null;
+            if (page <= 0) throw new Exception("PAGESMALLER");
             if (!await _context.Database.CanConnectAsync())
                 return null;
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
+                                    .Where(xxx => xxx.Title.Contains(searchtitle))
                                     .OrderBy(a => a.Id)
                                     .Skip((page - 1) * pageCapacity)
                                     .Take(pageCapacity);
