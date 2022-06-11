@@ -42,18 +42,12 @@ namespace Term7MovieApi.Controllers
                 return await GetEightLatestMovies();
             if (request.Action == "page")
             {
-                ParentFilterRequest pfr = new ParentFilterRequest
-                {
-                    Page = request.PageIndex,
-                    PageSize = request.PageSize,
-                    SearchKey = request.SearchKey
-                };
-                return await GetAllMovie(pfr);
-                //return await GetAllMovie(pfr);
+                return await GetMoviesPaging(new MovieListPageRequest 
+                { PageIndex = request.PageIndex, PageSize = request.PageSize,
+                    TitleSearch = request.SearchKey});
             }
-
             if (request.Action == "detail")
-                return Ok(new ParentResponse { Message = "Do thầy đòi đẩy ra 1 api nên là cái này khum dùng nữa :v dùng cái dưới i" });
+                return await GetMoviesDetailFromID(request.MovieId);
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 
@@ -135,9 +129,10 @@ namespace Term7MovieApi.Controllers
             return Ok(result);
         }
 
-        private async Task<IActionResult> GetMoviesPaging(int pageIndex)
+        private async Task<IActionResult> GetMoviesPaging(MovieListPageRequest request)
         {
-            return Ok(new ParentResponse { Message = "bảo trì hệ thúm" });
+            var result = await _movieService.GetMovieListFollowPage(request);
+            return Ok(result);
         }
 
         /* ------------ END PRIVATE METHODS --------------- */

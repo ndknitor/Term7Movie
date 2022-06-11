@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Term7MovieCore.Data.Request
+namespace Term7MovieCore.Data.Request.Movie
 {
     public class MovieListPageRequest
     {
         public int PageIndex { get; set; }
-        public int PageSize { get; } = 16;
+        public int PageSize { get; set; }
+        public string TitleSearch { get; set; }
     }
 }

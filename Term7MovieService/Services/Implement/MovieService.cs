@@ -110,22 +110,31 @@ namespace Term7MovieService.Services.Implement
             return mhpr;
         }
 
-        public async Task<TemptMoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest request)
+        public async Task<MoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest request)
         {
-            IEnumerable<Movie> rawData = await movieRepository.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize);
+            IEnumerable<Movie> rawData = new List<Movie>();
+            try
+            {
+                rawData = await movieRepository.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize, request.TitleSearch);
+            }
+            catch(Exception ex)
+            {
+                if(ex.Message == "PAGESMALLER")
+                    return new MoviePagingResponse { Message = "Page index is smaller than 1" };
+            }
             //checking database connection
             if (rawData == null)
-                return new TemptMoviePagingResponse { Message = "Page index is smaller than 1" };
+                return new MoviePagingResponse { Message = "Cant access database at the moment" };
             //checking if there is any data in database
             if (!rawData.Any())
-                return new TemptMoviePagingResponse { Message = "Empty Data" };
+                return new MoviePagingResponse { Message = "Empty Data" };
             //checking input logical
             int maxpage = movieRepository.Count() / 16 + 1;
             if (request.PageIndex > maxpage) //madness shit
-                return new TemptMoviePagingResponse { Message = "Page index is more than total page" };
+                return new MoviePagingResponse { Message = "Page index is more than total page" };
 
             // ********* End validating or checking shet *********** //
-            TemptMoviePagingResponse mlr = new TemptMoviePagingResponse();
+            MoviePagingResponse mlr = new MoviePagingResponse();
             int[] movieIds = new int[rawData.Count()];
             for (int j = 0; j < rawData.Count(); j++)
             {
@@ -170,7 +179,8 @@ namespace Term7MovieService.Services.Implement
             MovieDetailDTO dto = new MovieDetailDTO();
             dto.Id = rawData.Id;
             dto.Title = rawData.Title;
-            dto.ReleaseDate = rawData.ReleaseDate;
+            dto.ReleaseDate = rawData.ReleaseDate.ToString("MMM") 
+                + " " + rawData.ReleaseDate.ToString("dd") + ", " + rawData.ReleaseDate.ToString("yyyy");
             dto.Duration = rawData.Duration;
             dto.RestrictedAge = rawData.RestrictedAge;
             dto.PosterImageUrl = rawData.PosterImageUrl;
@@ -508,7 +518,7 @@ namespace Term7MovieService.Services.Implement
             MovieDetailDTO dto = new MovieDetailDTO();
             dto.Id = 69;
             dto.Title = "Scream: Legacy";
-            dto.ReleaseDate = new DateTime(2022, 3, 25);
+            //dto.ReleaseDate = new DateTime(2022, 3, 25);
             dto.Duration = 65;
             dto.RestrictedAge = 0;
             dto.PosterImageUrl = "https://image.tmdb.org/t/p/w500/CJwKE5dVGCEYB26PXgCSqQqrit.jpg";

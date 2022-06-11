@@ -13,7 +13,7 @@ namespace Term7MovieService.Services.Interface
         
         Task<MovieHomePageResponse> GetEightLatestMovieForHomepage();
         
-        Task<TemptMoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest mlpr);
+        Task<MoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest mlpr);
         
         Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId);
 
