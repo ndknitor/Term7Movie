@@ -37,6 +37,7 @@ namespace Term7MovieCore.Data
         public static DateTime JSON_START_DATE = new DateTime(1970, 1, 1);
 
         public const string GOONG_IO = "Goong.io";
+        public const string MOMO_API = "MoMoAPI"; 
 
         public const string ROLE_ADMIN = "Admin";
         public const string ROLE_MANAGER = "Manager";
@@ -69,5 +70,9 @@ namespace Term7MovieCore.Data
         public const string POLICY_CREATE_ROOM_SAME_THEATER = "OnlyCreateRoomWithSameTheater";
         public const string POLICY_UPDATE_ROOM_SAME_THEATER = "OnlyUpdateRoomWithSameTheater";
         public const string POLICY_DELETE_ROOM_SAME_THEATER = "OnlyDeleteRoomWithSameTheater";
+
+        public const string POLICY_CREATE_TRANSACTION_TICKET_SAME_SHOWTIME = "OnlyCreateTransactionForTicketInTheSameShowtime";
+
+        public const int LOCK_TICKET_IN_MINUTE = 5;
     }
 }

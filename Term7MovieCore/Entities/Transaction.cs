@@ -18,6 +18,7 @@ namespace Term7MovieCore.Entities
         [Required]
         public int StatusId { get; set; }
         public TransactionStatus Status { set; get; }
+        public int? MomoResultCode { set; get; }
         public ICollection<Ticket> Tickets { get; set; }
     }
 }

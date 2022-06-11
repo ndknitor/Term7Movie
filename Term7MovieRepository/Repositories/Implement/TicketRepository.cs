@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Term7MovieCore.Data;
+using Term7MovieCore.Data.Options;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
@@ -6,10 +10,12 @@ namespace Term7MovieRepository.Repositories.Implement
 {
     public class TicketRepository : ITicketRepository
     {
-        private AppDbContext _context;
-        public TicketRepository(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly ConnectionOption _connectionOption;
+        public TicketRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
+            _connectionOption = connectionOption;
         }
 
         public async Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid)
@@ -58,6 +64,59 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task DeleteExpiredTicket()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> IsTicketInShowtimeValid(long showtimeId, IEnumerable<long> ticketId)
+        {
+            bool valid = false;
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " SELECT COUNT(Id) " +
+                    " FROM Tickets " +
+                    " WHERE ShowTimeId = @showtimeId AND Id IN @ticketId AND (LockedTime < @now OR LockedTime IS NULL) AND ";
+                object param = new { showtimeId, ticketId, now = DateTime.UtcNow };
+
+                int total = await con.ExecuteScalarAsync<int>(sql, param);
+
+                if (total == ticketId.Count()) return true;
+            }
+
+            return valid;
+        }
+
+        public async Task<IEnumerable<Ticket>> GetTicketByIdListAsync(IEnumerable<long> idList)
+        {
+            IEnumerable<Ticket> list = new List<Ticket>();
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " SELECT t.Id, t.SellingPrice, s.Id, st.Id, st.Name, st.BonusPrice " +
+                    " FROM Tickets t JOIN Seats s ON t.SeatId = s.Id " +
+                    "   JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
+                    " WHERE t.Id IN @idList ";
+                object param = new { idList };
+
+                list = await con.QueryAsync<Ticket>(sql, param);
+            }
+
+            return list;
+        }
+
+        public async Task LockTicketAsync(IEnumerable<long> idList)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = 
+                    " UPDATE Tickets " +
+                    " SET LockedTime = @time " +
+                    " WHERE Id IN @idList ";
+                object param = new { idList, time = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE) };
+
+                await con.ExecuteAsync(sql, param);
+            }
         }
     }
 }

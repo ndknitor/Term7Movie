@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Term7MovieApi.Extensions;
+using Term7MovieApi.Requirements;
 using Term7MovieApi.Requirements.RoomRequirement;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Extensions;
@@ -52,6 +53,14 @@ namespace Term7MovieApi.Handlers
 
                         break;
 
+                    case CreateTransactionTicketSameShowtimeRequirement:
+
+                        TransactionCreateRequest transactionCreateRequest = await httpContext.Request.ToObjectAsync<TransactionCreateRequest>();
+
+                        if (await IsTransactionCreateRequestValid(claims, transactionCreateRequest)) context.Succeed(requirement);
+
+                        break;
+
                 }
             }
         }
@@ -96,6 +105,13 @@ namespace Term7MovieApi.Handlers
             if (room == null) return false;
 
             return true;
+        }
+
+        private async Task<bool> IsTransactionCreateRequestValid(IEnumerable<Claim> claims, TransactionCreateRequest resource)
+        {
+            ITicketRepository ticketRepository = _unitOfWork.TicketRepository;
+
+            return await ticketRepository.IsTicketInShowtimeValid(resource.ShowtimeId, resource.IdList);
         }
     }
 }
