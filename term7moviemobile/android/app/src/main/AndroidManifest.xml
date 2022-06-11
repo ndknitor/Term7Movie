@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.term7moviemobile">
    <application
-        android:usesCleartextTraffic="true"
+       android:usesCleartextTraffic="true"
         android:label="f-cine"
         android:icon="@mipmap/ic_launcher">
         <activity

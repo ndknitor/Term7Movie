@@ -5,12 +5,12 @@ class MyTheme {
   static const backgroundColor = Color(0xFFFBFBFB);
   static const borderColor = Color(0xFFEFEFEF);
   static const textColor = Color(0xFF2E2E30);
+  static const grayColor = Color(0xFF84878B);
+  static const bottomBarColor = Color(0xFF84878B);
   static const infoColor = Color(0xFF0068FF);
   static const successColor = Color(0xFF54D62C);
   static const errorColor = Color(0xFFFF4842);
   static const warningColor = Color(0xFFFFC107);
-  static const statusBar = Color(0xFF2E3147);
-  static const appBarColor = Color(0xFF222539);
 
   static final myLightTheme = ThemeData(
     primaryColor: primaryColor,

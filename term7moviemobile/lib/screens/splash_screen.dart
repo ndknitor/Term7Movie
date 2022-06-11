@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -22,6 +23,9 @@ class _SplashState extends State<SplashScreen>
         curve: Curves.bounceOut,
         reverseCurve: Curves.bounceIn);
     _animationController.forward();
+    // Future.delayed(Duration(seconds: 2)).then((_) {
+    //   Get.toNamed('onboard');
+    // });
     super.initState();
   }
 
