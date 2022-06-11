@@ -1,19 +1,28 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:term7moviemobile/screens/home_screen.dart';
-import 'package:term7moviemobile/screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:term7moviemobile/services/api.dart';
+import 'package:term7moviemobile/services/auth_services.dart';
+import 'package:term7moviemobile/services/room_services.dart';
+import 'package:term7moviemobile/utils/constants.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
+  final storage = new FlutterSecureStorage();
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   late Rx<User?> _user;
   bool isLoging = false;
   User? get user => _user.value;
   final FirebaseAuth auth = FirebaseAuth.instance;
+  int? isviewed;
 
   @override
   void onReady() {
@@ -24,15 +33,18 @@ class AuthController extends GetxController {
   }
 
   loginRedirect(User? user) {
-    Timer(Duration(seconds: isLoging ? 0 : 2), () {
+    Timer(Duration(seconds: isLoging ? 0 : 2), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      isviewed = prefs.getInt('onBoard');
+      print(isviewed);
       if (user == null) {
         isLoging = false;
         update();
-        Get.offAll(() => const LoginScreen());
+        isviewed != 0 ? Get.offAllNamed('/onboard') : Get.offAllNamed('/login');
       } else {
         isLoging = true;
         update();
-        Get.offAll(() => const HomeScreen());
+        Get.offAllNamed('/');
       }
     });
   }
@@ -42,19 +54,26 @@ class AuthController extends GetxController {
     update();
     try {
       final GoogleSignInAccount? googleSignInAccount =
-          await GoogleSignIn().signIn();
-
+          await googleSignIn.signIn();
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication? googleAuth =
             await googleSignInAccount.authentication;
-
         final crendentials = GoogleAuthProvider.credential(
           accessToken: googleAuth?.accessToken,
           idToken: googleAuth?.idToken,
         );
-
         await auth.signInWithCredential(crendentials);
+        var token = await auth.currentUser?.getIdToken();
+        final res = await AuthServices.postIdToken(token);
+
+        if (res.statusCode == 200) {
+          await storage.write(
+              key: 'accessToken', value: res.data['accessToken']);
+          await storage.write(
+              key: 'refreshToken', value: res.data['refreshToken']);
+        }
         getSuccessSnackBar("Successfully logged in as ${_user.value!.email}");
+        //RoomServices.getRoomById("1").then((value) => print(value));
       }
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar("Google Login Failed", e);
@@ -88,6 +107,7 @@ class AuthController extends GetxController {
   }
 
   void signOut() async {
+    storage.deleteAll();
     await auth.signOut();
   }
 }
