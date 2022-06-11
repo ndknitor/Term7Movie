@@ -10,6 +10,7 @@ using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Response.Movie;
 using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
+using Newtonsoft.Json;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -275,11 +276,35 @@ namespace Term7MovieService.Services.Implement
                     response.Message = "Succesful";
                 else response.Message = "Some of category was failed while updating movie";
             }
+            catch (Exception ex)
+            {
+                //if (ex.Message == "DBCONNECTION")
+                //    response.Message = "Data storage unaccessible.";
+                //else response.Message = "Failed to update this movie";
+                if (ex.Message == "MOVIENOTFOUND")
+                    response.Message = "Movie ID not found, the ID was " + request.MovieId;
+                else
+                    throw new Exception(ex.Message);
+            }
+            return response;
+        }
+
+        public async Task<ParentResponse> DeleteMovie(int movieid)
+        {
+            ParentResponse response = new ParentResponse();
+            try
+            {
+                //hiện tại bên repo đang false => ko có connect
+                //throw exception tạm thời để track bug vì đang trong giai đoạn development :v
+                if (await movieRepository.DeleteMovie(movieid))
+                    response.Message = "Successful";
+                else response.Message = "Failed to deleted this movie";
+            }
             catch(Exception ex)
             {
-                if (ex.Message == "DBCONNECTION")
-                    response.Message = "Data storage unaccessible.";
-                else response.Message = "Failed to update this movie";
+                if(ex.Message == "MOVIENOTFOUND")
+                    return new ParentResponse { Message = "No Movie was found for id: " + movieid };
+                throw new Exception(ex.Message);
             }
             return response;
         }
@@ -518,7 +543,6 @@ namespace Term7MovieService.Services.Implement
             response.Message = "Hàng pha ke";
             return response;
         }
-
         /* ------------ END FAKE DATA ZONE ------------------- */
     }
 }

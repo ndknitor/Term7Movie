@@ -14,7 +14,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<Movie> GetMovieById(int id);
         Task<bool> CreateMovie(IEnumerable<Movie> movie);
         Task<bool> UpdateMovie(Movie movie);
-        Task<bool> DeleteMovie(Movie movie);
+        Task<bool> DeleteMovie(int movieid);
         int Count();
         Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies();
         Task<IEnumerable<Movie>> GetEightLatestMovies();
