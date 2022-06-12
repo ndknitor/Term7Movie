@@ -40,12 +40,23 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if(!await _context.Database.CanConnectAsync())
                 return null;
-            Ticket? ticket = await _context.Tickets.FindAsync(id);
+            Ticket ticket = await _context.Tickets.FindAsync(id);
             return ticket;
         }
-        public async Task BuyTicket(long transactionId)
+        public async Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList)
         {
-            throw new NotImplementedException();
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " UPDATE Tickets " +
+                    " SET TransactionId = @transactionId " +
+                    " WHERE Id IN @idList ";
+                object param = new { transactionId, idList };
+
+                int count = await con.ExecuteAsync(sql, param);
+
+                return count == idList.Count();
+            }
         }
         public async Task CreateTicket(Ticket ticket)
         {
@@ -63,7 +74,7 @@ namespace Term7MovieRepository.Repositories.Implement
         }
         public async Task DeleteExpiredTicket()
         {
-            throw new NotImplementedException();
+            await Task.CompletedTask;
         }
 
         public async Task<bool> IsTicketInShowtimeValid(long showtimeId, IEnumerable<long> ticketId)
@@ -75,7 +86,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     " SELECT COUNT(Id) " +
                     " FROM Tickets " +
-                    " WHERE ShowTimeId = @showtimeId AND Id IN @ticketId AND (LockedTime < @now OR LockedTime IS NULL) AND ";
+                    " WHERE ShowTimeId = @showtimeId AND StartTime > GETUTCDATE() AND Id IN @ticketId AND (LockedTime < @now OR LockedTime IS NULL) AND ";
                 object param = new { showtimeId, ticketId, now = DateTime.UtcNow };
 
                 int total = await con.ExecuteScalarAsync<int>(sql, param);
@@ -93,13 +104,19 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    " SELECT t.Id, t.SellingPrice, s.Id, st.Id, st.Name, st.BonusPrice " +
+                    " SELECT t.Id, t.SellingPrice, s.Id, s.Name, s.RoomId, st.Id, st.Name, st.BonusPrice " +
                     " FROM Tickets t JOIN Seats s ON t.SeatId = s.Id " +
                     "   JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
                     " WHERE t.Id IN @idList ";
                 object param = new { idList };
 
-                list = await con.QueryAsync<Ticket>(sql, param);
+                list = await con.QueryAsync<Ticket, Seat, SeatType, Ticket>(sql, 
+                    (t, s, st) => 
+                    {
+                        s.SeatType = st;
+                        t.Seat = s;
+                        return t;
+                    }, param, splitOn: "Id");
             }
 
             return list;

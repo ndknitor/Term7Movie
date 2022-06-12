@@ -13,5 +13,6 @@
         public string PartnerCode { set; get; } 
         public string IpnUrl { set; get; } 
         public string ReturnUrl { set; get; }
+        public string RedirectUrl { set; get; }
     }
 }

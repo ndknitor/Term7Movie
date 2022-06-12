@@ -7,7 +7,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<RefreshToken> GetRefreshTokenByJtiAsync(string jti);
         Task CreateRefreshTokenAsync(RefreshToken refreshToken);
-        Task DeleteRefreshTokenAsync(long id);
+        long DeleteExpiredRefreshToken();
         Task RevokeRefreshTokenAsync(string jti);
 
     }

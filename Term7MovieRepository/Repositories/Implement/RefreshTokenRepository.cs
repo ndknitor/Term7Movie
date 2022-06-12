@@ -36,9 +36,16 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             await _context.RefreshTokens.AddAsync(refreshToken);
         }
-        public async Task DeleteRefreshTokenAsync(long id)
+        public long DeleteExpiredRefreshToken()
         {
-            await Task.CompletedTask;
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " DELETE FROM RefreshTokens " +
+                    " WHERE ExpiredDate < GETUTCDATE() ";
+
+                return con.Execute(sql);
+            }
         }
         public async Task RevokeRefreshTokenAsync(string jti)
         {

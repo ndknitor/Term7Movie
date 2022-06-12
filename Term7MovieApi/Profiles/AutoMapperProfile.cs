@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -44,6 +45,29 @@ namespace Term7MovieApi.Profiles
             CreateMap<ShowtimeCreateRequest, Showtime>();
 
             CreateMap<ShowtimeUpdateRequest, Showtime>();
+
+            CreateMap<UserDTO, MomoUserInfoModel>()
+                .ForMember(
+                    des => des.Name,
+                    option => option.MapFrom(src => src.FullName)
+                );
+
+            CreateMap<Ticket, MomoItemModel>()
+                .BeforeMap((src, des) =>
+                {
+                    des.Quantity = 1;
+                    des.Description = string.Format(Constants.MOMO_ITEM_DESCRIPTION, src.Seat.RoomId, src.Seat.Name, src.Seat.SeatType.Name);
+                })
+                .ForMember(
+                    des => des.Amount,
+                    option => option.MapFrom(src => src.SellingPrice + src.Seat.SeatType.BonusPrice)
+                )
+                .ForMember(
+                    des => des.Name,
+                    option => option.MapFrom(src =>  Constants.MOMO_ITEM_NAME + " - " + src.Seat.SeatType.Name)
+                );
+
+            CreateMap<MomoIPNRequest, MomoPaymentCreateRequest>();
         }          
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Enum;
 using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Options;
@@ -14,32 +15,29 @@ namespace Term7MovieService.Services.Implement
     public class TransactionService : ITransactionService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly MomoOption momoOption;
         private readonly ITransactionRepository transactionRepo;
-        private readonly ITransactionHistoryRepository transactionHistoryRepo;
         private readonly ITicketRepository ticketRepo;
-
-        public TransactionService(IUnitOfWork unitOfWork, IOptions<MomoOption> option)
+        private readonly IPaymentService _paymentService;
+        public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService)
         {
             _unitOfWork = unitOfWork;
-            momoOption = option.Value;
             transactionRepo = _unitOfWork.TransactionRepository;
-            transactionHistoryRepo = _unitOfWork.TransactionHistoryRepository;
             ticketRepo = _unitOfWork.TicketRepository;
+            _paymentService = paymentService;
         }
 
-        public async Task<ParentResponse> CreateTransactionAsync(TransactionCreateRequest request, long customerId)
+        public async Task<TransactionCreateResponse> CreateTransactionAsync(TransactionCreateRequest request, UserDTO user)
         {
-            IEnumerable<Ticket> list = await ticketRepo.GetTicketByIdListAsync(request.IdList);
+            IEnumerable<Ticket> tickets = await ticketRepo.GetTicketByIdListAsync(request.IdList);
 
-            decimal total = list.Sum(t => t.SellingPrice);
+            decimal total = tickets.Sum(t => t.SellingPrice);
 
 
             // create transaction - pending
             Transaction transaction = new Transaction
             {
                 Id = Guid.NewGuid(),
-                CustomerId = customerId,
+                CustomerId = user.Id,
                 PurchasedDate = DateTime.UtcNow,
                 StatusId = (int)TransactionStatusEnum.Pending,
                 Total = total,
@@ -54,15 +52,27 @@ namespace Term7MovieService.Services.Implement
                 // lock ticket
                 await ticketRepo.LockTicketAsync(request.IdList);
 
-                return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
+                // create momo payment request
+                transaction.Tickets = tickets.ToList();
+
+                var result = await _paymentService.CreateMomoPaymentRequestAynsc(transaction, user);
+
+                if (result == null) throw new DbOperationException("Cannot create momo payment request");
+
+                return new TransactionCreateResponse { 
+                    Result = result,
+                    Message = Constants.MESSAGE_SUCCESS 
+                };
             }
 
             throw new DbOperationException();
-            // create momo payment request
+            
 
             // successs => change transaction success => status add to history o controller khasc
 
             // add transaction id to ticket
         }
+
+        public async Task ProcessPaymentAsync(MomoIPNRequest ipn) => await _paymentService.ProcessMomoIPNRequestAsync(ipn);
     }
 }
