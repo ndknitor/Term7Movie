@@ -17,10 +17,6 @@ namespace Term7MovieCore.Data.Dto.Movie
         public string ReleaseDate { get; set; }
         public string CoverImgURL { get; set; }
         public string PosterImgURL { get; set; }
-        public string DirectoryName { get; set; } = "Trần Hào Nam";
-        public string[] Actors { get; set; } = new string[] { "Trần Nam", "Nam Trần", "Tram Nần", "Nần Tram" };
-        public string SelfDestructMessage { get; } = "Cuối tuần rồi tôi không rảnh ngồi mò data " +
-            "actor đâu, tự thân vận động đi (Bức thư này sẽ tự hủy khi có data hoàn chỉnh cho director và actors).";
     }
 
     public class MovieType

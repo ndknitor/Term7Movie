@@ -189,7 +189,7 @@ namespace Term7MovieService.Services.Implement
             dto.Description = rawData.Description;
             dto.ViewCount = rawData.ViewCount;
             dto.TotalRating = rawData.TotalRating;
-            dto.DirectorId = rawData.DirectorId;
+            //dto.DirectorId = rawData.DirectorId;
             mdr.MovieDetail = dto;
             //Sublime text 4 is the best. for this damn situation
             //checking if there is any categories for this movie
@@ -527,7 +527,7 @@ namespace Term7MovieService.Services.Implement
             dto.Description = "";
             dto.ViewCount = 1;
             dto.TotalRating = 5;
-            dto.DirectorId = null;
+            //dto.DirectorId = null;
             List<MovieType> list = new List<MovieType>()
             {
                 new MovieType
