@@ -87,9 +87,9 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 string sql = 
                     " INSERT INTO Showtimes (MovieId, RoomId, StartTime, EndTime, TheaterId) " +
-                    " SELECT @Id, @RoomId, @StartTime, DATEADD(MINUTE, Duration), @TheaterId " +
+                    " SELECT @MovieId, @RoomId, @StartTime, DATEADD(MINUTE, Duration, @StartTime), @TheaterId " +
                     " FROM Movies " +
-                    " WHERE Id = @Id ";
+                    " WHERE Id = @MovieId ";
 
                 count = await con.ExecuteAsync(sql, showtime);
             }

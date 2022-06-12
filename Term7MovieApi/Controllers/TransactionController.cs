@@ -21,7 +21,7 @@ namespace Term7MovieApi.Controllers
             _transactionService = transactionService;
         }
 
-        //[Authorize(Roles = Constants.ROLE_CUSTOMER)]
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)]
         [HttpPost]
         public async Task<IActionResult> CreateTransactionAsync(TransactionCreateRequest request)
         {
@@ -38,7 +38,6 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        //[Authorize(Roles = Constants.ROLE_CUSTOMER)]
         [HttpGet("payment-complete")]
         public IActionResult PaymentComplete()
         {
