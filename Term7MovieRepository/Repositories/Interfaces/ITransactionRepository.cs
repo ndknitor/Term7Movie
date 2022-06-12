@@ -6,6 +6,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
     {
         Transaction GetTransactionById(long id);
         Task CreateTransaction(Transaction transaction);
-        Task UpdateTransaction(Transaction transaction);
+        Task UpdateTransaction(Guid id, int statusId, int momoStatus);
     }
 }

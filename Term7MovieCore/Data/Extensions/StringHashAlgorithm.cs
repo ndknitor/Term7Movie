@@ -20,5 +20,22 @@ namespace Term7MovieCore.Extensions
             byte[] bytes = Encoding.UTF8.GetBytes(s);
             return Convert.ToBase64String(bytes);
         }
+
+        public static string ToHS256String(this string s, string key)
+        {
+            ASCIIEncoding encoding = new ASCIIEncoding();
+
+            byte[] textBytes = encoding.GetBytes(s);
+            byte[] keyBytes = encoding.GetBytes(key);
+
+            byte[] hashBytes;
+
+            using (HMACSHA256 hash = new HMACSHA256(keyBytes))
+            {
+                hashBytes = hash.ComputeHash(textBytes);
+            }
+
+            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+        }
     }
 }

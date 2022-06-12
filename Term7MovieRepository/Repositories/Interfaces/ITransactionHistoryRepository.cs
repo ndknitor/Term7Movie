@@ -7,6 +7,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         IEnumerable<TransactionHistory> GetAllTransactionHistoryByCustomerId(long customerId);
         IEnumerable<TransactionHistory> GetAllTransactionHistoryByCompanyId(int companyId);
         TransactionHistory GetTransactionHistoryById(long id);
-        int CreateTransactionHistory(TransactionHistory transactionHistory);
+        Task CreateTransactionHistory(IEnumerable<long> idList);
     }
 }

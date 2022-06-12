@@ -20,14 +20,14 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             await _context.Transactions.AddAsync(transaction);
         }
-        public async Task UpdateTransaction(Transaction transaction)
+        public async Task UpdateTransaction(Guid id, int statusId, int momoStatus)
         {
-            Transaction dbTransaction = await _context.Transactions.FindAsync(transaction.Id);
+            Transaction dbTransaction = await _context.Transactions.FindAsync(id);
 
             if (dbTransaction == null) throw new DbNotFoundException();
 
-            dbTransaction.StatusId = transaction.StatusId;
-            dbTransaction.MomoResultCode = transaction.MomoResultCode;
+            dbTransaction.StatusId = statusId;
+            dbTransaction.MomoResultCode = momoStatus;
         }
     }
 }

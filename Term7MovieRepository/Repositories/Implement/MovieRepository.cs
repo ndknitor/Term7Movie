@@ -105,7 +105,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                Movie? movie = await _context.Movies.FindAsync(movieid);
+                Movie movie = await _context.Movies.FindAsync(movieid);
                 if (movie == null)
                     throw new Exception("MOVIENOTFOUND");
                 var categories = _context.MovieCategories.Where(a => a.MovieId == movieid);

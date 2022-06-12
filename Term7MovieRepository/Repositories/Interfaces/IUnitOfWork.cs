@@ -26,6 +26,7 @@
         IPromotionTypeRepository PromotionTypeRepository { get; }
         IUserLoginRepository UserLoginRepository { get; }
         IRoleRepository RoleRepository { get; }
+        IPaymentRequestRepository PaymentRequestRepository { get; }
         bool HasChange();
 
         Task<bool> CompleteAsync();

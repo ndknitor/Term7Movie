@@ -74,5 +74,11 @@ namespace Term7MovieCore.Data
         public const string POLICY_CREATE_TRANSACTION_TICKET_SAME_SHOWTIME = "OnlyCreateTransactionForTicketInTheSameShowtime";
 
         public const int LOCK_TICKET_IN_MINUTE = 5;
+
+        public const string LANG_VI = "vi";
+        public const string LANG_EN = "en";
+
+        public const string MOMO_ITEM_DESCRIPTION = "Room: {0} - Seat: {1} - Type: {2}";
+        public const string MOMO_ITEM_NAME = "Ticket";
     }
 }

@@ -12,5 +12,10 @@ namespace Term7MovieCore.Data.Exceptions
         {
 
         }
+
+        public DbOperationException(string message) : base(message)
+        {
+
+        }
     }
 }

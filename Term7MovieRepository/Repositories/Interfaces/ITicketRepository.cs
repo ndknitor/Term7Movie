@@ -7,7 +7,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid);
         Task<IEnumerable<Ticket>> GetAllTicketByTransactionId(Guid id);
         Task<Ticket> GetTicketById(long id);
-        Task BuyTicket(long transactionId); //chưa cần
+        Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList); //chưa cần
         Task CreateTicket(Ticket ticket);
         Task CreateTicket(IEnumerable<Ticket> tickets);
         Task DeleteExpiredTicket();
