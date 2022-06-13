@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Term7MovieApi.BackgroundServices;
 using Term7MovieApi.Handlers;
 using Term7MovieApi.Requirements;
 using Term7MovieApi.Requirements.RoomRequirement;
@@ -71,6 +72,13 @@ namespace Term7MovieApi.Extensions
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureBackgroundService(this IServiceCollection services)
+        {
+            services.AddHostedService<DeleteExpiredRefreshTokenService>();
 
             return services;
         }
