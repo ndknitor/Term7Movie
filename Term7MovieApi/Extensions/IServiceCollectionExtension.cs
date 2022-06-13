@@ -42,6 +42,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<IPaymentService, PaymentService>();
 
+            services.AddScoped<ICompanyService, CompanyService>();
+
             return services;
         }
 
