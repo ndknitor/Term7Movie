@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Extensions;
+using Term7MovieCore.Data.Request;
 using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
@@ -30,6 +31,15 @@ namespace Term7MovieApi.Controllers
             }
 
             var response = await _companyService.GetCompanyDetailAsync(companyId, managerId);
+
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllCompany([FromQuery] ParentFilterRequest request)
+        {
+            var response = await _companyService.GetAllCompanyAsync(request);
 
             return Ok(response);
         }

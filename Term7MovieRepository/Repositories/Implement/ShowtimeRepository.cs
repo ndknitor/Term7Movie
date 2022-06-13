@@ -24,7 +24,7 @@ namespace Term7MovieRepository.Repositories.Implement
             PagingList<ShowtimeDto> list = new();
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
-                int offset = request.PageSize * (request.Page - 1 ) + 1;
+                int offset = request.PageSize * (request.Page - 1 );
                 int fetch = request.PageSize;
 
                 string query =

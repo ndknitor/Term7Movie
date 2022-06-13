@@ -41,5 +41,16 @@ namespace Term7MovieService.Services.Implement
                 Company = company
             };
         }
+
+        public async Task<CompanyListResponse> GetAllCompanyAsync(ParentFilterRequest request)
+        {
+            IEnumerable<CompanyDto> list = await companyRepo.GetAllCompany(request);
+
+            return new CompanyListResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Companies = list
+            };
+        }
     }
 }
