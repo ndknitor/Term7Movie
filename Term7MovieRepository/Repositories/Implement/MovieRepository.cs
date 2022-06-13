@@ -364,6 +364,24 @@ namespace Term7MovieRepository.Repositories.Implement
         }
         /* ----------------- END UPDATE MOVIE ---------------------- */
 
+        /* ----------------- START GET MOVIE TITLE --------------- */
+        public async Task<IEnumerable<Movie>> GetMoviesTitle()
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            List<Movie> result = new List<Movie>();
+            var query = _context.Movies.Select(xxx => new Movie
+            {
+                Id = xxx.Id,
+                Title = xxx.Title, 
+            });
+            result = await query.ToListAsync();
+            return result;
+        }
+
+
+        /* ------------------ END GET MOVIE TITLE --------------- */
+
         /* ----------------- START PRIVATE FUNCTION ------------------ */
         //private async Task<int> GetExternalId() //Don't use it
         //{

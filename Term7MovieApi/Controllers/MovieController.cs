@@ -48,6 +48,8 @@ namespace Term7MovieApi.Controllers
             }
             if (request.Action == "detail")
                 return await GetMoviesDetailFromID(request.MovieId);
+            if (request.Action == "titles")
+                return await GetMovieTitles();
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 
@@ -119,14 +121,38 @@ namespace Term7MovieApi.Controllers
         //I have used too many brain cell for this lol if i get it wrong then sorry
         private async Task<IActionResult> GetIncomingMovies()
         {
-            var result = _movieService.FakeIncomingMovie();
-            return Ok(result);
+            //chưa dùng đến. (để dự phòng thôi)
+            try
+            {
+                var result = await _movieService.GetEightLosslessLatestMovieForHomepage();
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
         }
 
         private async Task<IActionResult> GetEightLatestMovies()
         {
-            var result = _movieService.FakeShowingMovie();
-            return Ok(result);
+            //sr vì chưa handle lỗi tốt lắm. hmu hmu
+            try
+            {
+                Stopwatch zaWarudo = new Stopwatch();
+                zaWarudo.Start();
+                var result = await _movieService.GetEightLatestMovieForHomepage();
+                zaWarudo.Stop();
+                _logger.LogInformation("The power of Dio has stopped the world for: " + zaWarudo.ElapsedMilliseconds);
+                if (result == null)
+                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+            }
         }
 
         private async Task<IActionResult> GetMoviesPaging(MovieListPageRequest request)
@@ -135,6 +161,11 @@ namespace Term7MovieApi.Controllers
             return Ok(result);
         }
 
+        private async Task<IActionResult> GetMovieTitles()
+        {
+            var result = await _movieService.GetMovieTitle();
+            return Ok(result);
+        }
         /* ------------ END PRIVATE METHODS --------------- */
     }
 }

@@ -134,14 +134,13 @@ namespace Term7MovieService.Services.Implement
             {
                 Ticket tiktok = new Ticket();
                 tiktok.SeatId = request.SeatId;
-                tiktok.TransactionId = request.TransactionId;
                 tiktok.ShowTimeId = request.ShowTimeId;
                 tiktok.ShowStartTime = request.ShowStartTime;
                 tiktok.OriginalPrice = request.OriginalPrice;
                 tiktok.ReceivePrice = request.ReceivePrice;
                 tiktok.SellingPrice = request.SellingPrice;
                 tiktok.StatusId = request.StatusId;
-                tiktok.LockedTime = request.LockedTime;
+                tiktok.LockedTime = null;
                 await tiktokRepository.CreateTicket(tiktok);
                 return new ParentResponse { Message = "A ticket has created" };
             }
