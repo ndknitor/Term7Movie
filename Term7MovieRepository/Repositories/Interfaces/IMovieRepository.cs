@@ -23,5 +23,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId);
         Task<CreateMovieError> CreateMovieWithCategory(MovieCreateRequest request);
         Task<bool> UpdateMovie(MovieUpdateRequest request);
+        Task<IEnumerable<Movie>> GetMoviesTitle();
     }
 }

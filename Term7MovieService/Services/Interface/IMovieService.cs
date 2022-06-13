@@ -25,6 +25,8 @@ namespace Term7MovieService.Services.Interface
 
         Task<ParentResponse> DeleteMovie(int movieid);
 
+        Task<MovieTitleResponse> GetMovieTitle();
+
         IncomingMovieResponse FakeIncomingMovie();
 
         MovieHomePageResponse FakeShowingMovie();

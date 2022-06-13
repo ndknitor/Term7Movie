@@ -321,6 +321,30 @@ namespace Term7MovieService.Services.Implement
 
         /* --------------------- END CUD MOVIE ------------- */
 
+        /* -------------------- START GET TITLE MOVIE ------------------ */
+        public async Task<MovieTitleResponse> GetMovieTitle()
+        {
+            var rawData = await movieRepository.GetMoviesTitle();
+            if (rawData == null) return new MovieTitleResponse { Message = "Cant access database" };
+            List<MovieTitleDTO> list = new List<MovieTitleDTO>();
+            foreach(var item in rawData)
+            {
+                MovieTitleDTO dto = new MovieTitleDTO()
+                {
+                    MovieId = item.Id,
+                    Title = item.Title,
+                };
+                list.Add(dto);
+            }
+            return new MovieTitleResponse
+            {
+                Message = "Successful",
+                MovieTitles = list
+            };
+        }
+        /* ---------------------- END GET TITLE MOVIE --------------- */
+
+
         /* --------------------- START PRIVATE FUNCTION -------------- */
 
         /* --------------------- END PRIVATE FUNCTION ------------ */
