@@ -86,5 +86,20 @@ namespace Term7MovieApi.Controllers
             }
             return Ok(response);
         }
+
+        [Authorize]
+        [HttpGet("lossless/{theaterid:int}")]
+        public async Task<IActionResult> GetRoomNumberForATheater(int theaterid)
+        {
+            try
+            {
+                var response = await _roomService.GetRoomNumberFromTheater(theaterid);
+                return Ok(response);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
+            }
+        }
     }
 }

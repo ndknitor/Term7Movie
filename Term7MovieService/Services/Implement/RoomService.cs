@@ -4,6 +4,7 @@ using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Response.Room;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
@@ -91,6 +92,28 @@ namespace Term7MovieService.Services.Implement
                 return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
             }
             return null;
+        }
+
+        public async Task<RoomNumberResponse> GetRoomNumberFromTheater(int theaterid)
+        {
+            try
+            {
+                var rawdata = await roomRepo.GetRoomNumberFromTheater(theaterid);
+                if (rawdata == null)
+                    return new RoomNumberResponse { Message = "Database sập rồi" };
+                return new RoomNumberResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS,
+                    RoomNumbers = rawdata
+                };
+
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message == "EMPTYDATA")
+                    return new RoomNumberResponse { Message = "There is no room for this theater" };
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

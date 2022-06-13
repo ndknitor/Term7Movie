@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Room;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
@@ -124,6 +126,23 @@ namespace Term7MovieRepository.Repositories.Implement
 
             }
             return list;
+        }
+
+        public async Task<IEnumerable<RoomNumberDTO>> GetRoomNumberFromTheater(int theaterid)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            List<RoomNumberDTO> result = new List<RoomNumberDTO>();
+            var query = _context.Rooms
+                                .Where(a => a.TheaterId == theaterid)
+                                .Select(a => new RoomNumberDTO
+                                {
+                                    RoomID = a.Id,
+                                    RoomNumber = a.No
+                                });
+            if (!query.Any()) throw new Exception("EMPTYDATA");
+            result = await query.ToListAsync();
+            return result;
         }
     }
 }
