@@ -161,14 +161,14 @@ namespace Term7MovieService.Services.Implement
             {
                 Ticket tiktok = new Ticket();
                 tiktok.SeatId = ticket.SeatId;
-                tiktok.TransactionId = ticket.TransactionId;
+                //tiktok.TransactionId = ticket.TransactionId;
                 tiktok.ShowTimeId = ticket.ShowTimeId;
                 tiktok.ShowStartTime = ticket.ShowStartTime;
                 tiktok.OriginalPrice = ticket.OriginalPrice;
                 tiktok.ReceivePrice = ticket.ReceivePrice;
                 tiktok.SellingPrice = ticket.SellingPrice;
                 tiktok.StatusId = ticket.StatusId;
-                tiktok.LockedTime = ticket.LockedTime;
+                tiktok.LockedTime = null;
                 tiktokList.Add(tiktok);
             }
             try

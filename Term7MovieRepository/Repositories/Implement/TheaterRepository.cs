@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -109,6 +111,23 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return theaters;
+        }
+
+        public async Task<IEnumerable<TheaterNameDTO>> GetAllTheaterByCompanyIdAsync(int companyid)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                return null;
+            List<TheaterNameDTO> result = new List<TheaterNameDTO>();
+            var query = _context.Theaters
+                            .Where(a => a.CompanyId == companyid)
+                            .Select(xxx => new TheaterNameDTO
+                            {
+                                Name = xxx.Name,
+                                TheaterId = xxx.Id
+                            });
+            if (!query.Any()) throw new Exception("EMPTYDATA");
+            result = await query.ToListAsync();
+            return result;
         }
 
         private string ConcatQueryWithFilter(string query, string count, TheaterFilterRequest request)

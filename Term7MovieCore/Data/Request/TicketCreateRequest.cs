@@ -11,8 +11,6 @@ namespace Term7MovieCore.Data.Request
         [Range(1, long.MaxValue)]
         public long SeatId { get; set; }
         
-        public Guid TransactionId { get; set; }
-
         [Range(1, long.MaxValue)]
         public long ShowTimeId { get; set; }
         
@@ -30,7 +28,5 @@ namespace Term7MovieCore.Data.Request
         
         [Required]
         public int StatusId { get; set; }
-        
-        public DateTime LockedTime { get; set; }
     }
 }
