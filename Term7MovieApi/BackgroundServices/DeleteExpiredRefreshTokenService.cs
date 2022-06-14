@@ -21,7 +21,7 @@ namespace Term7MovieApi.BackgroundServices
         {
             DateTime now = DateTime.UtcNow;
             DateTime next23H59 = now.Date.AddHours(23).AddMinutes(59).AddSeconds(58);
-            
+
             timer = new Timer(DeleteExpiredRefreshToken, null, next23H59 - now, TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
