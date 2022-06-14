@@ -6,6 +6,7 @@ using Term7MovieCore.Data.Dto;
 using Dapper;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Collections;
+using Microsoft.EntityFrameworkCore;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -100,6 +101,23 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             int count = 0;
             return count;
+        }
+
+        public async Task<long?> GetManagerIdFromCompanyId(int companyid)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            return _context.Companies.FirstOrDefault(a => a.Id == companyid).ManagerId;
+            //long? company = null;
+            //using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            //{
+            //    string sql = @" SELECT TOP(1) ManagerId
+            //                    FROM Companies 
+            //                    WHERE Id = @companyid ";
+            //    object param = new { companyid };
+            //    company = await con.QueryFirstOrDefaultAsync<long>(sql, param);
+            //}
+            //return company;
         }
     }
 }

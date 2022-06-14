@@ -10,6 +10,7 @@ using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
 using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
+using Newtonsoft.Json;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -277,6 +278,9 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.CoverImageUrl = request.CoverImgURL;
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
+                movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
+                movie.Director = request.Director;
+                movie.Languages = request.Language;
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
                 await _context.Movies.AddAsync(movie);
@@ -321,8 +325,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                Movie movie = new Movie();
-                movie.Id = request.MovieId;
+                Movie movie = _context.Movies.SingleOrDefault(a => a.Id == request.MovieId);
                 movie.Title = request.Title;
                 movie.ReleaseDate = request.ReleasedDate;
                 movie.Duration = request.Duration;
@@ -331,6 +334,9 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.CoverImageUrl = request.CoverImgURL;
                 movie.TrailerUrl = request.TrailerURL;
                 movie.Description = request.Description;
+                movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
+                movie.Director = request.Director;
+                movie.Languages = request.Language;
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
                 _context.Update(movie);

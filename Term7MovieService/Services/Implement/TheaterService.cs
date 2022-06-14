@@ -16,7 +16,7 @@ namespace Term7MovieService.Services.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITheaterRepository theaterRepo;
-        //private readonly ICompanyRepository companyRepo;
+        private readonly ICompanyRepository companyRepo;
         private readonly IMapper _mapper;
         private readonly ILocationService _locationService;
 
@@ -24,7 +24,7 @@ namespace Term7MovieService.Services.Implement
         {
             _unitOfWork = unitOfWork;
             theaterRepo = _unitOfWork.TheaterRepository;
-            //companyRepo = _unitOfWork.CompanyRepository;
+            companyRepo = _unitOfWork.CompanyRepository;
             _mapper = mapper;
             _locationService = locationService;
         }
@@ -126,15 +126,21 @@ namespace Term7MovieService.Services.Implement
             return location;
         }
 
-        public async Task<TheaterNameResponse> GetTheaterNamesFromCompany(int? companyId, long? managerid)
+        public async Task<TheaterNameResponse> GetTheaterNamesFromCompany(int companyId, long? managerid)
         {
             try
             {
-                //if (managerid == null)
-                //    throw new Exception("400");
-                var rawData = await theaterRepo.GetAllTheaterByCompanyIdAsync(companyId.Value);
-                if (rawData == null) 
-                    return new TheaterNameResponse { Message = "Database sập rồi" };
+                if (!managerid.HasValue)
+                    throw new Exception("403");
+                //khum phải manager
+                long? ActualManager = await companyRepo.GetManagerIdFromCompanyId(companyId);
+                if (ActualManager == null)
+                    return new TheaterNameResponse { Message = "Can't find such company" };
+                if (ActualManager.Value != managerid.Value)
+                    throw new Exception("400");
+                //thằng manager này đang ráng vào company thằng khác
+
+                var rawData = await theaterRepo.GetAllTheaterByCompanyIdAsync(companyId);
                 return new TheaterNameResponse { Message = Constants.MESSAGE_SUCCESS,
                                                     TheaterNames = rawData};
             }
@@ -142,6 +148,8 @@ namespace Term7MovieService.Services.Implement
             {
                 if (ex.Message == "EMPTYDATA")
                     return new TheaterNameResponse { Message = "There is no theater in this company." };
+                if (ex.Message == "DBCONNECTION")
+                    return new TheaterNameResponse { Message = "Database down" };
                 throw new Exception(ex.Message);
             }
         }
