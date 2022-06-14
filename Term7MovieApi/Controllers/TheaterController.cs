@@ -47,7 +47,7 @@ namespace Term7MovieApi.Controllers
 
         [HttpGet("names")]
         [Authorize]
-        public async Task<IActionResult> GetTheaterByCompanyId(int? companyId)
+        public async Task<IActionResult> GetTheaterByCompanyId(int companyId)
         {
             try
             {
@@ -58,18 +58,17 @@ namespace Term7MovieApi.Controllers
                     managerid = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
                 }
                 _logger.LogInformation(role + "_" + managerid + "_" + companyId);
-                if (companyId == null)
-                    throw new Exception("400");
-                _logger.LogInformation("Checkmate");
-                var result = await _theaterService.GetTheaterNamesFromCompany(companyId.Value, managerid);
+                //_logger.LogInformation("Checkmate");
+                var result = await _theaterService.GetTheaterNamesFromCompany(companyId, managerid);
                 return Ok(result);
             }
             catch(Exception ex)
             {
-                _logger.LogInformation(ex.Message);
                 if (ex.Message == "400")
-                    return BadRequest(new ParentResponse { Message = "Logic went wrong or access deny." });
-                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
+                    return BadRequest(new ParentResponse { Message = "This manager doesn't belong to this company" });
+                if (ex.Message == "403")
+                    return Forbid();
+                return NotFound(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
             }
         }
 

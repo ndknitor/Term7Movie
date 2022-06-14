@@ -133,7 +133,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<TheaterNameDTO>> GetAllTheaterByCompanyIdAsync(int companyid)
         {
             if (!await _context.Database.CanConnectAsync())
-                return null;
+                throw new Exception("DBCONNECTION");
             List<TheaterNameDTO> result = new List<TheaterNameDTO>();
             var query = _context.Theaters
                             .Where(a => a.CompanyId == companyid)
