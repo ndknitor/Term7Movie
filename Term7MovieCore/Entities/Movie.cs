@@ -18,7 +18,7 @@ namespace Term7MovieCore.Entities
         public string CoverImageUrl { set; get; }
         [Column(TypeName = "varchar(max)")]
         public string TrailerUrl { set; get; }
-        [Column(TypeName = "varchar(max)")]
+        [Column(TypeName = "nvarchar(max)")]
         public string Description { set; get; }
         public long ViewCount { set; get; }
         public float TotalRating { set; get; }
