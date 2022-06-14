@@ -3,6 +3,7 @@ using Term7MovieApi.BackgroundServices;
 using Term7MovieApi.Handlers;
 using Term7MovieApi.Requirements;
 using Term7MovieApi.Requirements.RoomRequirement;
+using Term7MovieApi.Requirements.ShowtimeRequirement;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Options;
 using Term7MovieService.Services.Implement;
@@ -42,6 +43,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<IPaymentService, PaymentService>();
 
+            services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
+
             services.AddScoped<ICompanyService, CompanyService>();
 
             return services;
@@ -71,6 +74,9 @@ namespace Term7MovieApi.Extensions
                 option.AddPolicy(Constants.POLICY_DELETE_ROOM_SAME_THEATER, policy => policy.Requirements.Add(new DeleteRoomWithSameTheaterRequirement()));
 
                 option.AddPolicy(Constants.POLICY_CREATE_TRANSACTION_TICKET_SAME_SHOWTIME, policy => policy.Requirements.Add(new CreateTransactionTicketSameShowtimeRequirement()));
+
+                option.AddPolicy(Constants.POLICY_NO_OVERLAP_SHOWTIME, policy => policy.Requirements.Add(new NoOverlapShowtimeRequirement()));
+                option.AddPolicy(Constants.POLICY_CREATE_SHOWTIME_SAME_MANAGER, policy => policy.Requirements.Add(new CreateShowtimeForSameManagerRequirement()));
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();

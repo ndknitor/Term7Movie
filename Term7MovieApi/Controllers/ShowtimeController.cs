@@ -35,7 +35,8 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [HttpPost] // chua viet policy
+        [HttpPost]
+        [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_CREATE_SHOWTIME_SAME_MANAGER)]
         public async Task<IActionResult> CreateShowtimeAsync(ShowtimeCreateRequest request)
         {
             long managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
@@ -45,6 +46,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpPatch] // chua viet policy
+        [Authorize(Roles = Constants.ROLE_MANAGER)]
         public async Task<IActionResult> UpdateShowtimeAsync(ShowtimeUpdateRequest request)
         {
             var response = await _showtimeService.UpdateShowtimeAsync(request);
