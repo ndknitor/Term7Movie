@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -17,9 +18,9 @@ namespace Term7MovieRepository.Repositories.Implement
             _connectionOption = connection;
         }
 
-        public async Task<IEnumerable<TransactionHistory>> GetAllTransactionHistory(ParentFilterRequest request)
+        public async Task<PagingList<TransactionHistory>> GetAllTransactionHistory(ParentFilterRequest request)
         {
-            IEnumerable<TransactionHistory> list = new List<TransactionHistory>();
+            PagingList<TransactionHistory> pagingList = new PagingList<TransactionHistory>();
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
@@ -29,17 +30,27 @@ namespace Term7MovieRepository.Repositories.Implement
                                 FROM TransactionHistories
                                 ORDER BY Id DESC 
                                 OFFSET @offset ROWS
-                                FETCH NEXT @fetch ROWS ONLY ";
+                                FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string count = @" SELECT COUNT(Id) FROM TransactionHistories ";
+
                 object param = new { fetch, offset };
-                list = await con.QueryAsync<TransactionHistory>(sql, param);
+
+                var multiQ = await con.QueryMultipleAsync(sql + count, param);
+
+                var list = await multiQ.ReadAsync<TransactionHistory>();
+
+                long total = await multiQ.ReadFirstOrDefaultAsync<long>();
+
+                pagingList = new PagingList<TransactionHistory>(request.PageSize, request.Page, list, total);
             }
 
-            return list;
+            return pagingList;
         }
 
-        public async Task<IEnumerable<TransactionHistory>> GetAllTransactionHistoryByCustomerId(ParentFilterRequest request, long customerId)
+        public async Task<PagingList<TransactionHistory>> GetAllTransactionHistoryByCustomerId(ParentFilterRequest request, long customerId)
         {
-            IEnumerable<TransactionHistory> list = new List<TransactionHistory>();
+            PagingList<TransactionHistory> pagingList = new PagingList<TransactionHistory>();
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
@@ -50,32 +61,58 @@ namespace Term7MovieRepository.Repositories.Implement
                                 WHERE UserId = @customerId
                                 ORDER BY Id DESC 
                                 OFFSET @offset ROWS
-                                FETCH NEXT @fetch ROWS ONLY ";
+                                FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string count = @" SELECT COUNT(Id) 
+                                FROM TransactionHistories
+                                WHERE UserId = @customerId ";
+
                 object param = new { customerId, fetch, offset};
-                list = await con.QueryAsync<TransactionHistory>(sql, param);
+
+                var multiQ = await con.QueryMultipleAsync(sql + count, param);
+
+                var list = await multiQ.ReadAsync<TransactionHistory>();
+
+                long total = await multiQ.ReadFirstOrDefaultAsync<long>();
+
+                pagingList = new PagingList<TransactionHistory>(request.PageSize, request.Page, list, total);
+
             }
 
-            return list;
+            return pagingList;
         }
-        public async Task<IEnumerable<TransactionHistory>> GetAllTransactionHistoryByCompanyId(ParentFilterRequest request, long managerId)
+        public async Task<PagingList<TransactionHistory>> GetAllTransactionHistoryByCompanyId(ParentFilterRequest request, long managerId)
         {
-            IEnumerable<TransactionHistory> list = new List<TransactionHistory>();
+            PagingList<TransactionHistory> pagingList = new PagingList<TransactionHistory>();
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 int fetch = request.PageSize;
                 int offset = request.PageSize * (request.Page - 1);
-                string sql = @" SELECT Id, UserId, TicketId, TicketPrice, TheaterId, TheaterName, PurchasedDate, MovieId, TransactionId
+
+                string sql = @" SELECT trh.Id, trh.UserId, trh.TicketId, trh.TicketPrice, trh.TheaterId, trh.TheaterName, trh.PurchasedDate, trh.MovieId, trh.TransactionId
                                 FROM TransactionHistories trh JOIN Theaters th ON trh.TheaterId = th.Id
                                 WHERE th.ManagerId = @managerId
                                 ORDER BY Id DESC 
                                 OFFSET @offset ROWS
-                                FETCH NEXT @fetch ROWS ONLY ";
-                object param = new { fetch, offset };
-                list = await con.QueryAsync<TransactionHistory>(sql, param);
+                                FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string count = @" SELECT COUNT(trh.Id) 
+                                FROM TransactionHistories trh JOIN Theaters th ON trh.TheaterId = th.Id
+                                WHERE th.ManagerId = @managerId ";
+
+                object param = new { fetch, offset, managerId };
+
+                var multiQ = await con.QueryMultipleAsync(sql + count, param);
+
+                var list = await multiQ.ReadAsync<TransactionHistory>();
+
+                long total = await multiQ.ReadFirstOrDefaultAsync<long>();
+
+                pagingList = new PagingList<TransactionHistory>(request.PageSize, request.Page, list, total);
             }
 
-            return list;
+            return pagingList;
         }
         public TransactionHistory GetTransactionHistoryById(long id)
         {

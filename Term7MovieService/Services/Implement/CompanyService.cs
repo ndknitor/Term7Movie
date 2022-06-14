@@ -1,4 +1,5 @@
 ﻿using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
@@ -44,7 +45,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<CompanyListResponse> GetAllCompanyAsync(ParentFilterRequest request)
         {
-            IEnumerable<CompanyDto> list = await companyRepo.GetAllCompany(request);
+            PagingList<CompanyDto> list = await companyRepo.GetAllCompany(request);
 
             return new CompanyListResponse
             {

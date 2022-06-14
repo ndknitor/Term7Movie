@@ -1,4 +1,5 @@
 ﻿using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
@@ -22,7 +23,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<TransactionHistoryListResponse> GetTransactionListHistoryAynsc(ParentFilterRequest request, string role, long userId)
         {
-            IEnumerable<TransactionHistory> list = null;
+            PagingList<TransactionHistory> list = null;
             switch (role)
             {
                 case Constants.ROLE_ADMIN:

@@ -63,6 +63,7 @@ namespace Term7MovieCore.Data
         public const string CONSTRAINT_REQUEST_MESSAGE_MAX_LENGTH = "Max length {1}";
         public const string CONSTRAINT_REQUEST_MESSAGE_START_TIME_NOT_VALID = "Start time not valid";
         public const string CONSTRAINT_REQUEST_MESSAGE_END_TIME_NOT_VALID = "End time not valid";
+        public const string CONSTRAINT_REQUEST_SHOWTIME_MUST_BE_IN_40MIN = "Start time must be in next 40 minutes";
 
         public const int DefaultPageSize = 10;
         public const int DefaultPage = 1;
@@ -73,7 +74,11 @@ namespace Term7MovieCore.Data
 
         public const string POLICY_CREATE_TRANSACTION_TICKET_SAME_SHOWTIME = "OnlyCreateTransactionForTicketInTheSameShowtime";
 
+        public const string POLICY_NO_OVERLAP_SHOWTIME = "NoOverlapShowtime";
+        public const string POLICY_CREATE_SHOWTIME_SAME_MANAGER = "OnlyCreateShowtimeSameManager";
+
         public const int LOCK_TICKET_IN_MINUTE = 5;
+        public const int CREATE_SHOWTIME_UPPER_BOUND_IN_MINUTE = 40;
 
         public const string LANG_VI = "vi";
         public const string LANG_EN = "en";

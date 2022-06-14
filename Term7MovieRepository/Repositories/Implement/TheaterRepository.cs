@@ -59,14 +59,31 @@ namespace Term7MovieRepository.Repositories.Implement
 
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
-                string query =
+                string queryTheater =
                     " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status " +
                     " FROM Theaters " +
-                    " WHERE Status = 1 AND Id = @id ";
+                    " WHERE Status = 1 AND Id = @id ; ";
+
+                string queryShowtime = 
+                    @" SELECT sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, m.Id, m.Title, m.RestrictedAge, m.PosterImageUrl, m.CoverImageUrl, m.TrailerUrl, m.Duration
+                       FROM Showtimes sh JOIN Movies m on sh.MovieId = m.Id
+                       WHERE TheaterId = @id AND StartTime > GETUTCDATE() ";
 
                 object param = new { id };
 
-                theater = await con.QueryFirstOrDefaultAsync<TheaterDto>(query, param);
+                var multiQ = await con.QueryMultipleAsync(queryTheater + queryShowtime, param);
+                
+                theater = await multiQ.ReadFirstOrDefaultAsync<TheaterDto>();
+
+                if (theater != null)
+                {
+                    theater.Showtimes = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>(
+                        (sh, m) =>
+                        {
+                            sh.Movie = m;
+                            return sh;
+                        }, splitOn: "Id");
+                }
             }
 
             return theater;

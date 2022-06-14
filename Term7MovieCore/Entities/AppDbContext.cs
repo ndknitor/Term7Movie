@@ -9,14 +9,9 @@ namespace Term7MovieCore.Entities
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public virtual DbSet<Actor> Actors { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
-        public virtual DbSet<Director> Directors { get; set; }
-        public virtual DbSet<Language> Languages { get; set; }
         public virtual DbSet<Movie> Movies { get; set; }
-        public virtual DbSet<MovieActor> MoversActors { get; set; }
         public virtual DbSet<MovieCategory> MovieCategories { get; set; }
-        public virtual DbSet<MovieLanguage> MovieLanguages { set; get; }
         public virtual DbSet<RefreshToken> RefreshTokens { set; get; }
         public virtual DbSet<Room> Rooms { set; get; }
         public virtual DbSet<Seat> Seats { set; get; }
@@ -56,14 +51,8 @@ namespace Term7MovieCore.Entities
             builder.Entity<UserLogin>()
                 .HasKey(ul => new { ul.ProviderKey, ul.LoginProvider });
 
-            builder.Entity<MovieActor>()
-                .HasKey(ma => new { ma.MovieId, ma.ActorId });
-
             builder.Entity<MovieCategory>()
                 .HasKey(mc => new { mc.MovieId, mc.CategoryId });
-
-            builder.Entity<MovieLanguage>()
-                .HasKey(ml => new { ml.MovieId, ml.LanguageId });
 
             builder.Entity<RefreshToken>()
                 .HasIndex(r => r.Jti)

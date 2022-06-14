@@ -21,7 +21,7 @@ namespace Term7MovieCore.Data.Collections
             Page = page;
             Total = total;
             Results = results;
-            MaxPage = (long) (Math.Ceiling((double)total / pageSize));
+            MaxPage = (long) Math.Ceiling(total / ((float)pageSize));
         }
     }
 }

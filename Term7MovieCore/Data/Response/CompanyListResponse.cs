@@ -1,9 +1,10 @@
-﻿using Term7MovieCore.Data.Dto;
+﻿using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
 
 namespace Term7MovieCore.Data.Response
 {
     public class CompanyListResponse : ParentResponse
     {
-        public IEnumerable<CompanyDto> Companies { set; get; }
+        public PagingList<CompanyDto> Companies { set; get; }
     }
 }

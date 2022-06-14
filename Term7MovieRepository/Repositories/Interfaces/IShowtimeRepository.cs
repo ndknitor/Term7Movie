@@ -12,5 +12,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<int> CreateShowtimeAsync(Showtime showtime);
         Task UpdateShowtimeAsync(Showtime showtime);
         int DeleteShowtimeById(long id);
+        Task<bool> IsShowtimeNotOverlap(ShowtimeCreateRequest request);
+
+        Task<bool> CanManagerCreateShowtime(ShowtimeCreateRequest request, long managerId);
     }
 }

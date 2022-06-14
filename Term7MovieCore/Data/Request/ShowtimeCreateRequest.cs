@@ -15,7 +15,7 @@ namespace Term7MovieCore.Data.Request
         [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO)]
         public int TheaterId { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        [FutureDatetime(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_START_TIME_NOT_VALID)]
+        [ShowtimeInNext30MinAtrribute(ErrorMessage = Constants.CONSTRAINT_REQUEST_SHOWTIME_MUST_BE_IN_40MIN)]
         public DateTime StartTime { set; get; }
     }
 }
