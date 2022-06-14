@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
 using System.Security.Claims;
 using Term7MovieApi.Extensions;
 using Term7MovieApi.Requirements;
 using Term7MovieApi.Requirements.RoomRequirement;
+using Term7MovieApi.Requirements.ShowtimeRequirement;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Extensions;
 using Term7MovieCore.Data.Request;
 using Term7MovieRepository.Repositories.Interfaces;
@@ -61,6 +64,13 @@ namespace Term7MovieApi.Handlers
 
                         break;
 
+                    case CreateShowtimeForSameManagerRequirement:
+
+                        ShowtimeCreateRequest showtimeCreateRequest = await httpContext.Request.ToObjectAsync<ShowtimeCreateRequest>();
+
+                        if (await CanManagerCreateShowtime(claims, showtimeCreateRequest)) context.Succeed(requirement);
+
+                        break;
                 }
             }
         }
@@ -112,6 +122,33 @@ namespace Term7MovieApi.Handlers
             ITicketRepository ticketRepository = _unitOfWork.TicketRepository;
 
             return await ticketRepository.IsTicketInShowtimeValid(resource.ShowtimeId, resource.IdList);
+        }
+
+        private async Task<bool> IsShowtimeNotOverlapValid<T>( T resource)
+        {
+            bool valid = false;
+            switch(resource)
+            {
+                case ShowtimeCreateRequest:
+                    valid = await _unitOfWork.ShowtimeRepository.IsShowtimeNotOverlap(resource as ShowtimeCreateRequest);
+                    break;
+            }
+
+            return valid;
+        }
+
+        private async Task<bool> CanManagerCreateShowtime<T>(IEnumerable<Claim> claims, T resource)         
+        {
+            bool valid = false;
+            long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            switch(resource)
+            {
+                case ShowtimeCreateRequest:
+                    valid = await _unitOfWork.ShowtimeRepository.CanManagerCreateShowtime(resource as ShowtimeCreateRequest, managerId);
+                    break;
+            }
+
+            return valid;
         }
     }
 }

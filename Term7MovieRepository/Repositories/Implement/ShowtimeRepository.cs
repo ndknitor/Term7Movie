@@ -111,5 +111,81 @@ namespace Term7MovieRepository.Repositories.Implement
             int count = 0;
             return count;
         }
+
+        public async Task<bool> CanManagerCreateShowtime(ShowtimeCreateRequest request, long managerId)
+        {
+            bool valid = false;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" SELECT 1
+                                FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id 
+                                WHERE RoomId = @RoomId AND TheaterId = @TheaterId AND th.ManagerId = @managerId ";
+
+                object param = new { request.TheaterId, request.RoomId, managerId };
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
+
+                valid = count == 1;
+            }
+
+            return valid;
+        }
+
+        public async Task<bool> CanManagerUpdateShowtime(ShowtimeUpdateRequest request, long managerId)
+        {
+            bool valid = false;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" SELECT 1
+                                FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id 
+                                WHERE Id = @Id AND th.ManagerId = @managerId ";
+
+                object param = new { request.Id, managerId };
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
+
+                valid = count == 1;
+            }
+
+            return valid;
+        }
+
+        public async Task<bool> IsShowtimeNotOverlap(ShowtimeCreateRequest request)
+        {
+            bool valid = false;
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" SELECT 1
+                                FROM Showtimes 
+                                WHERE RoomId = @RoomId AND TheaterId = @TheaterId AND @StartTime BETWEEN StartTime AND EndTime ";
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, request);
+
+                valid = count == 0;
+            }
+
+            return valid;
+        }
+
+        public async Task<bool> IsShowtimeNotOverlap(ShowtimeUpdateRequest request)
+        {
+            bool valid = false;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" SELECT 1
+                                FROM Showtimes 
+                                WHERE Id = @Id AND @StartTime BETWEEN StartTime AND EndTime ";
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, request);
+
+                valid = count == 0;
+            }
+
+            return valid;
+        }
     }
 }

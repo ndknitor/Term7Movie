@@ -54,6 +54,16 @@ namespace Term7MovieApi.Filters
                     context.Result = new JsonResult(response);
                     break;
 
+                case BadRequestException:
+
+                    _logger.LogError(message);
+
+                    response.Message = message;
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    context.Result = new JsonResult(response);
+
+                    break;
+
             }
         }
     }

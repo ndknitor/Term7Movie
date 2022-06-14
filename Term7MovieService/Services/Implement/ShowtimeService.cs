@@ -49,13 +49,18 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<ParentResponse> CreateShowtimeAsync(ShowtimeCreateRequest request, long managerId)
         {
+
             Showtime showtime = _mapper.Map<Showtime>(request);
 
-            bool isExist = await _unitOfWork.RoomRepository.CheckRoomExist(managerId, request.TheaterId, request.RoomId);
+            bool notOverlap = await showtimeRepo.IsShowtimeNotOverlap(request);
 
-            if (!isExist) throw new DbOperationException();
+            if (!notOverlap) throw new BadRequestException(ErrorMessageConstants.ERROR_MESSAGE_SHOWTIME_OVERLAP);
 
             await showtimeRepo.CreateShowtimeAsync(showtime);
+
+            if (!_unitOfWork.HasChange()) throw new DbOperationException();
+
+            await _unitOfWork.CompleteAsync();
 
             return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
         }

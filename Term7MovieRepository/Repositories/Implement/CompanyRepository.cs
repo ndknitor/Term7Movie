@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data.Dto;
 using Dapper;
 using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Collections;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -17,9 +18,9 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
-        public async Task<IEnumerable<CompanyDto>> GetAllCompany(ParentFilterRequest request)
+        public async Task<PagingList<CompanyDto>> GetAllCompany(ParentFilterRequest request)
         {
-            IEnumerable<CompanyDto> list = new List<CompanyDto>();
+            PagingList<CompanyDto> pagingList = new PagingList<CompanyDto>();
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
@@ -32,14 +33,19 @@ namespace Term7MovieRepository.Repositories.Implement
                                 OFFSET @offset ROWS
                                 FETCH NEXT @fetch ROWS ONLY ; ";
 
+                string count = @" SELECT COUNT(Id) 
+                                FROM Companies ; ";
+
                 string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
                                          FROM Theaters ";
 
                 object param = new { fetch, offset };
 
-                var multiQ = await con.QueryMultipleAsync(sql + theaterQuery, param);
+                var multiQ = await con.QueryMultipleAsync(sql + count + theaterQuery, param);
 
-                list = await multiQ.ReadAsync<CompanyDto>();
+                IEnumerable<CompanyDto> list = await multiQ.ReadAsync<CompanyDto>();
+
+                long total = await multiQ.ReadFirstOrDefaultAsync<long>();
 
                 IEnumerable<TheaterDto> theaters = await multiQ.ReadAsync<TheaterDto>();
 
@@ -47,9 +53,11 @@ namespace Term7MovieRepository.Repositories.Implement
                 {
                     company.Theaters = theaters.Where(t => t.CompanyId == company.Id);
                 }
+
+                pagingList = new PagingList<CompanyDto>(page: request.Page, pageSize: request.PageSize, results: list, total: total);
             }
 
-            return list;
+            return pagingList;
         }
         public async Task<CompanyDto> GetCompanyById(int id)
         {
