@@ -13,10 +13,12 @@ namespace Term7MovieApi.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyService _companyService;
+        private readonly ILogger<CompanyController> _logger;
 
-        public CompanyController(ICompanyService companyService)
+        public CompanyController(ILogger<CompanyController> logger, ICompanyService companyService)
         {
             _companyService = companyService;
+            _logger = logger;
         }
 
         [Authorize]
@@ -29,7 +31,7 @@ namespace Term7MovieApi.Controllers
             {
                 managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
             }
-
+            //_logger.LogInformation(role + "_" + managerId.ToString() + "_" + companyId.ToString());
             var response = await _companyService.GetCompanyDetailAsync(companyId, managerId);
 
             return Ok(response);

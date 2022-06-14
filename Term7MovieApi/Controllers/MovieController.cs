@@ -7,6 +7,7 @@ using Term7MovieCore.Entities;
 using Term7MovieService.Services.Interface;
 using System.Diagnostics;
 using Term7MovieCore.Data.Request.Movie;
+using Term7MovieCore.Data;
 
 namespace Term7MovieApi.Controllers
 {
@@ -60,6 +61,7 @@ namespace Term7MovieApi.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPost]
         public async Task<IActionResult> CreateMovie(MovieCreateRequest[] request)
         {
@@ -82,6 +84,7 @@ namespace Term7MovieApi.Controllers
             }
         }
 
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPut]
         public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
         {
@@ -102,6 +105,7 @@ namespace Term7MovieApi.Controllers
             }
         }
 
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpDelete]
         public async Task<IActionResult> DeleteMovie(int movieid)
         {

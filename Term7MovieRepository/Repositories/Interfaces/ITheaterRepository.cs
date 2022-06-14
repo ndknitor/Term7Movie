@@ -1,5 +1,6 @@
 ﻿using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 
@@ -13,5 +14,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task UpdateTheaterAsync(Theater theater);
         Task DeleteTheaterAsync(int id);
         Task<IEnumerable<TheaterDto>> GetTheaterByManagerIdAsync(long managerId);
+        Task<IEnumerable<TheaterNameDTO>> GetAllTheaterByCompanyIdAsync(int companyid);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Room;
 using Term7MovieCore.Entities;
 
 namespace Term7MovieRepository.Repositories.Interfaces
@@ -12,5 +13,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task DeleteRoom(int roomId);
         Task<IEnumerable<RoomDto>> GetRoomByManagerIdAsync(long managerId);
         Task<bool> CheckRoomExist(long managerId, int theaterId, int roomId);
+        Task<IEnumerable<RoomNumberDTO>> GetRoomNumberFromTheater(int theaterid);
     }
 }

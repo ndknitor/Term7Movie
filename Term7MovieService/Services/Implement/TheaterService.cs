@@ -5,6 +5,7 @@ using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data.Response.Theater;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
@@ -15,6 +16,7 @@ namespace Term7MovieService.Services.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITheaterRepository theaterRepo;
+        //private readonly ICompanyRepository companyRepo;
         private readonly IMapper _mapper;
         private readonly ILocationService _locationService;
 
@@ -22,6 +24,7 @@ namespace Term7MovieService.Services.Implement
         {
             _unitOfWork = unitOfWork;
             theaterRepo = _unitOfWork.TheaterRepository;
+            //companyRepo = _unitOfWork.CompanyRepository;
             _mapper = mapper;
             _locationService = locationService;
         }
@@ -121,6 +124,26 @@ namespace Term7MovieService.Services.Implement
                 location.Lng = location.Lng.Length > 20 ? location.Lng.Substring(0, 20) : location.Lng;
             }
             return location;
+        }
+
+        public async Task<TheaterNameResponse> GetTheaterNamesFromCompany(int? companyId, long? managerid)
+        {
+            try
+            {
+                //if (managerid == null)
+                //    throw new Exception("400");
+                var rawData = await theaterRepo.GetAllTheaterByCompanyIdAsync(companyId.Value);
+                if (rawData == null) 
+                    return new TheaterNameResponse { Message = "Database sập rồi" };
+                return new TheaterNameResponse { Message = Constants.MESSAGE_SUCCESS,
+                                                    TheaterNames = rawData};
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message == "EMPTYDATA")
+                    return new TheaterNameResponse { Message = "There is no theater in this company." };
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

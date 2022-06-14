@@ -14,11 +14,13 @@ namespace Term7MovieApi.Controllers
     [ApiController]
     public class TheaterController : ControllerBase
     {
+        private readonly ILogger<TheaterController> _logger;
         private readonly ITheaterService _theaterService;
 
-        public TheaterController(ITheaterService theaterService)
+        public TheaterController(ILogger<TheaterController> logger, ITheaterService theaterService)
         {
             _theaterService = theaterService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -42,6 +44,35 @@ namespace Term7MovieApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("names")]
+        [Authorize]
+        public async Task<IActionResult> GetTheaterByCompanyId(int? companyId)
+        {
+            try
+            {
+                string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+                long? managerid = null;
+                if(Constants.ROLE_MANAGER.Equals(role))
+                {
+                    managerid = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+                }
+                _logger.LogInformation(role + "_" + managerid + "_" + companyId);
+                if (companyId == null)
+                    throw new Exception("400");
+                _logger.LogInformation("Checkmate");
+                var result = await _theaterService.GetTheaterNamesFromCompany(companyId.Value, managerid);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                if (ex.Message == "400")
+                    return BadRequest(new ParentResponse { Message = "Logic went wrong or access deny." });
+                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
+            }
+        }
+
 
         [HttpPost]
         [Authorize(Roles = Constants.ROLE_MANAGER)]

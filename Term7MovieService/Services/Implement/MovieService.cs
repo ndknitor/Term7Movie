@@ -11,6 +11,7 @@ using Term7MovieCore.Data.Response.Movie;
 using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
 using Newtonsoft.Json;
+using Term7MovieCore.Data;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -59,7 +60,7 @@ namespace Term7MovieService.Services.Implement
             }
             if (list.Count == 0) IMR.Message = "No data for incoming movies :(";
             else if (list.Count < 3) IMR.Message = "Missing incoming movie from database";
-            else IMR.Message = "Succesfully";
+            else IMR.Message = Constants.MESSAGE_SUCCESS;
             IMR.LosslessMovieList = list;
             return IMR;
         }
@@ -104,7 +105,7 @@ namespace Term7MovieService.Services.Implement
                 list.Add(movie);
             }
             if (!DoesItNull)
-                mhpr.Message = "Succesfully";
+                mhpr.Message = Constants.MESSAGE_SUCCESS;
             else mhpr.Message = "Some movie categories is null";
             mhpr.movieList = list;
             return mhpr;
@@ -161,7 +162,7 @@ namespace Term7MovieService.Services.Implement
                 list.Add(movie);
             }
             if (!DoesItNull)
-                mlr.Message = "Succesfully";
+                mlr.Message = Constants.MESSAGE_SUCCESS;
             else mlr.Message = "Some movie categories is null";
             mlr.MovieList = list;
             mlr.CurrentPage = request.PageIndex;
@@ -200,7 +201,7 @@ namespace Term7MovieService.Services.Implement
                 return mdr;
             }
             dto.movieTypes = categories;
-            mdr.Message = "Successful";
+            mdr.Message = Constants.MESSAGE_SUCCESS;
             return mdr;
                 
         }
@@ -230,7 +231,7 @@ namespace Term7MovieService.Services.Implement
                 bool result = await movieRepository.CreateMovie(Movies);
                 if (result)
                 {
-                    father.Message = "Successful";
+                    father.Message = Constants.MESSAGE_SUCCESS;
                     return father;
                 }
                 father.Message = "Create Movie Failed";
@@ -273,7 +274,7 @@ namespace Term7MovieService.Services.Implement
                 response.Message = "All movie was failed while adding";
             else if (ErrorList.Any(a => a.Status == false))
                 response.Message = "Some movie was failed while adding";
-            else response.Message = "Successfully";
+            else response.Message = Constants.MESSAGE_SUCCESS;
             return response;
         }
 
@@ -283,7 +284,7 @@ namespace Term7MovieService.Services.Implement
             try
             {
                 if (await movieRepository.UpdateMovie(request))
-                    response.Message = "Succesful";
+                    response.Message = Constants.MESSAGE_SUCCESS;
                 else response.Message = "Some of category was failed while updating movie";
             }
             catch (Exception ex)
@@ -307,7 +308,7 @@ namespace Term7MovieService.Services.Implement
                 //hiện tại bên repo đang false => ko có connect
                 //throw exception tạm thời để track bug vì đang trong giai đoạn development :v
                 if (await movieRepository.DeleteMovie(movieid))
-                    response.Message = "Successful";
+                    response.Message = Constants.MESSAGE_SUCCESS;
                 else response.Message = "Failed to deleted this movie";
             }
             catch(Exception ex)
@@ -338,7 +339,7 @@ namespace Term7MovieService.Services.Implement
             }
             return new MovieTitleResponse
             {
-                Message = "Successful",
+                Message = Constants.MESSAGE_SUCCESS,
                 MovieTitles = list
             };
         }
