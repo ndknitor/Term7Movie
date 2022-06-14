@@ -57,7 +57,7 @@ namespace Term7MovieApi.Controllers
                 {
                     managerid = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
                 }
-                _logger.LogInformation(role + "_" + managerid + "_" + companyId);
+                //_logger.LogInformation(role + "_" + managerid + "_" + companyId);
                 //_logger.LogInformation("Checkmate");
                 var result = await _theaterService.GetTheaterNamesFromCompany(companyId, managerid);
                 return Ok(result);
