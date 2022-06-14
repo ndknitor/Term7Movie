@@ -4,6 +4,7 @@ using Term7MovieCore.Data.Options;
 using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data.Dto;
 using Dapper;
+using Term7MovieCore.Data.Request;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -16,9 +17,24 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
-        public IEnumerable<TheaterCompany> GetAllCompany()
+        public async Task<IEnumerable<CompanyDto>> GetAllCompany(ParentFilterRequest request)
         {
-            IEnumerable<TheaterCompany> list = new List<TheaterCompany>();
+            IEnumerable<CompanyDto> list = new List<CompanyDto>();
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                int offset = request.PageSize*(request.Page - 1);
+                int fetch = request.PageSize;
+
+                string sql = @" SELECT Id, Name, LogoUrl, IsActive 
+                                FROM Companies 
+                                ORDER BY Id 
+                                OFFSET @offset ROWS
+                                FETCH NEXT @fetch ROWS ONLY ";
+                object param = new { fetch, offset };
+                list = await con.QueryAsync<CompanyDto>(sql, param);
+            }
+
             return list;
         }
         public async Task<CompanyDto> GetCompanyById(int id)
