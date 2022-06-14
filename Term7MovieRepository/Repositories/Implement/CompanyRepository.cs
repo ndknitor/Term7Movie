@@ -30,9 +30,23 @@ namespace Term7MovieRepository.Repositories.Implement
                                 FROM Companies 
                                 ORDER BY Id 
                                 OFFSET @offset ROWS
-                                FETCH NEXT @fetch ROWS ONLY ";
+                                FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
+                                         FROM Theaters ";
+
                 object param = new { fetch, offset };
-                list = await con.QueryAsync<CompanyDto>(sql, param);
+
+                var multiQ = await con.QueryMultipleAsync(sql + theaterQuery, param);
+
+                list = await multiQ.ReadAsync<CompanyDto>();
+
+                IEnumerable<TheaterDto> theaters = await multiQ.ReadAsync<TheaterDto>();
+
+                foreach(var company in list)
+                {
+                    company.Theaters = theaters.Where(t => t.CompanyId == company.Id);
+                }
             }
 
             return list;
