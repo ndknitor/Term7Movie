@@ -41,6 +41,7 @@ builder.Services.InjectProjectServices();
 
 // create instance for config in appsettings.json
 builder.Services.ConfigureOptions(config);
+builder.Services.ConfigureBackgroundService();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
