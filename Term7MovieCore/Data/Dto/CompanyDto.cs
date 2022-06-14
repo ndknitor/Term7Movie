@@ -12,5 +12,6 @@ namespace Term7MovieCore.Data.Dto
         public string Name { set; get; }
         public string LogoUrl { set; get; }
         public bool IsActive { set; get; }
+        public IEnumerable<TheaterDto> Theaters { set; get; }
     }
 }

@@ -1,15 +1,18 @@
-﻿using Term7MovieRepository.Repositories.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using Term7MovieCore.Data.Options;
+using Term7MovieRepository.Repositories.Implement;
+using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieApi.BackgroundServices
 {
     public class DeleteExpiredRefreshTokenService : IHostedService, IDisposable
     {
         private Timer timer = null;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IRefreshTokenRepository refreshTokenRepository;
 
-        public DeleteExpiredRefreshTokenService(IUnitOfWork unitOfWork)
+        public DeleteExpiredRefreshTokenService(IOptions<ConnectionOption> connectionOption)
         {
-            _unitOfWork = unitOfWork;
+            refreshTokenRepository = new RefreshTokenRepository(null, connectionOption.Value);
         }
 
         void IDisposable.Dispose()
@@ -20,8 +23,9 @@ namespace Term7MovieApi.BackgroundServices
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
             DateTime now = DateTime.UtcNow;
-            DateTime next23H59 = now.Date.AddHours(23).AddMinutes(59).AddSeconds(58);
+            DateTime next23H59 = now.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
+            refreshTokenRepository.DeleteExpiredRefreshToken();
             timer = new Timer(DeleteExpiredRefreshToken, null, next23H59 - now, TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
@@ -36,7 +40,7 @@ namespace Term7MovieApi.BackgroundServices
 
         private void DeleteExpiredRefreshToken(object state)
         {
-            _unitOfWork.RefreshTokenRepository.DeleteExpiredRefreshToken();
+            refreshTokenRepository.DeleteExpiredRefreshToken();
         }
     }
 }
