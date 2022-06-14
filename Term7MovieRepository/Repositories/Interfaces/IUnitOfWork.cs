@@ -2,13 +2,9 @@
 {
     public interface IUnitOfWork
     {
-        IActorRepository ActorRepository { get; }
         ICategoryRepository CategoryRepository { get; }
         ICompanyRepository CompanyRepository { get; }
-        ILanguageRepository LanguageRepository { get; }
-        IMovieActorRepository MovieActorRepository { get; }
         IMovieCategoryRepository MovieCategoryRepository { get; }
-        IMovieLanguageRepository MovieLanguageRepository { get; }
         IMovieRepository MovieRepository { get; }
         IRefreshTokenRepository RefreshTokenRepository { get; }
         IRoomRepository RoomRepository { get; }

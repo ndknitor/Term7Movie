@@ -16,13 +16,9 @@ namespace Term7MovieRepository.Repositories.Implement
             _connectionOption = connectionOption.Value;
         }
 
-        public IActorRepository ActorRepository { get => new ActorRepository(_context); }
         public ICategoryRepository CategoryRepository { get => new CategoryRepository(_context); }
         public ICompanyRepository CompanyRepository { get => new CompanyRepository(_context, _connectionOption); }
-        public ILanguageRepository LanguageRepository { get => new LanguageRepository(_context); }
-        public IMovieActorRepository MovieActorRepository { get => new MovieActorRepository(_context); }
         public IMovieCategoryRepository MovieCategoryRepository { get => new MovieCategoryRepository(_context); }
-        public IMovieLanguageRepository MovieLanguageRepository { get => new MovieLanguageRepository(_context); }
         public IMovieRepository MovieRepository { get => new MovieRepository(_context, _connectionOption); }
         public IRefreshTokenRepository RefreshTokenRepository { get => new RefreshTokenRepository(_context, _connectionOption); }
         public IRoomRepository RoomRepository { get => new RoomRepository(_context, _connectionOption); }

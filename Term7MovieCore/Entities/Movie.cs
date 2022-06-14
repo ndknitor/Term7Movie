@@ -18,14 +18,16 @@ namespace Term7MovieCore.Entities
         public string CoverImageUrl { set; get; }
         [Column(TypeName = "varchar(max)")]
         public string TrailerUrl { set; get; }
-        [Column(TypeName = "nvarchar(max)")]
+        [Column(TypeName = "varchar(max)")]
         public string Description { set; get; }
         public long ViewCount { set; get; }
         public float TotalRating { set; get; }
-        public int? DirectorId { set; get; }
-        public Director Director { set; get; }
-        public ICollection<MovieActor> MovieActors { set; get; }
-        public ICollection<MovieLanguage> MovieLanguages { set; get; }
+        [Column(TypeName = "varchar(max)")]
+        public string Director { set; get; }
+        [Column(TypeName = "varchar(max)")]
+        public string Actors { set; get; }
+        [Column(TypeName = "varchar(max)")]
+        public string Languages { set; get; }
         public ICollection<MovieCategory> MovieCategories { set; get; }
         public ICollection<Showtime> MovieShowtimes { set; get; }
         public ICollection<MovieRating> MovieRatings { set; get; }
