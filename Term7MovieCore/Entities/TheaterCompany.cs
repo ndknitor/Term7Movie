@@ -8,7 +8,7 @@ namespace Term7MovieCore.Entities
     {
         public int Id { set; get; }
         [Column(TypeName = "nvarchar(30)"), Required]
-        public int Name { set; get; }
+        public string Name { set; get; }
         [Column(TypeName = "varchar(200)")]
         public string LogoUrl { set; get; }
         public bool IsActive { set; get; }
