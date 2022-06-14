@@ -20,5 +20,8 @@ namespace Term7MovieCore.Data.Request.Movie
         //public int? DirectorId { get; set; }
         [Required]
         public int[] CategoryIDs { get; set; }
+        public string Director { get; set; }
+        public string[] Actors { get; set; }
+        public string Language { get; set; }
     }
 }
