@@ -12,6 +12,7 @@ using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
 using Newtonsoft.Json;
 using Term7MovieCore.Data;
+using Term7MovieRepository.Cache.Interface;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -19,16 +20,30 @@ namespace Term7MovieService.Services.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMovieRepository movieRepository;
+        private readonly ICacheProvider _cacheProvider;
 
-        public MovieService(IUnitOfWork unitOfWork)
+        public MovieService(IUnitOfWork unitOfWork, ICacheProvider cacheProvider)
         {
             _unitOfWork = unitOfWork;
             movieRepository = _unitOfWork.MovieRepository;
+            _cacheProvider = cacheProvider;
         }
 
         public async Task<MovieListResponse> GetAllMovie(ParentFilterRequest request)
         {
-            PagingList<MovieModelDto> movies = await movieRepository.GetAllMovie(request);
+            PagingList<MovieModelDto> movies;
+
+            IEnumerable<MovieModelDto> list = await _cacheProvider.GetValueAsync<IEnumerable<MovieModelDto>>(Constants.REDIS_KEY_MOVIE);
+
+            if (list == null)
+            {
+                movies = await movieRepository.GetAllMovie(request);
+            } else
+            {
+                var pagingList = list.Skip(request.PageSize * (request.Page - 1)).Take(request.PageSize);
+
+                movies = new PagingList<MovieModelDto>(request.PageSize, request.Page, pagingList, list.Count());
+            }
 
             return new MovieListResponse
             {

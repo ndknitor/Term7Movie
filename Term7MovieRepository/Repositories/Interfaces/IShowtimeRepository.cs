@@ -8,6 +8,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
     public interface IShowtimeRepository
     {
         Task<PagingList<ShowtimeDto>> GetShowtimesByTheaterIdAsync(ShowtimeFilterRequest request);
+
+        Task<PagingList<ShowtimeDto>> GetShowtimesByManagerIdAsync(ShowtimeFilterRequest request, long managerId);
         Task<ShowtimeDto> GetShowtimeByIdAsync(long id);
         Task<int> CreateShowtimeAsync(Showtime showtime);
         Task UpdateShowtimeAsync(Showtime showtime);

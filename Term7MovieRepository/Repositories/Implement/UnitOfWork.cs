@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Entities;
+using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieRepository.Repositories.Implement
@@ -10,10 +11,12 @@ namespace Term7MovieRepository.Repositories.Implement
     {
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
-        public UnitOfWork(AppDbContext context, IOptions<ConnectionOption> connectionOption)
+        private readonly ICacheProvider _cacheProvider;
+        public UnitOfWork(AppDbContext context, ICacheProvider cacheProvider, IOptions<ConnectionOption> connectionOption)
         {
             _context = context;
             _connectionOption = connectionOption.Value;
+            _cacheProvider = cacheProvider;
         }
 
         public ICategoryRepository CategoryRepository { get => new CategoryRepository(_context); }

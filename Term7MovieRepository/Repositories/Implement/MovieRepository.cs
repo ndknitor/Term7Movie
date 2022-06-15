@@ -34,23 +34,77 @@ namespace Term7MovieRepository.Repositories.Implement
                 string query =
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
                     " FROM Movies " +
-                    " WHERE ReleaseDate BETWEEN ( GETDATE() - 30) AND (GETDATE() + 30) " +
+                    " WHERE ReleaseDate >= ( GETUTCDATE() - 60)  " +
                     " ORDER BY Id " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
-                string count = " SELECT COUNT(1) FROM Movies ";
+
+                string count = " SELECT COUNT(1) FROM Movies WHERE ReleaseDate >= ( GETUTCDATE() - 60) ; ";
+
+                string category = 
+                    " SELECT mc.MovieId, c.Id, c.Name " +
+                    " FROM MovieCategories mc JOIN Categories c ON mc.CategoryId = c.Id ";
 
                 object param = new { offset, fetch };
                 
-                var multiQ = await con.QueryMultipleAsync(query + count, param);
+                var multiQ = await con.QueryMultipleAsync(query + count + category, param);
+
                 IEnumerable<MovieModelDto> list = await multiQ.ReadAsync<MovieModelDto>();
+
                 long total = await multiQ.ReadFirstAsync<long>();
+
+                IEnumerable<MovieCategory> movieCategories = multiQ.Read<MovieCategory, Category, MovieCategory>((mc, c) =>
+                {
+                    mc.Category = c;
+                    return mc;
+                });
+
+                foreach(MovieModelDto m in list)
+                {
+                    m.Categories = movieCategories.Where(mc => m.Id == mc.MovieId).Select(c => new CategoryDTO {Id = c.Category.Id, Name = c.Category.Name });
+                }
 
                 pagingList = new PagingList<MovieModelDto>(request.PageSize, request.Page, list, total);
             }
 
             return pagingList;
         }
+
+        public IEnumerable<MovieModelDto> GetAllMovie()
+        {
+            IEnumerable<MovieModelDto> list;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string query =
+                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
+                    " FROM Movies " +
+                    " WHERE ReleaseDate >= ( GETUTCDATE() - 60) " +
+                    " ORDER BY ReleaseDate DESC ; ";
+
+                string category =
+                    " SELECT mc.MovieId, c.Id, c.Name " +
+                    " FROM MovieCategories mc JOIN Categories c ON mc.CategoryId = c.Id ; ";
+
+                var multiQ = con.QueryMultiple(query + category);
+
+                list = multiQ.Read<MovieModelDto>();
+
+                IEnumerable<MovieCategory> movieCategories = multiQ.Read<MovieCategory, Category, MovieCategory>((mc, c) =>
+                {
+                    mc.Category = c;
+                    return mc;
+                });
+
+                foreach (MovieModelDto m in list)
+                {
+                    m.Categories = movieCategories.Where(mc => m.Id == mc.MovieId).Select(c => new CategoryDTO { Id = c.Category.Id, Name = c.Category.Name });
+                }
+            }
+
+            return list;
+        }
+
         public async Task<Movie> GetMovieById(int id)
         {
             Movie movie = await _context.Movies.FindAsync(id);

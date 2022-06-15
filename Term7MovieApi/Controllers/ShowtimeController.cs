@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Extensions;
 using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Response;
 using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
@@ -22,9 +23,10 @@ namespace Term7MovieApi.Controllers
 
         
         [HttpGet]
-        public async Task<IActionResult> GetShowtimesByTheaterIdAsync([FromQuery] ShowtimeFilterRequest request)
+        public async Task<IActionResult> GetShowtimesAsync([FromQuery] ShowtimeFilterRequest request)
         {
-            var response = await _showtimeService.GetShowtimesByTheaterIdAsync(request);
+            long userId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            ShowtimeListResponse response = await _showtimeService.GetShowtimesAsync(request, userId);
             return Ok(response);
         }
 

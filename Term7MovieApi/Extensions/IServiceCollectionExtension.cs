@@ -6,6 +6,8 @@ using Term7MovieApi.Requirements.RoomRequirement;
 using Term7MovieApi.Requirements.ShowtimeRequirement;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Options;
+using Term7MovieRepository.Cache.Implement;
+using Term7MovieRepository.Cache.Interface;
 using Term7MovieService.Services.Implement;
 using Term7MovieService.Services.Interface;
 
@@ -47,6 +49,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ICompanyService, CompanyService>();
 
+            services.AddScoped<ICacheProvider, CacheProvider>();
+
             return services;
         }
 
@@ -87,7 +91,7 @@ namespace Term7MovieApi.Extensions
         public static IServiceCollection ConfigureBackgroundService(this IServiceCollection services)
         {
             services.AddHostedService<DeleteExpiredRefreshTokenService>();
-
+            services.AddHostedService<DistributedCacheSupportService>();
             return services;
         }
     }
