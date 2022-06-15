@@ -67,9 +67,21 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 string sql = @" SELECT Id, Name, LogoUrl, IsActive 
                                 FROM Companies 
-                                WHERE Id = @id ";
+                                WHERE Id = @id ; ";
+
+                string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
+                                         FROM Theaters
+                                         WHERE CompanyId = @id ";
                 object param = new { id };
-                company = await con.QueryFirstOrDefaultAsync<CompanyDto>(sql, param);
+
+                var multiQ = await con.QueryMultipleAsync(sql + theaterQuery, param);
+
+                company = await multiQ.ReadFirstOrDefaultAsync<CompanyDto>();
+
+                if (company != null)
+                {
+                    company.Theaters = await multiQ.ReadAsync<TheaterDto>();
+                }
             }
             return company;
         }
@@ -81,9 +93,22 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 string sql = @" SELECT Id, Name, LogoUrl, IsActive 
                                 FROM Companies 
-                                WHERE ManagerId = @managerId ";
+                                WHERE ManagerId = @managerId ; ";
+
+                string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
+                                         FROM Theaters
+                                         WHERE ManagerId = @managerId ";
+
                 object param = new { managerId };
-                company = await con.QueryFirstOrDefaultAsync<CompanyDto>(sql, param);
+
+                var multiQ = await con.QueryMultipleAsync(sql + theaterQuery, param);
+
+                company = await multiQ.ReadFirstOrDefaultAsync<CompanyDto>();
+
+                if (company != null)
+                {
+                    company.Theaters = await multiQ.ReadAsync<TheaterDto>();
+                }
             }
             return company;
         }
