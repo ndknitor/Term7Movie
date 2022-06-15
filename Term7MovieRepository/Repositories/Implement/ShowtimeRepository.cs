@@ -119,8 +119,8 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql = @" SELECT 1
-                                FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id 
-                                WHERE RoomId = @RoomId AND TheaterId = @TheaterId AND th.ManagerId = @managerId ";
+                                FROM Rooms r sh JOIN Theaters th ON r.TheaterId = th.Id  
+                                WHERE Id = @RoomId AND TheaterId = @TheaterId AND th.ManagerId = @managerId ";
 
                 object param = new { request.TheaterId, request.RoomId, managerId };
 
