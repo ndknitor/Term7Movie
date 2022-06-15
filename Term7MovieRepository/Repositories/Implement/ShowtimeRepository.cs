@@ -120,7 +120,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 string sql = @" SELECT 1
                                 FROM Rooms r sh JOIN Theaters th ON r.TheaterId = th.Id  
-                                WHERE Id = @RoomId AND TheaterId = @TheaterId AND th.ManagerId = @managerId ";
+                                WHERE r.Id = @RoomId AND TheaterId = @TheaterId AND th.ManagerId = @managerId ";
 
                 object param = new { request.TheaterId, request.RoomId, managerId };
 
