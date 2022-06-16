@@ -63,9 +63,10 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string query =
-                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, th.Name as 'TheaterName', sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl " +
+                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, th.Name as 'TheaterName', sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl, r.Id, r.No " +
                     " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
-                    "  JOIN Theaters th ON sh.TheaterId = th.Id " +
+                    "   JOIN Theaters th ON sh.TheaterId = th.Id " +
+                    "   JOIN Rooms r ON sh.RoomId = r.Id " +
                     " WHERE th.ManagerId = @managerId AND StartTime > GETUTCDATE() " +
                     " ORDER BY StartTime " +
                     " OFFSET @offset ROWS " +
@@ -78,9 +79,10 @@ namespace Term7MovieRepository.Repositories.Implement
                 object param = new { managerId, offset, fetch };
 
                 var multiQ = await con.QueryMultipleAsync(query + count, param);
-                IEnumerable<ShowtimeDto> results = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>((sh, m) =>
+                IEnumerable<ShowtimeDto> results = multiQ.Read<ShowtimeDto, MovieModelDto, RoomDto,ShowtimeDto>((sh, m, r) =>
                 {
                     sh.Movie = m;
+                    sh.Room = r;
                     return sh;
                 }, splitOn: "Id");
                 int total = await multiQ.ReadFirstOrDefaultAsync<int>();
