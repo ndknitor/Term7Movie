@@ -265,13 +265,13 @@ namespace Term7MovieRepository.Repositories.Implement
             //sorry performance-sama
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception("DBCONNECTION");
-            var result = new List<TheaterShowTimeDTO>();       //TEMPORARY 30 days
+            //var result = new List<TheaterShowTimeDTO>();       //TEMPORARY 45 days
             DateTime rightnow = DateTime.UtcNow;
             var query = await _context.Showtimes
                                             .Include(x => x.Theater)
                                             .Include(x => x.Movie)
-                                            .Where(x => x.StartTime < rightnow.AddDays(60)
-                                                && x.StartTime > rightnow.AddDays(-2))
+                                            .Where(x => x.StartTime < rightnow.AddDays(45)
+                                                && x.StartTime > rightnow)
                                             //.AsQueryable()
                                             //.DistinctBy(a => a.MovieId)
                                             .Select(xxx => new TheaterShowTimeDTO
@@ -291,44 +291,44 @@ namespace Term7MovieRepository.Repositories.Implement
                                             })
                                             .ToListAsync();
             if (!query.Any() || query.Count < 3) throw new Exception("NOT ENOUGH MANA");
+            return query;
             //int firstmovieid = query.FirstOrDefault().MovieId;
             //double firsminutesremain = query.FirstOrDefault().MinutesRemain; //đóng vài trò làm biến min nựa
             //king crimson
             //vì 1 cái list movieid lung tung nên chả biết nó ở đâu mà lần huhu
             //First step lọc ra số movieid unique
-            IEnumerable<int> movieids = query.Select(x => x.MovieId).Distinct();
-            foreach (int movieid in movieids)
-            {
-                //foreach(var movie in query.Where(x => x.MovieId == movieid))
-                //{
-                //    var 
-                //    //double ChoosenRecommend = Math.Abs(0.8 * movie.MinutesRemain) + movie.DistanceFromUser * 0.2;
-                //    //if (ChoosenRecommend <= recommend)
-                //    //{
-                //    //    movie.RecommendPoint = ChoosenRecommend;
-                //    //    result.Add(movie);
-                //    //    break;
-                //    //}
-                //}
-                //kono power...
-                var nuggest = query.Where(lmao => lmao.MovieId == movieid)
-                    .MaxBy(x => Math.Abs(x.MinutesRemain * 0.8) + x.DistanceFromUser * 0.2);
-                result.Add(nuggest);
-                //var item = query.First(a => a.MovieId == movieid);
-                //double recommendpoint = //Min
-                //    (item.MinutesRemain * 0.8) + item.DistanceFromUser * 0.2;
-                //foreach (var movie in query.Where(x => x.MovieId == movieid))
-                //{
-                //    double currentRecommendpoint = Math.Abs(movie.MinutesRemain * 0.8) + movie.DistanceFromUser * 0.2;
-                //    bool hmmmm = currentRecommendpoint > recommendpoint;
-                //    if (currentRecommendpoint > recommendpoint) //nếu tìm thấy phim ko ưu tiên skip
-                //        result.Remove(movie);
-                //    else if (currentRecommendpoint <= recommendpoint) //tìm thấy dòng thời gian hợp lý nhét dô đỡ phải tính bên sơ vịt
-                //        movie.RecommendPoint = currentRecommendpoint;
-                //}
-            }
-            if (result.Count < 3) throw new Exception("NOT ENOUGH MANA");
-            return result;
+            //IEnumerable<int> movieids = query.Select(x => x.MovieId).Distinct();
+            //foreach (int movieid in movieids)
+            //{
+            //    foreach (var movie in query.Where(x => x.MovieId == movieid))
+            //    {
+            //        double ChoosenRecommend = Math.Abs(0.8 * movie.MinutesRemain) + movie.DistanceFromUser * 0.2;
+            //        if (ChoosenRecommend <= recommend)
+            //        {
+            //            movie.RecommendPoint = ChoosenRecommend;
+            //            result.Add(movie);
+            //            break;
+            //        }
+            //    }
+            //    kono power...
+            //    var nuggest = query.Where(lmao => lmao.MovieId == movieid)
+            //        .MaxBy(x => Math.Abs(x.MinutesRemain * 0.8) + x.DistanceFromUser * 0.2);
+            //    result.Add(nuggest);
+            //    var item = query.First(a => a.MovieId == movieid);
+            //    double recommendpoint = //Min
+            //        (item.MinutesRemain * 0.8) + item.DistanceFromUser * 0.2;
+            //    foreach (var movie in query.Where(x => x.MovieId == movieid))
+            //    {
+            //        double currentRecommendpoint = Math.Abs(movie.MinutesRemain * 0.8) + movie.DistanceFromUser * 0.2;
+            //        bool hmmmm = currentRecommendpoint > recommendpoint;
+            //        if (currentRecommendpoint > recommendpoint) //nếu tìm thấy phim ko ưu tiên skip
+            //            result.Remove(movie);
+            //        else if (currentRecommendpoint <= recommendpoint) //tìm thấy dòng thời gian hợp lý nhét dô đỡ phải tính bên sơ vịt
+            //            movie.RecommendPoint = currentRecommendpoint;
+            //    }
+            //}
+            //if (result.Count < 3) throw new Exception("NOT ENOUGH MANA");
+            //return result;
         }
 
         //memory lost some how?

@@ -8,6 +8,7 @@ namespace Term7MovieCore.Data.Dto.Movie
         public int MovieId { get; set; }
         public string PosterImgURL { get; set; }
         public int TheaterId { get; set; }
+        public long ShowTimeId { get; set; }
         //public string ShowTimeId { get; set; }
         public decimal MinPrice { get; set; }
         public decimal MaxPrice { get; set; }

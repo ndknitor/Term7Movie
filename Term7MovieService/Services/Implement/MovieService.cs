@@ -486,7 +486,8 @@ namespace Term7MovieService.Services.Implement
                         PosterImgURL = item.PosterImageURL,
                         MinPrice = MinMax.Item1,
                         MaxPrice = MinMax.Item2,
-                        RecommendPoint = item.MinutesRemain * 0.8 + item.DistanceFromUser * 0.2
+                        RecommendPoint = item.MinutesRemain * 0.8 + item.DistanceFromUser * 0.2,
+                        ShowTimeId = item.ShowTimeId
                     });
                 }
                 response.MovieHomePages = result;

@@ -214,7 +214,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 .Select(a => new Movie
                 {
                     Id = a.Id,
-                    //overImageUrl = a.CoverImageUrl,
+                    Title = a.Title,
                     PosterImageUrl = a.PosterImageUrl
                 })
                 .Take(3);
