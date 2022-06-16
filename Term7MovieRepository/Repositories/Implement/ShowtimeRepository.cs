@@ -53,6 +53,43 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return list;
         }
+
+        public async Task<PagingList<ShowtimeDto>> GetShowtimesByManagerIdAsync(ShowtimeFilterRequest request, long managerId)
+        {
+            PagingList<ShowtimeDto> list = new();
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                int offset = request.PageSize * (request.Page - 1);
+                int fetch = request.PageSize;
+
+                string query =
+                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl " +
+                    " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
+                    "  JOIN Theaters th ON sh.TheaterId = th.Id " +
+                    " WHERE th.ManagerId = @managerId AND StartTime > GETUTCDATE() " +
+                    " ORDER BY StartTime " +
+                    " OFFSET @offset ROWS " +
+                    " FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string count =
+                    " SELECT COUNT(1) " +
+                    " FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id " +
+                    " WHERE th.ManagerId = @managerId AND StartTime > GETUTCDATE() ";
+                object param = new { managerId, offset, fetch };
+
+                var multiQ = await con.QueryMultipleAsync(query + count, param);
+                IEnumerable<ShowtimeDto> results = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>((sh, m) =>
+                {
+                    sh.Movie = m;
+                    return sh;
+                }, splitOn: "Id");
+                int total = await multiQ.ReadFirstOrDefaultAsync<int>();
+
+                list = new PagingList<ShowtimeDto>(request.PageSize, request.Page, results, total);
+            }
+            return list;
+        }
+
         public async Task<ShowtimeDto> GetShowtimeByIdAsync(long id)
         {
             ShowtimeDto showtime = null;

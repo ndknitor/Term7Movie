@@ -37,6 +37,13 @@ namespace Term7MovieApi.Controllers
         [HttpGet]//tôi mất 25p chỉ để hiểu rằng t sẽ làm thế này (:
         public async Task<IActionResult> GetMoviesForSpecificAction([FromQuery] MovieActionRequest request)
         {
+
+            switch(request.Action)
+            {
+                case "all":
+                    return await GetAllMovie(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize});
+            }
+
             if (request.Action == "incoming")
                 return await GetIncomingMovies();
             if (request.Action == "latest")

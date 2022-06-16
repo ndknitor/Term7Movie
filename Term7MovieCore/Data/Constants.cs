@@ -79,11 +79,14 @@ namespace Term7MovieCore.Data
 
         public const int LOCK_TICKET_IN_MINUTE = 5;
         public const int CREATE_SHOWTIME_UPPER_BOUND_IN_MINUTE = 40;
+        public const int REDIS_CACHE_LOAD_IN_MINUTE = 5;
 
         public const string LANG_VI = "vi";
         public const string LANG_EN = "en";
 
         public const string MOMO_ITEM_DESCRIPTION = "Room: {0} - Seat: {1} - Type: {2}";
         public const string MOMO_ITEM_NAME = "Ticket";
+
+        public const string REDIS_KEY_MOVIE = "MOVIES";
     }
 }

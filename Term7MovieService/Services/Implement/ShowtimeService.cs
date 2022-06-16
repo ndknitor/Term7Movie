@@ -24,9 +24,18 @@ namespace Term7MovieService.Services.Implement
             _mapper = mapper;
         }
 
-        public async Task<ShowtimeListResponse> GetShowtimesByTheaterIdAsync(ShowtimeFilterRequest request)
+        public async Task<ShowtimeListResponse> GetShowtimesAsync(ShowtimeFilterRequest request, long userId)
         {
-            PagingList<ShowtimeDto> list = await showtimeRepo.GetShowtimesByTheaterIdAsync(request);
+            PagingList<ShowtimeDto> list;
+
+            if (request.TheaterId != null)
+            {
+                list = await showtimeRepo.GetShowtimesByTheaterIdAsync(request);
+            } else
+            {
+                list = await showtimeRepo.GetShowtimesByManagerIdAsync(request, userId);
+            }
+
             return new ShowtimeListResponse
             {
                 Message = Constants.MESSAGE_SUCCESS,

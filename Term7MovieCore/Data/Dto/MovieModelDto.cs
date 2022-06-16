@@ -13,6 +13,11 @@
         public string Description { set; get; }
         public long? ViewCount { set; get; }
         public float? TotalRating { set; get; }
-        public int? DirectorId { set; get; }
+        public string Director { set; get; }
+
+        public string Actors { set; get; }
+        public string Languages { set; get; }
+
+        public IEnumerable<CategoryDTO> Categories { set; get; }
     }
 }
