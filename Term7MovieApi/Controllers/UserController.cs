@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieService.Services.Interface;
@@ -20,13 +21,21 @@ namespace Term7MovieApi.Controllers
             _userService = userService;
         }
 
-        [Authorize]
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpGet]
-        public async Task<IActionResult> GetUser([FromQuery] int userid)
+        public async Task<IActionResult> GetAllUserAsync([FromQuery] UserFilterRequest request)
+        {
+            var response = await _userService.GetAllUserAsync(request);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpGet("{userId:int}")]
+        public async Task<IActionResult> GetUser(int userId)
         {
             try
             {
-                var result = await _userService.GetUserFromId(userid);
+                var result = await _userService.GetUserFromId(userId);
                 return Ok(result);
             }
             catch(Exception ex)

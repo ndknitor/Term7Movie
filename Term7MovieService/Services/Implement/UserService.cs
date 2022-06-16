@@ -1,5 +1,7 @@
 ﻿
 
+using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
@@ -17,6 +19,18 @@ namespace Term7MovieService.Services.Implement
         {
             _unitOfWork = unitOfWork;
             userRepository = _unitOfWork.UserRepository;
+        }
+
+        public async Task<UserListResponse> GetAllUserAsync(UserFilterRequest request)
+        {
+            PagingList<UserDTO> pagingList = await userRepository.GetAllUserAsync(request);
+
+            return new UserListResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Users = pagingList
+            };
+
         }
 
         public async Task<UserResponse> GetUserFromId(int userid)

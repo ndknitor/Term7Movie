@@ -1,6 +1,4 @@
-﻿
-
-namespace Term7MovieCore.Data.Dto
+﻿namespace Term7MovieCore.Data.Dto
 {
     public class UserDTO
     {
@@ -10,6 +8,11 @@ namespace Term7MovieCore.Data.Dto
         public string Phone { get; set; }
         public string Email { get; set; }
         public string PictureUrl { get; set; }
+        public int? CompanyId { set; get; }
+        public CompanyDto Company { set; get; }
         public int? Point { get; set; }
+        public int StatusId { set; get; }
+        public string StatusName { set; get; }
+        public RoleDto Role { set; get; }
     }
 }
