@@ -25,5 +25,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<CreateMovieError> CreateMovieWithCategory(MovieCreateRequest request);
         Task<bool> UpdateMovie(MovieUpdateRequest request);
         Task<IEnumerable<Movie>> GetMoviesTitle();
+        Task<IEnumerable<Movie>> GetRemainInformationForHomePage(int[] MovieIds);
     }
 }

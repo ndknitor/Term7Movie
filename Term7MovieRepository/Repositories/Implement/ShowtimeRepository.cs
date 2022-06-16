@@ -1,9 +1,12 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Utility;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
@@ -225,6 +228,80 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return valid;
+        }
+
+        public async Task<IEnumerable<TheaterShowTimeLocationDTO>> GetRecentlyShowTimeForMovieHomepage()
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            var result = new List<TheaterShowTimeLocationDTO>();       //TEMPORARY 60 days
+            var query = await _context.Showtimes
+                                            .Include(x => x.Theater)
+                                            .Where(x => x.StartTime < DateTime.UtcNow.AddDays(60))
+                                            .DistinctBy(a => a.MovieId)
+                                            .Select(xxx => new TheaterShowTimeLocationDTO
+                                            {
+                                                MovieId = xxx.MovieId,
+                                                ShowTimeId = xxx.Id,
+                                                StartTime = xxx.StartTime,
+                                                TheaterId = xxx.TheaterId != null ? xxx.TheaterId.Value : -1,
+                                                Location = new Coordinate
+                                                {
+                                                    Latitude = double.Parse(xxx.Theater.Latitude),
+                                                    Longitude = double.Parse(xxx.Theater.Longitude),
+                                                }
+                                            })
+                                            .ToListAsync();
+            if (!query.Any() || query.Count < 3) throw new Exception("NOT ENOUGH MANA");
+            result = query;
+            //first round
+            return result;
+
+        }
+
+        public async Task<IEnumerable<TheaterShowTimeDTO>> GetRecentlyShowTimeWithMinutesRemain(Coordinate userlocation)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            var result = new List<TheaterShowTimeDTO>();       //TEMPORARY 60 days
+            DateTime rightnow = DateTime.UtcNow;
+            var query = await _context.Showtimes
+                                            .Include(x => x.Theater)
+                                            .Include(x => x.Movie)
+                                            .Where(x => x.StartTime < rightnow.AddDays(60))
+                                            .DistinctBy(a => a.MovieId)
+                                            .Select(xxx => new TheaterShowTimeDTO
+                                            {
+                                                MovieId = xxx.MovieId,
+                                                ShowTimeId = xxx.Id,
+                                                MinutesRemain = (rightnow - xxx.StartTime).TotalMinutes,
+                                                MovieTitle = xxx.Movie.Title,
+                                                PosterImageURL = xxx.Movie.PosterImageUrl,
+                                                TheaterId = xxx.TheaterId != null ? xxx.TheaterId.Value : -1,
+                                                DistanceFromUser = CalculateDistanceByHaversine(userlocation, 
+                                                    new Coordinate
+                                                    {
+                                                        Latitude = double.Parse(xxx.Theater.Latitude),
+                                                        Longitude = double.Parse(xxx.Theater.Longitude)
+                                                    }),
+                                            })
+                                            .ToListAsync();
+            if (!query.Any() || query.Count < 3) throw new Exception("NOT ENOUGH MANA");
+            result = query;
+            //first round
+            return result;
+
+        }
+
+        private double CalculateDistanceByHaversine(Coordinate Start, Coordinate Destination) //Unit Meters
+        {//Look fresh enough mlem mlem
+            var d1 = Start.Latitude * (Math.PI / 180.0);
+            var num1 = Start.Longitude * (Math.PI / 180.0);
+            var d2 = Destination.Latitude * (Math.PI / 180.0);
+            var num2 = Destination.Longitude * (Math.PI / 180.0) - num1;
+            var d3 = Math.Pow(Math.Sin((d2 - d1) / 2.0), 2.0) +
+                     Math.Cos(d1) * Math.Cos(d2) * Math.Pow(Math.Sin(num2 / 2.0), 2.0);
+            return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
         }
     }
 }
