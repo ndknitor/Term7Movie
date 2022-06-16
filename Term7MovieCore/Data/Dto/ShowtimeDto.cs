@@ -8,6 +8,7 @@
         public int RoomId { set; get; }
         public RoomDto Room { set; get; }
         public int TheaterId { set; get; }
+        public string TheaterName { set; get; }
         public DateTime StartTime { set; get; }
         public DateTime EndTime { set; get; }
     }
