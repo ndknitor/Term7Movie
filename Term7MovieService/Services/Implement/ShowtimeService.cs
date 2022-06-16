@@ -65,11 +65,9 @@ namespace Term7MovieService.Services.Implement
 
             if (!notOverlap) throw new BadRequestException(ErrorMessageConstants.ERROR_MESSAGE_SHOWTIME_OVERLAP);
 
-            await showtimeRepo.CreateShowtimeAsync(showtime);
+            int count = await showtimeRepo.CreateShowtimeAsync(showtime);
 
-            if (!_unitOfWork.HasChange()) throw new DbOperationException();
-
-            await _unitOfWork.CompleteAsync();
+            if (count == 0) throw new DbOperationException();
 
             return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
         }
