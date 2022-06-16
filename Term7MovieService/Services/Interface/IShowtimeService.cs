@@ -7,7 +7,7 @@ namespace Term7MovieService.Services.Interface
     {
         Task<ShowtimeListResponse> GetShowtimesAsync(ShowtimeFilterRequest request, long userId);
         Task<ShowtimeResponse> GetShowtimeByIdAsync(long id);
-        Task<ParentResponse> CreateShowtimeAsync(ShowtimeCreateRequest request, long managerId);
+        Task<ShowtimeCreateResponse> CreateShowtimeAsync(ShowtimeCreateRequest request, long managerId);
         Task<ParentResponse> UpdateShowtimeAsync(ShowtimeUpdateRequest request);
     }
 }
