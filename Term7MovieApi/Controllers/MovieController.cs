@@ -42,6 +42,8 @@ namespace Term7MovieApi.Controllers
             {
                 case "all":
                     return await GetAllMovie(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize});
+                case "home":
+                    return await GetMoviesForMobileHome(new MovieHomePageRequest { Latitude = request.Latitude, Longtitude = request.Longitude });
             }
 
             if (request.Action == "incoming")
@@ -176,6 +178,21 @@ namespace Term7MovieApi.Controllers
         {
             var result = await _movieService.GetMovieTitle();
             return Ok(result);
+        }
+
+        private async Task<IActionResult> GetMoviesForMobileHome(MovieHomePageRequest request)
+        {
+            try
+            {
+                if (request.Longtitude == 0 && request.Latitude == 0)
+                    return BadRequest(new ParentResponse { Message = "Đang giữa biển châu phi à?" });
+                var result = await _movieService.GetMovieRecommendationForHomePage(request);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new ParentResponse { Message = "Chụp hính báo lỗi cho Nam Trần huhu: " + ex.Message });
+            }
         }
         /* ------------ END PRIVATE METHODS --------------- */
     }

@@ -135,5 +135,20 @@ namespace Term7MovieRepository.Repositories.Implement
                 await con.ExecuteAsync(sql, param);
             }
         }
+
+        public async Task<Tuple<decimal, decimal>> GetMinAndMaxPriceFromShowTimeId(long showtimeid)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            var query = _context.Tickets.Where(a => a.ShowTimeId == showtimeid);
+            decimal min = 0;
+            decimal max = 0;
+            foreach(var item in query)
+            {
+                if(item.SellingPrice > max) max = item.SellingPrice;
+                else if(item.SellingPrice < min) min = item.SellingPrice;
+            }
+            return Tuple.Create(min, max);
+        }
     }
 }

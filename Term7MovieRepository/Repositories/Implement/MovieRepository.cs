@@ -214,7 +214,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 .Select(a => new Movie
                 {
                     Id = a.Id,
-                    //overImageUrl = a.CoverImageUrl,
+                    Title = a.Title,
                     PosterImageUrl = a.PosterImageUrl
                 })
                 .Take(3);
@@ -275,6 +275,19 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
 
+            return result;
+        }
+
+        public async Task<IEnumerable<Movie>> GetRemainInformationForHomePage(int[] MovieIds)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            List <Movie> result = new List<Movie>();
+            for(int i = 0; i < MovieIds.Length; i++)
+            {
+                Movie movie = await _context.Movies.FirstOrDefaultAsync(a => a.Id == MovieIds[i]);
+                result.Add(movie); //handle null later am too tired to think about it
+            }
             return result;
         }
         /* ------------- END QUERYING FOR MOVIE SHOW ON HOMEPAGE --------------------- */
@@ -430,11 +443,14 @@ namespace Term7MovieRepository.Repositories.Implement
             if (!await _context.Database.CanConnectAsync())
                 return null;
             List<Movie> result = new List<Movie>();
-            var query = _context.Movies.Select(xxx => new Movie
-            {
-                Id = xxx.Id,
-                Title = xxx.Title, 
-            });
+            var query = _context.Movies
+                        .Where(a => a.ReleaseDate >= DateTime.UtcNow
+                                    && a.ReleaseDate <= DateTime.UtcNow.AddDays(45))
+                        .Select(xxx => new Movie
+                                {
+                                    Id = xxx.Id,
+                                    Title = xxx.Title, 
+                                });
             result = await query.ToListAsync();
             return result;
         }

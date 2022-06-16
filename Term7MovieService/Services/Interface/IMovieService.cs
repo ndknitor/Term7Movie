@@ -10,9 +10,10 @@ namespace Term7MovieService.Services.Interface
         Task<MovieListResponse> GetAllMovie(ParentFilterRequest request);
         
         Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage();
-        
-        Task<MovieHomePageResponse> GetEightLatestMovieForHomepage();
-        
+
+        Task<MovieNotListResponse> GetEightLatestMovieForHomepage();
+
+
         Task<MoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest mlpr);
         
         Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId);
@@ -26,6 +27,12 @@ namespace Term7MovieService.Services.Interface
         Task<ParentResponse> DeleteMovie(int movieid);
 
         Task<MovieTitleResponse> GetMovieTitle();
+
+        //first time?
+        Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request);
+
+        //optimize
+        Task<MovieHomePageResponse> GetMovieRecommendationForHomePage(MovieHomePageRequest request);
 
         IncomingMovieResponse FakeIncomingMovie();
 
