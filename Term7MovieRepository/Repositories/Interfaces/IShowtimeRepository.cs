@@ -13,7 +13,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<PagingList<ShowtimeDto>> GetShowtimesByManagerIdAsync(ShowtimeFilterRequest request, long managerId);
         Task<ShowtimeDto> GetShowtimeByIdAsync(long id);
-        Task<int> CreateShowtimeAsync(Showtime showtime);
+        Task<long> CreateShowtimeAsync(Showtime showtime);
         Task UpdateShowtimeAsync(Showtime showtime);
         int DeleteShowtimeById(long id);
         Task<bool> IsShowtimeNotOverlap(ShowtimeCreateRequest request);

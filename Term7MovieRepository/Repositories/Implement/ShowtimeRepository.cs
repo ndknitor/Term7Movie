@@ -122,20 +122,22 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return showtime;
         }
-        public async Task<int> CreateShowtimeAsync(Showtime showtime)
+        public async Task<long> CreateShowtimeAsync(Showtime showtime)
         {
-            int count = 0;
+            long scopeIdentity = 0;
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql = 
                     " INSERT INTO Showtimes (MovieId, RoomId, StartTime, EndTime, TheaterId) " +
                     " SELECT @MovieId, @RoomId, @StartTime, DATEADD(MINUTE, Duration, @StartTime), @TheaterId " +
                     " FROM Movies " +
-                    " WHERE Id = @MovieId ";
+                    " WHERE Id = @MovieId ; ";
 
-                count = await con.ExecuteAsync(sql, showtime);
+                string getIdentity = @" SELECT SCOPE_IDENTITY() ; ";
+
+                scopeIdentity = await con.QueryFirstOrDefaultAsync<long>(sql + getIdentity, showtime);
             }
-            return count;
+            return scopeIdentity;
         }
         public async Task UpdateShowtimeAsync(Showtime showtime)
         {
