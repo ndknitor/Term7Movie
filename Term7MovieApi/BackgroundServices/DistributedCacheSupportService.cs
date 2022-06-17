@@ -17,35 +17,40 @@ namespace Term7MovieApi.BackgroundServices
         private readonly IMovieRepository movieRepo;
         private Timer timer = null;
 
+        private const int DELAY_FIRST_START_IN_MINUTE = 1;
+
         public DistributedCacheSupportService(IDistributedCache distributedCache, ILogger<DistributedCacheSupportService> logger, IOptions<ConnectionOption> option)
         {
             _cacheProvider = new CacheProvider(distributedCache);
             _logger = logger;
             movieRepo = new MovieRepository(null, option.Value);
         }
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             timer?.Dispose();
         }
 
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Timer timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(Constants.REDIS_CACHE_LOAD_IN_MINUTE));
+            Timer timer = new Timer(DoWork, null, TimeSpan.FromMinutes(DELAY_FIRST_START_IN_MINUTE), TimeSpan.FromMinutes(Constants.REDIS_CACHE_LOAD_IN_MINUTE));
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             timer?.Change(Timeout.Infinite, 0);
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         public void DoWork(object state)
         {
+            _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
+
             IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
-            _logger.LogInformation(DateTime.UtcNow + " - Redis set value");
+
+            _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
             _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);
             _cacheProvider.SetValue(Constants.REDIS_KEY_MOVIE, movies);
         }
