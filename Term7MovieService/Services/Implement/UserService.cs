@@ -37,7 +37,7 @@ namespace Term7MovieService.Services.Implement
         //being developer is all about copy and paste :D
         public async Task<UserListResponse> GetAllUserWithoutAdminAsync(UserFilterRequest request)
         {
-            PagingList<UserDTO> pagingList = await userRepository.GetAllUserAsync(request);
+            PagingList<UserDTO> pagingList = await userRepository.GetAllUserExceptAdaminAsync(request);
 
             return new UserListResponse
             {
