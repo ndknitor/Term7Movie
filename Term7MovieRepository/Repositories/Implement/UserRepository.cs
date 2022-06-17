@@ -65,6 +65,49 @@ namespace Term7MovieRepository.Repositories.Implement
             return pagingList;
         }
 
+        //Sharingan :D
+        public async Task<PagingList<UserDTO>> GetAllUserExceptAdaminAsync(UserFilterRequest request)
+        {
+            PagingList<UserDTO> pagingList = new PagingList<UserDTO>();
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                int offset = request.PageSize * (request.Page - 1);
+                int fetch = request.PageSize;
+
+                string count = @" SELECT COUNT(*)  
+                                  FROM Users u LEFT JOIN Companies c ON u.CompanyId = c.Id ; ";
+
+                string sql = @" SELECT u.Id, u.FullName, u.Email, u.PictureUrl, u.Point, u.CompanyId, u.StatusId, us.Name 'StatusName', c.Id, c.Name, r.Id, r.Name
+                                FROM Users u LEFT JOIN Companies c ON u.CompanyId = c.Id 
+                                     JOIN UserRoles ur ON u.Id = ur.UserId
+                                     JOIN Roles r ON r.Id = ur.RoleId
+                                     JOIN UserStatus us ON u.StatusId = us.Id
+                                WHERE r.Id != 1
+                                ORDER BY u.Id 
+                                OFFSET @offset ROWS
+                                FETCH NEXT @fetch ROWS ONLY ";
+
+
+                object param = new { offset, fetch };
+
+                var multiQ = await con.QueryMultipleAsync(count + sql, param);
+
+                long total = await multiQ.ReadFirstOrDefaultAsync<long>();
+
+                IEnumerable<UserDTO> users = multiQ.Read<UserDTO, CompanyDto, RoleDto, UserDTO>((u, c, r) =>
+                {
+                    u.Role = r;
+                    u.Company = c;
+                    return u;
+                }, splitOn: "Id");
+
+                pagingList = new PagingList<UserDTO>(request.PageSize, request.Page, users, total);
+            }
+
+            return pagingList;
+        }
+
         public async Task<int> GetCompanyIdByManagerId(long managerId)
         {
             int companyId = -1;

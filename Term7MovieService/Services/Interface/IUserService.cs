@@ -9,6 +9,7 @@ namespace Term7MovieService.Services.Interface
     public interface IUserService
     {
         Task<UserListResponse> GetAllUserAsync(UserFilterRequest request);
+        Task<UserListResponse> GetAllUserWithoutAdminAsync(UserFilterRequest request);
         Task<UserResponse> GetUserFromId(int userid);
 
         Task<ParentResponse> UpdateNameForUser(UserRequest request);

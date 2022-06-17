@@ -29,6 +29,14 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
+        [HttpGet("noadmin")]
+        public async Task<IActionResult> GetAllUserButAdminIsGoneAsync([FromQuery] UserFilterRequest request)
+        {
+            var response = await _userService.GetAllUserWithoutAdminAsync(request);
+            return Ok(response);
+        }
+
         [Authorize]
         [HttpGet("{userId:int}")]
         public async Task<IActionResult> GetUser(int userId)

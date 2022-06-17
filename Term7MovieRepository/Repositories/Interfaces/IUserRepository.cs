@@ -8,6 +8,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
     public interface IUserRepository
     {
         Task<PagingList<UserDTO>> GetAllUserAsync(UserFilterRequest request);
+        Task<PagingList<UserDTO>> GetAllUserExceptAdaminAsync(UserFilterRequest request);
         Task CreateUserAsync(User user);
         Task UpdateUserAsync(User userUpdate);
         Task DeleteUserAsync(long id);

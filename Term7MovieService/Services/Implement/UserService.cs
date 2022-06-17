@@ -33,6 +33,18 @@ namespace Term7MovieService.Services.Implement
             };
 
         }
+        
+        //being developer is all about copy and paste :D
+        public async Task<UserListResponse> GetAllUserWithoutAdminAsync(UserFilterRequest request)
+        {
+            PagingList<UserDTO> pagingList = await userRepository.GetAllUserAsync(request);
+
+            return new UserListResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Users = pagingList
+            };
+        }
 
         public async Task<UserResponse> GetUserFromId(int userid)
         {
