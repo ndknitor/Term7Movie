@@ -280,7 +280,7 @@ namespace Term7MovieRepository.Repositories.Implement
                                             {
                                                 MovieId = xxx.MovieId,
                                                 ShowTimeId = xxx.Id,
-                                                MinutesRemain = (rightnow - xxx.StartTime).TotalMinutes,
+                                                MinutesRemain = (xxx.StartTime - rightnow).TotalMinutes,
                                                 MovieTitle = xxx.Movie.Title,
                                                 PosterImageURL = xxx.Movie.PosterImageUrl,
                                                 TheaterId = xxx.TheaterId != null ? xxx.TheaterId.Value : -1,
@@ -290,6 +290,7 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         Latitude = double.Parse(xxx.Theater.Latitude),
                                                         Longitude = double.Parse(xxx.Theater.Longitude)
                                                     }),
+                                                StartTime = xxx.StartTime
                                             })
                                             .ToListAsync();
             if (!query.Any() || query.Count < 3) throw new Exception("NOT ENOUGH MANA");

@@ -487,7 +487,9 @@ namespace Term7MovieService.Services.Implement
                         MinPrice = MinMax.Item1,
                         MaxPrice = MinMax.Item2,
                         RecommendPoint = item.MinutesRemain * 0.8 + item.DistanceFromUser * 0.2,
-                        ShowTimeId = item.ShowTimeId
+                        ShowTimeId = item.ShowTimeId,
+                        StartTime = item.StartTime,
+                        DistanceCalculated = item.DistanceFromUser
                     });
                 }
                 response.MovieHomePages = result;
