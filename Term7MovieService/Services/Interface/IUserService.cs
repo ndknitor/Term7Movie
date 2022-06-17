@@ -12,5 +12,7 @@ namespace Term7MovieService.Services.Interface
         Task<UserResponse> GetUserFromId(int userid);
 
         Task<ParentResponse> UpdateNameForUser(UserRequest request);
+
+        Task<ParentResponse> UpdateUserRole(RoleUpdateRequest request);
     }
 }

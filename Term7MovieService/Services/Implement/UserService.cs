@@ -3,6 +3,7 @@
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieRepository.Repositories.Interfaces;
@@ -61,6 +62,22 @@ namespace Term7MovieService.Services.Implement
             user.FullName = request.FullName;
             await userRepository.UpdateUserAsync(user);
             return new ParentResponse { Message = "Does it success? I don't know." };
+        }
+
+        public async Task<ParentResponse> UpdateUserRole(RoleUpdateRequest request)
+        {
+            await userRepository.UpdateUserRole(request);
+
+            if (_unitOfWork.HasChange())
+            {
+                await _unitOfWork.CompleteAsync();
+                return new ParentResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS
+                };
+            }
+
+            throw new DbOperationException();
         }
     }
 }

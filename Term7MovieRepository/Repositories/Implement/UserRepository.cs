@@ -8,6 +8,8 @@ using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Exceptions;
+using Term7MovieCore.Data;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -166,6 +168,21 @@ namespace Term7MovieRepository.Repositories.Implement
                 return null;
             var user = await _context.Users.FirstOrDefaultAsync(a => a.Id == id);
             return user;
+        }
+
+        public async Task UpdateUserRole(RoleUpdateRequest request)
+        {
+            UserRole ur = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == request.UserId);
+
+            if (ur == null) throw new BadRequestException(ErrorMessageConstants.ERROR_MESSAGE_INVALID_USER);
+
+            _context.UserRoles.Remove(ur);
+
+            await _context.AddAsync(new UserRole 
+            { 
+                RoleId = (long)RoleEnum.Manager,
+                UserId = request.UserId
+            });
         }
     }
 }

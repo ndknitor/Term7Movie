@@ -104,7 +104,14 @@ namespace Term7MovieCore.Entities
             builder.Entity<TheaterCompany>()
                 .HasOne(t => t.Manager)
                 .WithOne(u => u.Company)
-                .HasForeignKey<User>(u => u.CompanyId);
+                .HasForeignKey<User>(u => u.CompanyId)
+                .IsRequired(false);
+
+            builder.Entity<User>()
+                .HasOne(u => u.Company)
+                .WithOne(c => c.Manager)
+                .HasForeignKey<TheaterCompany>(t => t.ManagerId)
+                .IsRequired(false);
 
             foreach (var entityType in builder.Model.GetEntityTypes())
             {

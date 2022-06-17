@@ -71,6 +71,11 @@ namespace Term7MovieApi.Handlers
                         if (await CanManagerCreateShowtime(claims, showtimeCreateRequest)) context.Succeed(requirement);
 
                         break;
+
+                    case CompanyFilterRequirement:
+
+                        if (IsCompanyFilterRequestValid(claims, httpContext.Request)) context.Succeed(requirement);
+                        break;
                 }
             }
         }
@@ -149,6 +154,24 @@ namespace Term7MovieApi.Handlers
             }
 
             return valid;
+        }
+
+        private bool IsCompanyFilterRequestValid(IEnumerable<Claim> claims, HttpRequest request)
+        {
+            var filterRequest = new CompanyFilterRequest();
+
+            string role = claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+
+            bool withNoManager;
+
+            if (!bool.TryParse(request.Query[nameof(filterRequest.WithNoManager)], out withNoManager)) return true;
+
+            if (!Constants.ROLE_ADMIN.Equals(role) && withNoManager)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
