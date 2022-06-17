@@ -489,7 +489,11 @@ namespace Term7MovieService.Services.Implement
                         RecommendPoint = item.MinutesRemain * 0.8 + item.DistanceFromUser * 0.2,
                         ShowTimeId = item.ShowTimeId,
                         StartTime = item.StartTime,
-                        DistanceCalculated = item.DistanceFromUser
+                        DistanceCalculated = item.DistanceFromUser,
+                        MinutesRemain = (int)item.MinutesRemain,
+                        FormattedStartTime = item.StartTime.ToString("dd") + "/" +
+                            item.StartTime.ToString("MM") + "/" + item.StartTime.ToString("yyyy")
+                            + " " + item.StartTime.ToString("HH") + ":" + item.StartTime.ToString("mm")
                     });
                 }
                 response.MovieHomePages = result;

@@ -11,6 +11,8 @@ namespace Term7MovieCore.Data.Dto.Movie
         public long ShowTimeId { get; set; }
         //public string ShowTimeId { get; set; }
         public DateTime StartTime { get; set; }
+        public string FormattedStartTime { get; set; }
+        public int MinutesRemain { get; set; }
         public double DistanceCalculated { get; set; }
         public decimal MinPrice { get; set; }
         public decimal MaxPrice { get; set; }
