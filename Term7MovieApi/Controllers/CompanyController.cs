@@ -37,9 +37,9 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [Authorize]
+        [Authorize(Policy = Constants.POLICY_COMPANY_FILTER)]
         [HttpGet]
-        public async Task<IActionResult> GetAllCompany([FromQuery] ParentFilterRequest request)
+        public async Task<IActionResult> GetAllCompany([FromQuery] CompanyFilterRequest request)
         {
             var response = await _companyService.GetAllCompanyAsync(request);
 
