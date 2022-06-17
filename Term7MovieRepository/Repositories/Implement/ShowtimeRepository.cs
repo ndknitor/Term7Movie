@@ -16,6 +16,9 @@ namespace Term7MovieRepository.Repositories.Implement
     {
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
+
+        private const string FILTER_NOT_SHOWED_YET = "NOT_SHOWED";
+
         public ShowtimeRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
@@ -33,7 +36,10 @@ namespace Term7MovieRepository.Repositories.Implement
                 string query =
                     " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl " +
                     " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
-                    " WHERE TheaterId = @TheaterId AND StartTime > GETUTCDATE() " +
+                    " WHERE TheaterId = @TheaterId " +
+
+                    GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) +
+
                     " ORDER BY StartTime " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
@@ -41,7 +47,11 @@ namespace Term7MovieRepository.Repositories.Implement
                 string count =
                     " SELECT COUNT(1) " +
                     " FROM Showtimes " +
-                    " WHERE TheaterId = @TheaterId AND StartTime > GETUTCDATE() ";
+                    " WHERE TheaterId = @TheaterId " +
+
+                    GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET);
+
+
                 object param = new { request.TheaterId,  offset, fetch };
 
                 var multiQ = await con.QueryMultipleAsync(query + count, param);
@@ -70,7 +80,10 @@ namespace Term7MovieRepository.Repositories.Implement
                     " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
                     "   JOIN Theaters th ON sh.TheaterId = th.Id " +
                     "   JOIN Rooms r ON sh.RoomId = r.Id " +
-                    " WHERE th.ManagerId = @managerId AND StartTime > GETUTCDATE() " +
+                    " WHERE th.ManagerId = @managerId " + 
+
+                    GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) +
+
                     " ORDER BY StartTime " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
@@ -78,7 +91,10 @@ namespace Term7MovieRepository.Repositories.Implement
                 string count =
                     " SELECT COUNT(1) " +
                     " FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id " +
-                    " WHERE th.ManagerId = @managerId AND StartTime > GETUTCDATE() ";
+                    " WHERE th.ManagerId = @managerId " +
+
+                    GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET);
+
                 object param = new { managerId, offset, fetch };
 
                 var multiQ = await con.QueryMultipleAsync(query + count, param);
@@ -104,7 +120,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl, r.Id, r.No, r.TheaterId, r.NumberOfRow, r.NumberOfColumn, r.Status " +
                     " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
                     "       JOIN Rooms r ON sh.RoomId = r.Id " +
-                    " WHERE sh.Id = @id AND sh.StartTime > GETUTCDATE() ";
+                    " WHERE sh.Id = @id ";
 
                 object param = new { id };
 
@@ -144,6 +160,7 @@ namespace Term7MovieRepository.Repositories.Implement
             Showtime dbShowtime = await _context.Showtimes.FindAsync(showtime.Id);
 
             if (dbShowtime == null) return;
+            if (dbShowtime.StartTime < DateTime.UtcNow) return;
 
             double duration = (dbShowtime.StartTime - dbShowtime.EndTime).TotalMinutes;
             dbShowtime.StartTime = showtime.StartTime;
@@ -230,6 +247,19 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return valid;
+        }
+
+        private string GetAdditionQueryString(ShowtimeFilterRequest request, string filter)
+        {
+            string query = "";
+            switch(filter)
+            {
+                case FILTER_NOT_SHOWED_YET:
+                    if (request.IsNotShowedYet) query = " AND StartTime > GETUTCDATE() ";
+                    break;
+            }
+
+            return query;
         }
 
         public async Task<IEnumerable<TheaterShowTimeLocationDTO>> GetRecentlyShowTimeForMovieHomepage()
