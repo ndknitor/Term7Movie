@@ -18,7 +18,9 @@ namespace Term7MovieCore.Data.Request.Movie
         public int PageIndex { get; set; } = 1;
         //[FromQuery(Name = "search-key")]
         public string SearchKey { get; set; } = "";
+        [Range(-180, 180)]
         public double Longitude { get; set; }
+        [Range(-90, 90)]
         public double Latitude { get; set; }
     }
 }

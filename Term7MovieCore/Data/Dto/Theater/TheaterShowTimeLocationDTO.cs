@@ -17,6 +17,7 @@ namespace Term7MovieCore.Data.Dto.Theater
         public int MovieId { get; set; }
         public string MovieTitle { get; set; }
         public int TheaterId { get; set; }
+        public DateTime StartTime { get; set; }
         public double MinutesRemain { get; set; }
         public double DistanceFromUser { get; set; }
         public double RecommendPoint { get; set; }
