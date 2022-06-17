@@ -12,7 +12,7 @@ namespace Term7MovieCore.Entities
         [Column(TypeName = "varchar(200)")]
         public string LogoUrl { set; get; }
         public bool IsActive { set; get; }
-        public long ManagerId { set; get; }
+        public long? ManagerId { set; get; }
         public User Manager { set; get; }
         public ICollection<Theater> Theaters { set; get; }
     }

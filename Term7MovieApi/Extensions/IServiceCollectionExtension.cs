@@ -81,6 +81,9 @@ namespace Term7MovieApi.Extensions
 
                 option.AddPolicy(Constants.POLICY_NO_OVERLAP_SHOWTIME, policy => policy.Requirements.Add(new NoOverlapShowtimeRequirement()));
                 option.AddPolicy(Constants.POLICY_CREATE_SHOWTIME_SAME_MANAGER, policy => policy.Requirements.Add(new CreateShowtimeForSameManagerRequirement()));
+
+                option.AddPolicy(Constants.POLICY_COMPANY_FILTER, policy => policy.Requirements.Add(new CompanyFilterRequirement()));
+
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();

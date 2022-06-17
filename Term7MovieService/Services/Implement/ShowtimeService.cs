@@ -49,6 +49,10 @@ namespace Term7MovieService.Services.Implement
 
             if (showtime == null) throw new DbNotFoundException();
 
+            var seats = await _unitOfWork.SeatRepository.GetRoomSeats(showtime.RoomId);
+
+            showtime.Room.SeatDtos = seats;
+
             return new ShowtimeResponse
             {
                 Message = Constants.MESSAGE_SUCCESS,

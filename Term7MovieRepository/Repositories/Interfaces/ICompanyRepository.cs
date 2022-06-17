@@ -7,7 +7,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ICompanyRepository
     {
-        Task<PagingList<CompanyDto>> GetAllCompany(ParentFilterRequest request);
+        Task<PagingList<CompanyDto>> GetAllCompany(CompanyFilterRequest request);
+        Task<IEnumerable<CompanyDto>> GetAllCompanyNoPaging();
         Task<CompanyDto> GetCompanyById(int id);
 
         Task<CompanyDto> GetCompanyByManagerId(long managerId);

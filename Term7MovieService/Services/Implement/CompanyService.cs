@@ -43,7 +43,17 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<CompanyListResponse> GetAllCompanyAsync(ParentFilterRequest request)
+        public async Task<object> GetAllCompanyAsync(CompanyFilterRequest request)
+        {
+            if (request.WithNoManager)
+            {
+                return await GetAllCompanyNoPagingAsync();
+            }
+
+            return await GetAllCompanyPagingAsync(request);
+        }
+
+        private async Task<CompanyListResponse> GetAllCompanyPagingAsync(CompanyFilterRequest request)
         {
             PagingList<CompanyDto> list = await companyRepo.GetAllCompany(request);
 
@@ -51,6 +61,17 @@ namespace Term7MovieService.Services.Implement
             {
                 Message = Constants.MESSAGE_SUCCESS,
                 Companies = list
+            };
+        }
+
+        private async Task<ParentResultResponse> GetAllCompanyNoPagingAsync()
+        {
+            IEnumerable<CompanyDto> list = await companyRepo.GetAllCompanyNoPaging();
+
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = list.Where(c => c.ManagerId == null)
             };
         }
     }

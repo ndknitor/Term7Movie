@@ -14,12 +14,15 @@ namespace Term7MovieRepository.Repositories.Implement
     {
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
+
+        private const string FILTER_WITH_PAGING = "Paging";
+        private const string FILTER_WITH_NO_MANAGER = "NoManager";
         public CompanyRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
             _connectionOption = connectionOption;
         }
-        public async Task<PagingList<CompanyDto>> GetAllCompany(ParentFilterRequest request)
+        public async Task<PagingList<CompanyDto>> GetAllCompany(CompanyFilterRequest request)
         {
             PagingList<CompanyDto> pagingList = new PagingList<CompanyDto>();
 
@@ -112,6 +115,22 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return company;
         }
+
+        public async Task<IEnumerable<CompanyDto>> GetAllCompanyNoPaging()
+        {
+            IEnumerable<CompanyDto> company = null;
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" SELECT Id, Name, LogoUrl, IsActive, ManagerId  
+                                FROM Companies 
+                                WHERE IsActive = 1 ";
+
+                company = await con.QueryAsync<CompanyDto>(sql);
+            }
+
+            return company;
+        }
         public int CreateCompany(TheaterCompany company)
         {
             int count = 0;
@@ -143,6 +162,12 @@ namespace Term7MovieRepository.Repositories.Implement
             //    company = await con.QueryFirstOrDefaultAsync<long>(sql, param);
             //}
             //return company;
+        }
+
+        private string GetAdditionFilterQuery(CompanyFilterRequest request, string filter)
+        {
+            string query = "";
+            return query;
         }
     }
 }

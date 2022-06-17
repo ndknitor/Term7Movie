@@ -9,37 +9,40 @@ namespace Term7MovieApi.BackgroundServices
     {
         private Timer timer = null;
         private readonly IRefreshTokenRepository refreshTokenRepository;
+        private readonly ILogger<DeleteExpiredRefreshTokenService> _logger;
 
-        public DeleteExpiredRefreshTokenService(IOptions<ConnectionOption> connectionOption)
+        public DeleteExpiredRefreshTokenService(IOptions<ConnectionOption> connectionOption, ILogger<DeleteExpiredRefreshTokenService> logger)
         {
             refreshTokenRepository = new RefreshTokenRepository(null, connectionOption.Value);
+            _logger = logger;
         }
 
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             if (timer != null) timer.Dispose();
         }
 
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             DateTime now = DateTime.UtcNow;
             DateTime next23H59 = now.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-            refreshTokenRepository.DeleteExpiredRefreshToken();
+            // refreshTokenRepository.DeleteExpiredRefreshToken();
             timer = new Timer(DeleteExpiredRefreshToken, null, next23H59 - now, TimeSpan.FromDays(1));
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             if (timer != null) timer.Change(Timeout.Infinite, 0);
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         private void DeleteExpiredRefreshToken(object state)
         {
+            _logger.LogInformation(DateTime.UtcNow + "Start delete expired refresh tokens ");
             refreshTokenRepository.DeleteExpiredRefreshToken();
         }
     }
