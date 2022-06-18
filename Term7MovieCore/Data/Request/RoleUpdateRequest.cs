@@ -6,5 +6,7 @@ namespace Term7MovieCore.Data.Request
     {
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         public long UserId { set; get; }
+        [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
+        public int CompanyId { set; get; }
     }
 }

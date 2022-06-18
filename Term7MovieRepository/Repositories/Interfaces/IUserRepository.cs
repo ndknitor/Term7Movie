@@ -21,6 +21,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<User> GetUserById(int id);
 
-        Task UpdateUserRole(RoleUpdateRequest request);
+        Task<int> UpdateUserRole(RoleUpdateRequest request);
     }
 }
