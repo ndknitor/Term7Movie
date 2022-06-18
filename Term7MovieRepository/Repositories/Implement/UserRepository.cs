@@ -18,6 +18,8 @@ namespace Term7MovieRepository.Repositories.Implement
 
         private AppDbContext _context;
         private ConnectionOption _connectionOption;
+
+        private const string FILTER_BY_EMAIL = "Email";
         public UserRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
@@ -34,19 +36,29 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string count = @" SELECT COUNT(*)  
-                                  FROM Users u LEFT JOIN Companies c ON u.CompanyId = c.Id ; ";
+                                  FROM Users u LEFT JOIN Companies c ON u.CompanyId = c.Id
+                                       JOIN UserRoles ur ON u.Id = ur.UserId
+                                  WHERE ur.RoleId != @RoleId " +
+
+                                  GetAdditionUserFilter(request, FILTER_BY_EMAIL) +
+
+                               @" ; ";
 
                 string sql = @" SELECT u.Id, u.FullName, u.Email, u.PictureUrl, u.Point, u.CompanyId, u.StatusId, us.Name 'StatusName', c.Id, c.Name, r.Id, r.Name
                                 FROM Users u LEFT JOIN Companies c ON u.CompanyId = c.Id 
                                      JOIN UserRoles ur ON u.Id = ur.UserId
                                      JOIN Roles r ON r.Id = ur.RoleId
                                      JOIN UserStatus us ON u.StatusId = us.Id
-                                ORDER BY u.Id 
+                                WHERE ur.RoleId != @RoleId " +
+
+                                GetAdditionUserFilter(request, FILTER_BY_EMAIL) +
+
+                             @" ORDER BY u.Id 
                                 OFFSET @offset ROWS
                                 FETCH NEXT @fetch ROWS ONLY ";
 
 
-                object param = new {offset, fetch};
+                object param = new { offset, fetch, RoleId = (int)RoleEnum.Admin, Email = request.Email };
 
                 var multiQ = await con.QueryMultipleAsync(count + sql, param);
 
@@ -65,7 +77,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return pagingList;
         }
 
-        //Sharingan :D
+        //Sharingan :D =>>>> Count query thieu where condition roi 
         public async Task<PagingList<UserDTO>> GetAllUserExceptAdaminAsync(UserFilterRequest request)
         {
             PagingList<UserDTO> pagingList = new PagingList<UserDTO>();
@@ -83,13 +95,13 @@ namespace Term7MovieRepository.Repositories.Implement
                                      JOIN UserRoles ur ON u.Id = ur.UserId
                                      JOIN Roles r ON r.Id = ur.RoleId
                                      JOIN UserStatus us ON u.StatusId = us.Id
-                                WHERE r.Id != 1
+                                WHERE r.Id != @RoleId
                                 ORDER BY u.Id 
                                 OFFSET @offset ROWS
                                 FETCH NEXT @fetch ROWS ONLY ";
 
 
-                object param = new { offset, fetch };
+                object param = new { offset, fetch, RoleId = (int)RoleEnum.Admin };
 
                 var multiQ = await con.QueryMultipleAsync(count + sql, param);
 
@@ -213,19 +225,69 @@ namespace Term7MovieRepository.Repositories.Implement
             return user;
         }
 
-        public async Task UpdateUserRole(RoleUpdateRequest request)
+        public async Task<int> UpdateUserRole(RoleUpdateRequest request)
         {
-            UserRole ur = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == request.UserId);
+            int count = 0;
 
-            if (ur == null) throw new BadRequestException(ErrorMessageConstants.ERROR_MESSAGE_INVALID_USER);
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                await con.OpenAsync();
+                var transaction = await con.BeginTransactionAsync();
+                try
+                {
+                    string sql =
+                    @" 
+                       UPDATE Users
+                       SET CompanyId = @CompanyId
+                       WHERE Id = @UserId ;
 
-            _context.UserRoles.Remove(ur);
+                       DELETE FROM UserRoles 
+                       WHERE UserId = @UserId ;
 
-            await _context.AddAsync(new UserRole 
-            { 
-                RoleId = (long)RoleEnum.Manager,
-                UserId = request.UserId
-            });
+                       INSERT INTO UserRoles (UserId, RoleId)
+                       VALUES (@UserId, @RoleId); 
+                        
+                       UPDATE Companies
+                       SET ManagerId = @UserId 
+                       WHERE Id = @CompanyId AND ManagerId IS NULL ";
+
+                    object param = new { request.UserId, request.CompanyId, RoleId = (int)RoleEnum.Manager };
+
+                    count = await con.ExecuteAsync(sql, param, transaction: transaction);
+                    
+                    if (count == 4)
+                    {
+                        transaction.Commit();
+                        return count;
+                    }
+
+                    throw new BadRequestException(ErrorMessageConstants.ERROR_MESSAGE_INVALID_USER_OR_COMPANY);
+                } 
+                catch(DbUpdateException e)
+                {
+                    transaction.Commit();
+                    throw e;
+                }
+            }
+        }
+
+        private string GetAdditionUserFilter(UserFilterRequest request, string filter)
+        {
+            string query = "";
+
+            switch(filter)
+            {
+                case FILTER_BY_EMAIL:
+
+                    if (!string.IsNullOrEmpty(request.Email))
+                    {
+                        query = " AND Email LIKE CONCAT('%', @Email, '%') "; // param { Email = "%" + email + "%" de dung LIKE sql}
+                    }
+
+                    break;
+            }
+
+            return query;
         }
     }
 }

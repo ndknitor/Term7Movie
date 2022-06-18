@@ -2,6 +2,6 @@
 {
     public class UserFilterRequest : ParentFilterRequest
     {
-
+        public string Email { set; get; }
     }
 }

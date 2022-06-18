@@ -8,6 +8,6 @@
 
         public const string ERROR_MESSAGE_INVALID_USER = "Invalid user";
 
-        public const string ERROR_MESSAGE_INVALID_USER_OR_ROLE = "Invalid user or role";
+        public const string ERROR_MESSAGE_INVALID_USER_OR_COMPANY = "Invalid user or company";
     }
 }

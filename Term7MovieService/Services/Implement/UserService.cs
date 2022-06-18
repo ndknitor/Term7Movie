@@ -78,11 +78,10 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<ParentResponse> UpdateUserRole(RoleUpdateRequest request)
         {
-            await userRepository.UpdateUserRole(request);
+            int count = await userRepository.UpdateUserRole(request);
 
-            if (_unitOfWork.HasChange())
+            if (count > 0)
             {
-                await _unitOfWork.CompleteAsync();
                 return new ParentResponse
                 {
                     Message = Constants.MESSAGE_SUCCESS
