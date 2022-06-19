@@ -19,6 +19,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<bool> IsShowtimeNotOverlap(ShowtimeCreateRequest request);
 
         Task<bool> CanManagerCreateShowtime(ShowtimeCreateRequest request, long managerId);
+
+        Task<bool> CanManagerCreateTicket(long managerId, long showtimeId, DateTime startTime, IEnumerable<long> seatId);
         Task<IEnumerable<TheaterShowTimeLocationDTO>> GetRecentlyShowTimeForMovieHomepage();
 
         Task<IEnumerable<TheaterShowTimeDTO>> GetRecentlyShowTimeWithMinutesRemain(Coordinate UserLocation);

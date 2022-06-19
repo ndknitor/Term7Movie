@@ -15,8 +15,8 @@ namespace Term7MovieRepository.Repositories.Implement
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
 
-        private const string FILTER_WITH_PAGING = "Paging";
-        private const string FILTER_WITH_NO_MANAGER = "NoManager";
+        private const string FILTER_BY_NAME = "Name";
+
         public CompanyRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
@@ -32,18 +32,27 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string sql = @" SELECT Id, Name, LogoUrl, IsActive 
-                                FROM Companies 
-                                ORDER BY Id 
+                                FROM Companies " +
+                                
+                                GetAdditionFilterQuery(request, FILTER_BY_NAME) +
+
+                             @" ORDER BY Id 
                                 OFFSET @offset ROWS
                                 FETCH NEXT @fetch ROWS ONLY ; ";
 
                 string count = @" SELECT COUNT(Id) 
-                                FROM Companies ; ";
+                                FROM Companies " +
 
-                string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
+                                GetAdditionFilterQuery(request, FILTER_BY_NAME) +
+
+                                " ; ";
+
+                string theaterQuery = !request.TheaterIncluded ? "" :
+
+                 @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
                                          FROM Theaters ";
 
-                object param = new { fetch, offset };
+                object param = new { fetch, offset , request.SearchKey};
 
                 var multiQ = await con.QueryMultipleAsync(sql + count + theaterQuery, param);
 
@@ -51,11 +60,14 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 long total = await multiQ.ReadFirstOrDefaultAsync<long>();
 
-                IEnumerable<TheaterDto> theaters = await multiQ.ReadAsync<TheaterDto>();
-
-                foreach(var company in list)
+                if (request.TheaterIncluded)
                 {
-                    company.Theaters = theaters.Where(t => t.CompanyId == company.Id);
+                    IEnumerable<TheaterDto> theaters = await multiQ.ReadAsync<TheaterDto>();
+
+                    foreach (var company in list)
+                    {
+                        company.Theaters = theaters.Where(t => t.CompanyId == company.Id);
+                    }
                 }
 
                 pagingList = new PagingList<CompanyDto>(page: request.Page, pageSize: request.PageSize, results: list, total: total);
@@ -167,6 +179,14 @@ namespace Term7MovieRepository.Repositories.Implement
         private string GetAdditionFilterQuery(CompanyFilterRequest request, string filter)
         {
             string query = "";
+
+            switch(filter)
+            {
+                case FILTER_BY_NAME:
+                    if (!string.IsNullOrEmpty(request.SearchKey))  query = " WHERE Name LIKE CONCAT('%', @SearchKey, '%') ";
+                    break;
+            }
+
             return query;
         }
     }
