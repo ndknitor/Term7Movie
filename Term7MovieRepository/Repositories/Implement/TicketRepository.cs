@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Options;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
@@ -59,19 +60,41 @@ namespace Term7MovieRepository.Repositories.Implement
                 return count == idList.Count();
             }
         }
-        public async Task CreateTicket(Ticket ticket)
+        public async Task<int> CreateTicketAsync(TicketListCreateRequest request)
         {
-            if (!await _context.Database.CanConnectAsync())
-                throw new Exception("DBCONNECT");
-            await _context.Tickets.AddAsync(ticket);
-            await _context.SaveChangesAsync();
-        }
-        public async Task CreateTicket(IEnumerable<Ticket> tickets)
-        {
-            if (!await _context.Database.CanConnectAsync())
-                throw new Exception("DBCONNECT");
-            await _context.Tickets.AddRangeAsync(tickets);
-            await _context.SaveChangesAsync();
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                con.Open();
+                var transaction = con.BeginTransaction();
+
+                try
+                {
+                    
+
+                    string sql =
+                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId) 
+                       SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, (@ReceivePrice + st.BonusPrice), 1 
+                       FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
+                       WHERE s.Id = @SeatId ";
+
+                    object param = new { request.Tickets };
+
+                    int count = await con.ExecuteAsync(sql, param);
+
+                    if (count == request.Tickets.Count())
+                    {
+                        await transaction.CommitAsync();
+                        return count;
+                    }
+                } 
+                catch (DbUpdateException e)
+                {
+                    await transaction.RollbackAsync();
+                    throw e;
+                }
+
+                return 0;
+            }
         }
         public async Task DeleteExpiredTicket()
         {

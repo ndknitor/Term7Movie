@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto.Ticket;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Entities;
@@ -128,65 +130,21 @@ namespace Term7MovieService.Services.Implement
             }; //how to C#
         }
 
-        public async Task<ParentResponse> CreateTicket(TicketCreateRequest request)
+        public async Task<ParentResponse> CreateTicketAsync(TicketListCreateRequest request)
         {
-            try
+            var ticketRepo = tiktokRepository;
+
+            int count = await ticketRepo.CreateTicketAsync(request);
+
+            if (count > 0)
             {
-                Ticket tiktok = new Ticket();
-                tiktok.SeatId = request.SeatId;
-                tiktok.ShowTimeId = request.ShowTimeId;
-                tiktok.ShowStartTime = request.ShowStartTime;
-                tiktok.OriginalPrice = request.OriginalPrice;
-                tiktok.ReceivePrice = request.ReceivePrice;
-                tiktok.SellingPrice = request.SellingPrice;
-                tiktok.StatusId = request.StatusId;
-                tiktok.LockedTime = null;
-                await tiktokRepository.CreateTicket(tiktok);
-                return new ParentResponse { Message = "A ticket has created" };
-            }
-            catch(Exception ex)
-            {
-                if(ex.Message == "DBCONNECT")
+                return new ParentResponse
                 {
-                    return new ParentResponse { Message = "Can't access database" };
-                }
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<ParentResponse> CreateALotOfTicket(TicketCreateRequest[] request)
-        {//tập trung làm cái khác quan trọng hơn thay vì cache lỗi
-            List<Ticket> tiktokList = new List<Ticket>();
-            foreach(var ticket in request)
-            {
-                Ticket tiktok = new Ticket();
-                tiktok.SeatId = ticket.SeatId;
-                //tiktok.TransactionId = ticket.TransactionId;
-                tiktok.ShowTimeId = ticket.ShowTimeId;
-                tiktok.ShowStartTime = ticket.ShowStartTime;
-                tiktok.OriginalPrice = ticket.OriginalPrice;
-                tiktok.ReceivePrice = ticket.ReceivePrice;
-                tiktok.SellingPrice = ticket.SellingPrice;
-                tiktok.StatusId = ticket.StatusId;
-                tiktok.LockedTime = null;
-                tiktokList.Add(tiktok);
-            }
-            try
-            {
-                await tiktokRepository.CreateTicket(tiktokList);
-                return new ParentResponse { Message = "A lot of ticket has created but don't know if there is any errors :v" };
-#warning có time thì nên response cái list status add thành công cho từng ticket huhu tôi lười
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message == "DBCONNECT")
-                {
-                    return new ParentResponse { Message = "Can't access database" };
-                }
-                throw new Exception(ex.Message);
+                    Message = Constants.MESSAGE_SUCCESS
+                };
             }
 
-
+            throw new BadRequestException();
         }
     }
 }

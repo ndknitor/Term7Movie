@@ -1,5 +1,6 @@
-﻿using Term7MovieCore.Data.Dto.Analyst;
+﻿using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
+﻿using Term7MovieCore.Data.Dto.Analyst;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
@@ -8,9 +9,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid);
         Task<IEnumerable<Ticket>> GetAllTicketByTransactionId(Guid id);
         Task<Ticket> GetTicketById(long id);
-        Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList); //chưa cần
-        Task CreateTicket(Ticket ticket);
-        Task CreateTicket(IEnumerable<Ticket> tickets);
+        Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList);
+        Task<int> CreateTicketAsync(TicketListCreateRequest request);
         Task DeleteExpiredTicket();
         Task<IEnumerable<Ticket>> GetTicketByIdListAsync(IEnumerable<long> idList);
         Task<bool> IsTicketInShowtimeValid(long showtimeId, IEnumerable<long> ticketId);
