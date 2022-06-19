@@ -491,9 +491,10 @@ namespace Term7MovieService.Services.Implement
                         StartTime = item.StartTime,
                         DistanceCalculated = item.DistanceFromUser,
                         MinutesRemain = (int)item.MinutesRemain,
-                        FormattedStartTime = item.StartTime.ToString("dd") + "/" +
-                            item.StartTime.ToString("MM") + "/" + item.StartTime.ToString("yyyy")
-                            + " " + item.StartTime.ToString("HH") + ":" + item.StartTime.ToString("mm")
+                        //FormattedStartTime = item.StartTime.ToString("dd") + "/" +
+                        //    item.StartTime.ToString("MM") + "/" + item.StartTime.ToString("yyyy")
+                        //    + " " + item.StartTime.ToString("HH") + ":" + item.StartTime.ToString("mm")
+                        FormattedStartTime = item.StartTime.ToString("dd/MM/yyyy HH:mm")
                     });
                 }
                 response.MovieHomePages = result;

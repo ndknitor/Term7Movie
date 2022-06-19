@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
@@ -150,5 +151,64 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return Tuple.Create(min, max);
         }
+
+        public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
+            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            //Get every theater id belong in that company
+            var showtimeids = await _context.Theaters
+                                .Include(a => a.Showtimes)
+                                .Where(a => a.CompanyId == 1)
+                                .SelectMany(a => a.Showtimes)
+                                .Select(a => a.Id).ToListAsync();
+            if (!showtimeids.Any())
+                return null; //công ty này chưa có cái rạp nào cả...
+            //lấy ra số ticket có trong toàn bộ showtimeids có được từ query trên và count lại toàn bộ để ra quantity
+            //đây chỉ là tuần hiện tại
+            var firstquery = await _context.Showtimes
+                                .Include(a => a.Tickets)
+                                .Where(a => a.Tickets.Any(
+                                    a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1))
+                                    && a.StartTime <= DateTime.UtcNow.Date && a.StartTime >= ThisMondayWeek)
+                                .SelectMany(a => a.Tickets)
+                                .CountAsync();
+            //lấy tuần trước
+            var secondquery = await _context.Showtimes
+                                .Include(a => a.Tickets)
+                                .Where(a => a.Tickets.Any(
+                                    a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1))
+                                    && a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
+                                .SelectMany(a => a.Tickets)
+                                .CountAsync();
+            var thirdquery = await _context.Showtimes
+                                .Include(a => a.Tickets)
+                                .Where(a => a.Tickets.Any
+                                (a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1)))
+                                .SelectMany(a => a.Tickets)
+                                .CountAsync();
+            TicketQuanityDTO dto = new TicketQuanityDTO();
+            dto.NewTicketSoldQuantity = firstquery;
+            dto.OldTicketSoldQuantity = secondquery;
+            dto.TotalTicketSoldQuantity = thirdquery;
+            if (firstquery > secondquery)
+            {
+                dto.IsTicketSoldUpOrDown = true;
+                dto.PercentTicketSoldChange = (float)100F - ((float)secondquery * (float)100F / (float)firstquery);
+            }
+            else if (firstquery < secondquery)
+            {
+                dto.IsTicketSoldUpOrDown = false;
+                dto.PercentTicketSoldChange = (float)100F - ((float)firstquery * (float)100F / (float)secondquery);
+            }
+            else if( firstquery == secondquery)
+            {
+                dto.IsTicketSoldUpOrDown = true;
+                dto.PercentTicketSoldChange = 0.69F;
+            }
+            return dto;
+        }
+
     }
 }
