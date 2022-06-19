@@ -69,17 +69,13 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 try
                 {
-                    
-
                     string sql =
                         @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId) 
                        SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, (@ReceivePrice + st.BonusPrice), 1 
                        FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
                        WHERE s.Id = @SeatId ";
 
-                    object param = new { request.Tickets };
-
-                    int count = await con.ExecuteAsync(sql, param);
+                    int count = await con.ExecuteAsync(sql, request.Tickets, transaction: transaction);
 
                     if (count == request.Tickets.Count())
                     {

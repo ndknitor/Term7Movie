@@ -55,7 +55,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = Constants.ROLE_MANAGER)]
+        [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_MANAGER_CREATE_TICKET)]
         public async Task<IActionResult> CreateTicket(TicketListCreateRequest request)
         {
             var response = await _ticketService.CreateTicketAsync(request);

@@ -84,6 +84,8 @@ namespace Term7MovieApi.Extensions
 
                 option.AddPolicy(Constants.POLICY_COMPANY_FILTER, policy => policy.Requirements.Add(new CompanyFilterRequirement()));
 
+
+                option.AddPolicy(Constants.POLICY_MANAGER_CREATE_TICKET, policy => policy.Requirements.Add(new TicketCreateRequirement()));
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();
