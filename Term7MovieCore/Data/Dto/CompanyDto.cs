@@ -13,6 +13,8 @@ namespace Term7MovieCore.Data.Dto
         public string LogoUrl { set; get; }
         public bool IsActive { set; get; }
         public long? ManagerId { set; get; }
+        public string ManagerName { set; get; }
+        public string ManagerEmail { set; get; }
         public IEnumerable<TheaterDto> Theaters { set; get; }
     }
 }

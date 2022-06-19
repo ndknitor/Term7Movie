@@ -31,17 +31,17 @@ namespace Term7MovieRepository.Repositories.Implement
                 int offset = request.PageSize*(request.Page - 1);
                 int fetch = request.PageSize;
 
-                string sql = @" SELECT Id, Name, LogoUrl, IsActive 
-                                FROM Companies " +
+                string sql = @" SELECT c.Id, c.Name, c.LogoUrl, c.IsActive, c.ManagerId, u.FullName 'ManagerName', u.Email 'ManagerEmail'
+                                FROM Companies c LEFT JOIN Users u ON c.ManagerId = u.Id " +
                                 
                                 GetAdditionFilterQuery(request, FILTER_BY_NAME) +
 
-                             @" ORDER BY Id 
+                             @" ORDER BY c.Id 
                                 OFFSET @offset ROWS
                                 FETCH NEXT @fetch ROWS ONLY ; ";
 
-                string count = @" SELECT COUNT(Id) 
-                                FROM Companies " +
+                string count = @" SELECT COUNT(*) 
+                                FROM Companies c" +
 
                                 GetAdditionFilterQuery(request, FILTER_BY_NAME) +
 
@@ -148,9 +148,33 @@ namespace Term7MovieRepository.Repositories.Implement
             int count = 0;
             return count;
         }
-        public int UpdateCompany(TheaterCompany company)
+        public async Task<int> UpdateCompany(CompanyUpdateRequest request)
         {
             int count = 0;
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" UPDATE Companies 
+                       SET Name = @Name, LogoUrl = @LogoUrl, IsActive = @IsActive 
+                       WHERE Id = @Id ; ";
+
+                if (!request.IsActive)
+                {
+                    sql += @" UPDATE Users
+                              SET StatusId = 1 , LockoutEnd = '9999-12-31'
+                              WHERE CompanyId = @Id ";
+                } else
+                {
+                    sql += @" UPDATE Users
+                              SET StatusId = 2 , LockoutEnd = NULL 
+                              WHERE CompanyId = @Id ";
+                }
+
+                count = await con.ExecuteAsync(sql, request);
+
+            }
+
             return count;
         }
         public int DeleteCompany(int id)
@@ -183,7 +207,7 @@ namespace Term7MovieRepository.Repositories.Implement
             switch(filter)
             {
                 case FILTER_BY_NAME:
-                    if (!string.IsNullOrEmpty(request.SearchKey))  query = " WHERE Name LIKE CONCAT('%', @SearchKey, '%') ";
+                    if (!string.IsNullOrEmpty(request.SearchKey))  query = " WHERE c.Name LIKE CONCAT('%', @SearchKey, '%') ";
                     break;
             }
 
