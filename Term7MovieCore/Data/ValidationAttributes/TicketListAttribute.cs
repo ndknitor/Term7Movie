@@ -9,11 +9,11 @@ namespace Term7MovieCore.Data.ValidationAttributes
         {
             IEnumerable<TicketCreateRequest> tickets = value as IEnumerable<TicketCreateRequest>;
 
-            IEnumerable<long> showtimes = tickets.Select(t => t.ShowTimeId);
+            IEnumerable<long> showtimes = tickets.Select(t => t.ShowTimeId).Distinct();
 
             if (showtimes.Count() != 1) return false;
 
-            IEnumerable<DateTime> startTimes = tickets.Select(t => t.ShowStartTime);
+            IEnumerable<DateTime> startTimes = tickets.Select(t => t.ShowStartTime).Distinct();
 
             if (startTimes.Count() != 1) return false;
 

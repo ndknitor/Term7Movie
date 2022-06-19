@@ -81,6 +81,8 @@ namespace Term7MovieCore.Data
 
         public const string POLICY_COMPANY_FILTER = "CompanyFilter";
 
+        public const string POLICY_MANAGER_CREATE_TICKET = "OnlyCreateTicketSameManagerShowtime";
+
         public const int LOCK_TICKET_IN_MINUTE = 5;
         public const int CREATE_SHOWTIME_UPPER_BOUND_IN_MINUTE = 40;
         public const int REDIS_CACHE_LOAD_IN_MINUTE = 5;
