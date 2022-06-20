@@ -211,7 +211,8 @@ namespace Term7MovieService.Services.Implement
             dto.Description = rawData.Description;
             dto.ViewCount = rawData.ViewCount;
             dto.TotalRating = rawData.TotalRating;
-            //dto.Actors = JsonConvert.DeserializeObject<string[]>(rawData.Actors);
+            dto.Actors = string.IsNullOrEmpty(rawData.Actors) ? null :
+                JsonConvert.DeserializeObject<string[]>(rawData.Actors);
             dto.Language = rawData.Languages;
             dto.Director = rawData.Director;
             //dto.DirectorId = rawData.DirectorId;
@@ -368,7 +369,7 @@ namespace Term7MovieService.Services.Implement
             };
         }
         /* ---------------------- END GET TITLE MOVIE --------------- */
-
+        
         /* --------------------- START DEALING WITH HOMEPAGE MOBILE APP --------------- */
         public async Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request)
         {
@@ -494,7 +495,8 @@ namespace Term7MovieService.Services.Implement
                         //FormattedStartTime = item.StartTime.ToString("dd") + "/" +
                         //    item.StartTime.ToString("MM") + "/" + item.StartTime.ToString("yyyy")
                         //    + " " + item.StartTime.ToString("HH") + ":" + item.StartTime.ToString("mm")
-                        FormattedStartTime = item.StartTime.ToString("dd/MM/yyyy HH:mm")
+                        FormattedStartTime = item.StartTime.ToString("dd/MM/yyyy HH:mm"),
+                        TheaterName = item.TheaterName
                     });
                 }
                 response.MovieHomePages = result;

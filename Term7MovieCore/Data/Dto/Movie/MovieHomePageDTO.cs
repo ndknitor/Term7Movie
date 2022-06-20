@@ -18,7 +18,7 @@ namespace Term7MovieCore.Data.Dto.Movie
         public decimal MaxPrice { get; set; }
         public double RecommendPoint { get; set; }
         //Field cho Detail từng cái ở trên (field này dùng khi người ta click vào)
-        //public string TheaterName { get; set; }
+        public string TheaterName { get; set; }
         //public string TheaterAddress { get; set; }
         //public IEnumerable<ShowtimeDto> Showtimes { get; set; } //3 xuất chiếu sắp xảy ra (hoặc ít hơn nếu thiếu data)
     }

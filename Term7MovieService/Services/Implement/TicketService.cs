@@ -175,7 +175,6 @@ namespace Term7MovieService.Services.Implement
             {
                 await tiktokRepository.CreateTicket(tiktokList);
                 return new ParentResponse { Message = "A lot of ticket has created but don't know if there is any errors :v" };
-#warning có time thì nên response cái list status add thành công cho từng ticket huhu tôi lười
             }
             catch (Exception ex)
             {
