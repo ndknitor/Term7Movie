@@ -17,6 +17,6 @@ namespace Term7MovieCore.Entities
         public DateTime StartTime { set; get; }
         [Required]
         public DateTime EndTime { set; get; }
-        public ICollection<Ticket> Tickets { set; get; }
+        public ICollection<ShowtimeTicketType> ShowtimeTicketTypes { set; get; }
     }
 }

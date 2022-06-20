@@ -70,6 +70,8 @@ namespace Term7MovieApi.Extensions
 
 
             services.Configure<ImgBBOption>(config.GetSection(Constants.IMGBB_COM));
+
+            services.Configure<ProfitFormulaOption>(config.GetSection(Constants.PROFIT_FORMULA));
             return services;
         }
 
