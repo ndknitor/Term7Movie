@@ -21,7 +21,7 @@ namespace Term7MovieCore.Data.Dto.Theater
         public double MinutesRemain { get; set; }
         public double DistanceFromUser { get; set; }
         public double RecommendPoint { get; set; }
-        public string PosterImageURL { get; set; }
+        public string CoverImageURL { get; set; }
         public string TheaterName { get; set; }
     }
 }

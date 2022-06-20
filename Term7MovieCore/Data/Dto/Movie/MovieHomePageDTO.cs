@@ -6,7 +6,7 @@ namespace Term7MovieCore.Data.Dto.Movie
         //Field show ở home
         public string Title { get; set; }
         public int MovieId { get; set; }
-        public string PosterImgURL { get; set; }
+        public string CoverImgURL { get; set; }
         public int TheaterId { get; set; }
         public long ShowTimeId { get; set; }
         //public string ShowTimeId { get; set; }

@@ -311,7 +311,7 @@ namespace Term7MovieRepository.Repositories.Implement
                                                 ShowTimeId = xxx.Id,
                                                 MinutesRemain = (xxx.StartTime - rightnow).TotalMinutes,
                                                 MovieTitle = xxx.Movie.Title,
-                                                PosterImageURL = xxx.Movie.PosterImageUrl,
+                                                CoverImageURL = xxx.Movie.CoverImageUrl,
                                                 TheaterId = xxx.TheaterId != null ? xxx.TheaterId.Value : -1,
                                                 DistanceFromUser = CalculateDistanceByHaversine(userlocation,
                                                     new Coordinate
