@@ -9,5 +9,7 @@ namespace Term7MovieService.Services.Interface
         Task<object> GetAllCompanyAsync(CompanyFilterRequest request);
 
         Task<ParentResponse> UpdateCompanyAsync(CompanyUpdateRequest request);
+
+        Task<ParentResponse> CreateCompanyAsync(CompanyCreateRequest request);
     }
 }
