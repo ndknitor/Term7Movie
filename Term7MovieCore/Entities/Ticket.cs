@@ -11,8 +11,7 @@ namespace Term7MovieCore.Entities
         public Seat Seat { set; get; }
         public Guid? TransactionId { get; set; }
         public Transaction Transaction { set; get; }
-        public long? ShowTimeId { get; set; }
-        public Showtime ShowTime { set; get; }
+        public long ShowTimeId { get; set; }
         [Required]
         public DateTime ShowStartTime { get; set; }
         [Column(TypeName = "money"), Required]
@@ -25,5 +24,7 @@ namespace Term7MovieCore.Entities
         public int StatusId { set; get; }
         public TicketStatus Status { set; get; }
         public DateTime? LockedTime { set; get; }
+        public Guid? ShowtimeTicketTypeId { set; get; }
+        public ShowtimeTicketType ShowtimeTicketType { set; get; }
     }
 }

@@ -9,6 +9,5 @@ namespace Term7MovieCore.Entities
         [Required]
         public string Name { get; set; }
         public ICollection<Seat> Seats { get; set; }
-        public ICollection<TheaterSeatType> TheaterSeatTypes { set; get;}
     }
 }

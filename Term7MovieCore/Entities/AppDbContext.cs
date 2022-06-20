@@ -24,8 +24,7 @@ namespace Term7MovieCore.Entities
         public virtual DbSet<Transaction> Transactions { set; get; }
         public virtual DbSet<TransactionHistory> TransactionHistories { set; get; }
         public virtual DbSet<TransactionStatus> TransactionStatuses { get; set; }
-
-        public virtual DbSet<TheaterSeatType> TheaterSeatTypes { set; get; }
+        public virtual DbSet<ShowtimeTicketType> ShowtimeTicketTypes { set; get; }
         public virtual DbSet<MomoPaymentCreateRequest> PaymentRequests { set; get; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -114,18 +113,15 @@ namespace Term7MovieCore.Entities
                 .HasForeignKey<TheaterCompany>(t => t.ManagerId)
                 .IsRequired(false);
 
-            builder.Entity<TheaterSeatType>()
-                .HasKey(ts => new { ts.TheaterId, ts.SeatTypeId });
+            builder.Entity<ShowtimeTicketType>()
+                .HasOne(stt => stt.Showtime)
+                .WithMany(sh => sh.ShowtimeTicketTypes)
+                .HasForeignKey(stt => stt.ShowtimeId);
 
-            builder.Entity<TheaterSeatType>()
-                .HasOne(t => t.Theater)
-                .WithMany(t => t.TheaterSeatTypes)
-                .HasForeignKey(ts => ts.TheaterId);
-
-            builder.Entity<TheaterSeatType>()
-                .HasOne(ts => ts.SeatType)
-                .WithMany(st => st.TheaterSeatTypes)
-                .HasForeignKey(ts => ts.SeatTypeId);
+            builder.Entity<ShowtimeTicketType>()
+                .HasOne(stt => stt.TicketType)
+                .WithMany(tt => tt.ShowtimeTicketTypes)
+                .HasForeignKey(stt => stt.TicketTypeId);
 
             foreach (var entityType in builder.Model.GetEntityTypes())
             {

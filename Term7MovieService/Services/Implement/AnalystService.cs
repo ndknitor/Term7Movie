@@ -29,6 +29,7 @@ namespace Term7MovieService.Services.Implement
         /* --------- START PRIVATE FUNCTION ------- */
 
         /* -------- START GETTING QUICK ANALYST ------ */
+        /*
         private async Task<TicketQuanityDTO> GetQuickTicketVolumeForACompany(int companyid)
         {
             DateTime RightNow = DateTime.UtcNow;
@@ -38,7 +39,7 @@ namespace Term7MovieService.Services.Implement
             var quanity = await ticketRepository.GetQuickTicketQuanityInTwoWeek(companyid, 
                 MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             return quanity;
-        }
+        }*/
         /* -------- END GETTING QUICK ANALYST ------ */
 
         /// <summary>

@@ -23,6 +23,5 @@ namespace Term7MovieCore.Entities
         public bool Status { set; get; }
         public ICollection<Room> Rooms { set; get; }
         public ICollection<Showtime> Showtimes { set; get; }
-        public ICollection<TheaterSeatType> TheaterSeatTypes { set; get; }
     }
 }
