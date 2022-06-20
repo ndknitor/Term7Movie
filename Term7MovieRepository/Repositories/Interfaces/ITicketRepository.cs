@@ -16,7 +16,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<bool> IsTicketInShowtimeValid(long showtimeId, IEnumerable<long> ticketId);
         Task LockTicketAsync(IEnumerable<long> idList);
         Task<Tuple<decimal, decimal>> GetMinAndMaxPriceFromShowTimeId(long showtimeid);
-        Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid, 
-            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        //Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid, 
+        //    DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
     }
 }

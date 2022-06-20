@@ -12,11 +12,13 @@ namespace Term7MovieRepository.Repositories.Implement
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
         private readonly ICacheProvider _cacheProvider;
-        public UnitOfWork(AppDbContext context, ICacheProvider cacheProvider, IOptions<ConnectionOption> connectionOption)
+        private readonly ProfitFormulaOption _profitFormulaOption;
+        public UnitOfWork(AppDbContext context, ICacheProvider cacheProvider, IOptions<ConnectionOption> connectionOption, IOptions<ProfitFormulaOption> profitFormulaOption)
         {
             _context = context;
             _connectionOption = connectionOption.Value;
             _cacheProvider = cacheProvider;
+            _profitFormulaOption = profitFormulaOption.Value;
         }
 
         public ICategoryRepository CategoryRepository { get => new CategoryRepository(_context); }
@@ -29,7 +31,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public ISeatTypeRepository SeatTypeRepository { get => new SeatTypeRepository(_context, _connectionOption); }
         public IShowtimeRepository ShowtimeRepository { get => new ShowtimeRepository(_context, _connectionOption); }
         public ITheaterRepository TheaterRepository { get => new TheaterRepository(_context, _connectionOption); }
-        public ITicketRepository TicketRepository { get => new TicketRepository(_context, _connectionOption); }
+        public ITicketRepository TicketRepository { get => new TicketRepository(_context, _connectionOption, _profitFormulaOption); }
         public ITicketStatusRepository TicketStatusRepository { get => new TicketStatusRepository(_context); }
         public ITransactionHistoryRepository TransactionHistoryRepository { get => new TransactionHistoryRepository(_context, _connectionOption); }
         public ITransactionRepository TransactionRepository { get => new TransactionRepository(_context); }

@@ -29,7 +29,8 @@ namespace Term7MovieService.Services.Implement
         /* --------- START PRIVATE FUNCTION ------- */
 
         /* -------- START GETTING QUICK ANALYST ------ */
-        private async Task<TicketQuanityDTO> GettingAnalystForOneWeek(int companyid)
+        /*
+        private async Task<TicketQuanityDTO> GetQuickTicketVolumeForACompany(int companyid)
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
@@ -38,7 +39,7 @@ namespace Term7MovieService.Services.Implement
             var quanity = await ticketRepository.GetQuickTicketQuanityInTwoWeek(companyid, 
                 MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             return quanity;
-        }
+        }*/
         /* -------- END GETTING QUICK ANALYST ------ */
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Term7MovieService.Services.Implement
             switch (DayOfTheWeek)
             {
                 case 0: return InTheMeantime.AddDays(-6).Date;
-                case 1: return InTheMeantime.AddDays(1).Date; //so it wont block the constraint
+                case 1: return InTheMeantime.AddDays(0).Date; //so it wont block the constraint
                 case 2: return InTheMeantime.AddDays(-1).Date;
                 case 3: return InTheMeantime.AddDays(-2).Date;
                 case 4: return InTheMeantime.AddDays(-3).Date;
