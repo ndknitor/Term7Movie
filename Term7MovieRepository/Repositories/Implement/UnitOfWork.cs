@@ -21,7 +21,7 @@ namespace Term7MovieRepository.Repositories.Implement
             _profitFormulaOption = profitFormulaOption.Value;
         }
 
-        public ICategoryRepository CategoryRepository { get => new CategoryRepository(_context); }
+        public ICategoryRepository CategoryRepository { get => new CategoryRepository(_context, _connectionOption); }
         public ICompanyRepository CompanyRepository { get => new CompanyRepository(_context, _connectionOption); }
         public IMovieCategoryRepository MovieCategoryRepository { get => new MovieCategoryRepository(_context); }
         public IMovieRepository MovieRepository { get => new MovieRepository(_context, _connectionOption); }
@@ -43,6 +43,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public IRoleRepository RoleRepository { get => new RoleRepository(_context); }
 
         public IPaymentRequestRepository PaymentRequestRepository { get => new PaymentRequestRepository(_context, _connectionOption); }
+        public ITicketTypeRepository TicketTypeRepository { get => new TicketTypeRepository(_context, _connectionOption); }
         public bool HasChange()
         {
             return _context.ChangeTracker.HasChanges();

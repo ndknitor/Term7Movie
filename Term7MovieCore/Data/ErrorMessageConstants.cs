@@ -9,5 +9,7 @@
         public const string ERROR_MESSAGE_INVALID_USER = "Invalid user";
 
         public const string ERROR_MESSAGE_INVALID_USER_OR_COMPANY = "Invalid user or company";
+
+        public const string ERROR_MESSAGE_INVALID_TICKET_TYPE_ID = "Invalid ticket type";
     }
 }

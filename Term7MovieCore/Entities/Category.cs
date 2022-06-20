@@ -8,6 +8,7 @@ namespace Term7MovieCore.Entities
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(50)"), Required]
         public string Name { get; set; }
+        public string Color { set; get; }
         public ICollection<MovieCategory> MovieCategories { set; get; }
     }
 }

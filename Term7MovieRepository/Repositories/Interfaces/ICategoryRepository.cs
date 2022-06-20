@@ -1,10 +1,11 @@
-﻿using Term7MovieCore.Entities;
+﻿using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Entities;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ICategoryRepository
     {
-        Task<IEnumerable<Category>> GetAllCategory();
+        Task<IEnumerable<CategoryDTO>> GetAllCategory();
 
     }
 }
