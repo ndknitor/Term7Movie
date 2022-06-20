@@ -14,10 +14,12 @@ namespace Term7MovieRepository.Repositories.Implement
     {
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
-        public TicketRepository(AppDbContext context, ConnectionOption connectionOption)
+        private readonly ProfitFormulaOption _profitFormulaOption;
+        public TicketRepository(AppDbContext context, ConnectionOption connectionOption, ProfitFormulaOption profitFormulaOption)
         {
             _context = context;
             _connectionOption = connectionOption;
+            _profitFormulaOption = profitFormulaOption;
         }
 
         public async Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid)
@@ -66,16 +68,30 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 con.Open();
                 var transaction = con.BeginTransaction();
-
+                int count = 0;
                 try
                 {
-                    string sql =
+                    foreach(TicketCreateRequest ticket in request.Tickets)
+                    {
+                        string sql =
                         @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId) 
-                       SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, (@ReceivePrice + st.BonusPrice), 1 
-                       FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
-                       WHERE s.Id = @SeatId ";
+                           SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, @ReceivePrice + (@OriginalPrice - @ReceivePrice) * @SellingPriceRatio, 1 
+                           FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
+                                    JOIN TheaterSeatTypes tst ON st.Id = tst.SeatTypeId
+                                    JOIN Showtimes sh ON tst.TheaterId = sh.TheaterId
+                           WHERE s.Id = @SeatId AND sh.Id = @ShowTimeId ";
 
-                    int count = await con.ExecuteAsync(sql, request.Tickets, transaction: transaction);
+                        object param = new 
+                        { 
+                            ticket.SeatId,
+                            ticket.ShowTimeId,
+                            ticket.ShowStartTime,
+                            ticket.OriginalPrice,
+                            ticket.ReceivePrice,
+                            _profitFormulaOption.SellingPriceRatio };
+
+                        count += await con.ExecuteAsync(sql, param, transaction: transaction);
+                    }
 
                     if (count == request.Tickets.Count())
                     {

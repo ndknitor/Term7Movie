@@ -39,6 +39,7 @@ namespace Term7MovieCore.Data
         public const string GOONG_IO = "Goong.io";
         public const string MOMO_API = "MoMoAPI";
         public const string IMGBB_COM = "ImgBB.com";
+        public const string PROFIT_FORMULA = "ProfitFormula";
 
         public const string ROLE_ADMIN = "Admin";
         public const string ROLE_MANAGER = "Manager";
