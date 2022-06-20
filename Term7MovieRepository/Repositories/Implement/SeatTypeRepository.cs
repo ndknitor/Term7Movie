@@ -52,7 +52,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
             if (dbSeatType == null) return;
 
-            dbSeatType.BonusPrice = seatType.BonusPrice;
+            dbSeatType.Name = seatType.Name;
         }
 
     }

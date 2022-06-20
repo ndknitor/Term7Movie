@@ -156,8 +156,11 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 string sql =
                     @" UPDATE Companies 
-                       SET Name = @Name, LogoUrl = @LogoUrl, IsActive = @IsActive 
-                       WHERE Id = @Id ; ";
+                       SET Name = @Name, IsActive = @IsActive " + 
+
+                       request.LogoUrl != null ? " , LogoUrl = @LogoUrl " : "" +
+
+                    @" WHERE Id = @Id ; ";
 
                 if (!request.IsActive)
                 {

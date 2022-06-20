@@ -11,6 +11,7 @@ namespace Term7MovieCore.Data.Request
         public string Name { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         [MaxLength(200, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_MAX_LENGTH)]
+        [Url]
         public string LogoUrl { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         public bool IsActive { set; get; } = true;
