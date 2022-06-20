@@ -31,11 +31,20 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicketTypeAsync(TicketTypeCreateRequest request)
+        public async Task<IActionResult> CreateTicketTypeAsync([FromBody] TicketTypeCreateRequest request)
         {
             long managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
 
             var response = await _ticketTypeService.CreateTicketType(request, managerId);
+
+            return Ok(response);
+        }
+
+        [HttpPatch]
+        [Authorize(Policy = Constants.POLICY_MANAGER_UPDATE_TICKET_TYPE_SAME_COMPANY)]
+        public async Task<IActionResult> UpdateTicketTypeAsync([FromBody] TicketTypeUpdateRequest request)
+        {
+            var response = await _ticketTypeService.UpdateTicketType(request);
 
             return Ok(response);
         }

@@ -84,6 +84,14 @@ namespace Term7MovieApi.Handlers
                         if (await CanManagerCreateOrUpdateTicket(claims, ticketCreateRequest)) context.Succeed(requirement);
 
                         break;
+
+                    case TicketTypeUpdateRequirement:
+
+                        TicketTypeUpdateRequest ticketTypeUpdateRequest = await httpContext.Request.ToObjectAsync<TicketTypeUpdateRequest>();
+
+                        if (await CanManagerAccessTicketType(claims, ticketTypeUpdateRequest.Id)) context.Succeed(requirement);
+
+                        break;
                 }
             }
         }
@@ -209,6 +217,13 @@ namespace Term7MovieApi.Handlers
             }
 
             return valid;
+        }
+
+        private async Task<bool> CanManagerAccessTicketType(IEnumerable<Claim> claims, long ticketTypeId)
+        {
+            long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+
+            return await _unitOfWork.TicketTypeRepository.CanManagerAccessTicketType(ticketTypeId, managerId);
         }
     }
 }

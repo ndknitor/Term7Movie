@@ -41,5 +41,30 @@ namespace Term7MovieService.Services.Implement
                 Message = Constants.MESSAGE_SUCCESS
             };
         }
+
+        public async Task<ParentResponse> UpdateTicketType(TicketTypeUpdateRequest request)
+        {
+            int count = await ticketTypeRepository.UpdateAsync(request);
+
+            if (count == 0) throw new DbOperationException();
+
+            return new ParentResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
+
+        public async Task<ParentResultResponse> GetTicketTypeByIdAsync(long id)
+        {
+            TicketTypeDto ticketType = await ticketTypeRepository.GetTicketTypeByIdAsync(id);
+
+            if (ticketType == null) throw new DbNotFoundException();
+
+            return new ParentResultResponse
+            {
+                Result = ticketType,
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
     }
 }
