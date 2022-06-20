@@ -60,7 +60,7 @@ namespace Term7MovieApi.Profiles
                 })
                 .ForMember(
                     des => des.Amount,
-                    option => option.MapFrom(src => src.SellingPrice + src.Seat.SeatType.BonusPrice)
+                    option => option.MapFrom(src => src.SellingPrice)
                 )
                 .ForMember(
                     des => des.Name,

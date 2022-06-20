@@ -37,7 +37,8 @@ namespace Term7MovieCore.Data
         public static DateTime JSON_START_DATE = new DateTime(1970, 1, 1);
 
         public const string GOONG_IO = "Goong.io";
-        public const string MOMO_API = "MoMoAPI"; 
+        public const string MOMO_API = "MoMoAPI";
+        public const string IMGBB_COM = "ImgBB.com";
 
         public const string ROLE_ADMIN = "Admin";
         public const string ROLE_MANAGER = "Manager";

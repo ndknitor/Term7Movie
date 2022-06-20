@@ -25,6 +25,7 @@ namespace Term7MovieCore.Entities
         public virtual DbSet<TransactionHistory> TransactionHistories { set; get; }
         public virtual DbSet<TransactionStatus> TransactionStatuses { get; set; }
 
+        public virtual DbSet<TheaterSeatType> TheaterSeatTypes { set; get; }
         public virtual DbSet<MomoPaymentCreateRequest> PaymentRequests { set; get; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -112,6 +113,19 @@ namespace Term7MovieCore.Entities
                 .WithOne(c => c.Manager)
                 .HasForeignKey<TheaterCompany>(t => t.ManagerId)
                 .IsRequired(false);
+
+            builder.Entity<TheaterSeatType>()
+                .HasKey(ts => new { ts.TheaterId, ts.SeatTypeId });
+
+            builder.Entity<TheaterSeatType>()
+                .HasOne(t => t.Theater)
+                .WithMany(t => t.TheaterSeatTypes)
+                .HasForeignKey(ts => ts.TheaterId);
+
+            builder.Entity<TheaterSeatType>()
+                .HasOne(ts => ts.SeatType)
+                .WithMany(st => st.TheaterSeatTypes)
+                .HasForeignKey(ts => ts.SeatTypeId);
 
             foreach (var entityType in builder.Model.GetEntityTypes())
             {

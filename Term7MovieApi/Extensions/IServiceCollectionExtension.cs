@@ -51,6 +51,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ICacheProvider, CacheProvider>();
 
+            services.AddScoped<IImageHostService, ImageHostService>();
+
             return services;
         }
 
@@ -66,6 +68,8 @@ namespace Term7MovieApi.Extensions
 
             services.Configure<MomoOption>(config.GetSection(Constants.MOMO_API));
 
+
+            services.Configure<ImgBBOption>(config.GetSection(Constants.IMGBB_COM));
             return services;
         }
 
