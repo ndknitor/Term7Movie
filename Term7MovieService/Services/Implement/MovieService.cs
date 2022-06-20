@@ -211,7 +211,7 @@ namespace Term7MovieService.Services.Implement
             dto.Description = rawData.Description;
             dto.ViewCount = rawData.ViewCount;
             dto.TotalRating = rawData.TotalRating;
-            dto.Actors = JsonConvert.DeserializeObject<string[]>(rawData.Actors);
+            //dto.Actors = JsonConvert.DeserializeObject<string[]>(rawData.Actors);
             dto.Language = rawData.Languages;
             dto.Director = rawData.Director;
             //dto.DirectorId = rawData.DirectorId;
