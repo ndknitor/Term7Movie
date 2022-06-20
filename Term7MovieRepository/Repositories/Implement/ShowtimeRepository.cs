@@ -24,7 +24,6 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
-
         public async Task<PagingList<ShowtimeDto>> GetShowtimesByTheaterIdAsync(ShowtimeFilterRequest request)
         {
             PagingList<ShowtimeDto> list = new();
@@ -312,7 +311,7 @@ namespace Term7MovieRepository.Repositories.Implement
                                                 ShowTimeId = xxx.Id,
                                                 MinutesRemain = (xxx.StartTime - rightnow).TotalMinutes,
                                                 MovieTitle = xxx.Movie.Title,
-                                                PosterImageURL = xxx.Movie.PosterImageUrl,
+                                                CoverImageURL = xxx.Movie.CoverImageUrl,
                                                 TheaterId = xxx.TheaterId != null ? xxx.TheaterId.Value : -1,
                                                 DistanceFromUser = CalculateDistanceByHaversine(userlocation,
                                                     new Coordinate
@@ -320,7 +319,8 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         Latitude = double.Parse(xxx.Theater.Latitude),
                                                         Longitude = double.Parse(xxx.Theater.Longitude)
                                                     }),
-                                                StartTime = xxx.StartTime
+                                                StartTime = xxx.StartTime,
+                                                TheaterName = xxx.Theater.Name,
                                             })
                                             .ToListAsync();
             if (!query.Any() || query.Count < 3) throw new Exception("NOT ENOUGH MANA");

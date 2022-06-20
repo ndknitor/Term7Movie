@@ -27,7 +27,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<TicketResponse> GetTicketForSomething(TicketRequest request)
         {
-            if(!request.TransactionId.HasValue && !request.ShowTimeId.HasValue)
+            if (!request.TransactionId.HasValue && !request.ShowTimeId.HasValue)
                 return new TicketResponse { Message = "Parameter is missing, need at least one parameter" };
             if (request.TransactionId.HasValue && request.ShowTimeId.HasValue)
                 return new TicketResponse { Message = "One parameter at a time only" };
@@ -36,7 +36,7 @@ namespace Term7MovieService.Services.Implement
                 Guid dummy = request.TransactionId.Value;
                 return await GetTicketForATransaction(dummy);
             }
-            if(request.ShowTimeId.HasValue)
+            if (request.ShowTimeId.HasValue)
             {
                 int id = request.ShowTimeId.Value;
                 return await GetTicketForAShowTime(id);
@@ -47,12 +47,12 @@ namespace Term7MovieService.Services.Implement
         private async Task<TicketResponse> GetTicketForAShowTime(int showtimeid)
         {
             var rawdata = await tiktokRepository.GetAllTicketByShowtime(showtimeid);
-            if (rawdata == null) 
+            if (rawdata == null)
                 return new TicketResponse { Message = "Can't access data storage." };
             if (!rawdata.Any())
                 return new TicketResponse { Message = "No ticket was found" };
             List<TicketDTO> result = new List<TicketDTO>();
-            foreach(var ticket in rawdata)
+            foreach (var ticket in rawdata)
             {
                 TicketDTO dto = new TicketDTO();
                 dto.TicketId = ticket.Id;
@@ -79,7 +79,7 @@ namespace Term7MovieService.Services.Implement
             var rawdata = await tiktokRepository.GetAllTicketByTransactionId(transactionid);
             if (rawdata == null)
                 return new TicketResponse { Message = "Can't access data storage." };
-            if(!rawdata.Any())
+            if (!rawdata.Any())
                 return new TicketResponse { Message = "No ticket was found" };
             List<TicketDTO> result = new List<TicketDTO>();
             foreach (var ticket in rawdata)

@@ -28,8 +28,8 @@ namespace Term7MovieService.Services.Interface
 
         Task<MovieTitleResponse> GetMovieTitle();
 
-        //first time?
-        Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request);
+        //Saved for some day that doesn't exists :v
+        //Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request);
 
         //optimize
         Task<MovieHomePageResponse> GetMovieRecommendationForHomePage(MovieHomePageRequest request);

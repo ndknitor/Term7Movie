@@ -193,7 +193,7 @@ namespace Term7MovieRepository.Repositories.Implement
             //Get every theater id belong in that company
             var showtimeids = await _context.Theaters
                                 .Include(a => a.Showtimes)
-                                .Where(a => a.CompanyId == 1)
+                                .Where(a => a.CompanyId == companyid)
                                 .SelectMany(a => a.Showtimes)
                                 .Select(a => a.Id).ToListAsync();
             if (!showtimeids.Any())
@@ -221,6 +221,12 @@ namespace Term7MovieRepository.Repositories.Implement
                                 (a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1)))
                                 .SelectMany(a => a.Tickets)
                                 .CountAsync();
+            if (firstquery == 0 && secondquery == 0 && thirdquery == 0)
+            {
+                firstquery = 1;
+                secondquery = 1;
+                thirdquery = 1;
+            }
             TicketQuanityDTO dto = new TicketQuanityDTO();
             dto.NewTicketSoldQuantity = firstquery;
             dto.OldTicketSoldQuantity = secondquery;

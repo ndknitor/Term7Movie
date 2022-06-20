@@ -30,7 +30,7 @@ namespace Term7MovieService.Services.Implement
 
         /* -------- START GETTING QUICK ANALYST ------ */
         /*
-        private async Task<TicketQuanityDTO> GetQuickTicketVolumeForACompany(int companyid)
+        private async Task<TicketQuanityDTO> GettingAnalystForOneWeek(int companyid)
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
@@ -44,7 +44,7 @@ namespace Term7MovieService.Services.Implement
 
         /// <summary>
         /// Below are function to convert right damn now into 3 different time so we can get a part of 
-        /// the result in database :v
+        /// the result in database :v There is some minor function to processing time logical
         /// </summary>
         /// <param name="InTheMeantime"></param>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace Term7MovieService.Services.Implement
             switch (DayOfTheWeek)
             {
                 case 0: return InTheMeantime.AddDays(-6).Date;
-                case 1: return InTheMeantime.AddDays(1).Date; //so it wont block the constraint
+                case 1: return InTheMeantime.AddDays(0).Date; //so it wont block the constraint
                 case 2: return InTheMeantime.AddDays(-1).Date;
                 case 3: return InTheMeantime.AddDays(-2).Date;
                 case 4: return InTheMeantime.AddDays(-3).Date;
@@ -93,6 +93,11 @@ namespace Term7MovieService.Services.Implement
                 case 6: return InTheMeantime.AddDays(1 - 7).Date;
                 default: throw new NotSupportedException();
             }
+        }
+
+        private bool IsItSundayYet(DateTime WhichDayIsIt)
+        {
+            return (int)WhichDayIsIt.DayOfWeek == 0 ? true : false;
         }
 
 

@@ -211,7 +211,8 @@ namespace Term7MovieService.Services.Implement
             dto.Description = rawData.Description;
             dto.ViewCount = rawData.ViewCount;
             dto.TotalRating = rawData.TotalRating;
-            //dto.Actors = JsonConvert.DeserializeObject<string[]>(rawData.Actors);
+            dto.Actors = string.IsNullOrEmpty(rawData.Actors) ? null :
+                JsonConvert.DeserializeObject<string[]>(rawData.Actors);
             dto.Language = rawData.Languages;
             dto.Director = rawData.Director;
             //dto.DirectorId = rawData.DirectorId;
@@ -368,103 +369,103 @@ namespace Term7MovieService.Services.Implement
             };
         }
         /* ---------------------- END GET TITLE MOVIE --------------- */
-
+        
         /* --------------------- START DEALING WITH HOMEPAGE MOBILE APP --------------- */
-        public async Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request)
-        {
-            MovieHomePageResponse response = new MovieHomePageResponse();
-            try
-            {
-                var showtimes = await showRepository.GetRecentlyShowTimeForMovieHomepage();
-                //Đổ data ra sao cho có 3 thứ thời gian, vị trí, giá
-                List<MovieSorter> SorterList = new List<MovieSorter>();
-                foreach(var item in showtimes)
-                {
-                    var Tobiroppo = await tiktokRepository.GetMinAndMaxPriceFromShowTimeId(item.ShowTimeId);
-                    Coordinate UserLocation = new Coordinate 
-                    { Latitude = request.Latitude, 
-                        Longitude = request.Longtitude };
-                    SorterList.Add(new MovieSorter
-                    {
-                        current = item,
-                        MaxPrice = Tobiroppo.Item2,
-                        MinPrice = Tobiroppo.Item1,
-                        Distance = CalculateDistanceByHaversine(item.Location, UserLocation),
-                    });
-                }
-                //convert thời gian ra int để so sánh ưu tiên
-                // số càng cao thời gian càng xa ko ưu tiên :D
-                int TimeRecommender = 1;
-                foreach (var item in SorterList.OrderBy(a => a.current.StartTime))
-                {
-                    item.TimeRecommendPoint = TimeRecommender;
-                    TimeRecommender++; 
-                }
-                decimal MaxMinPriceInSorterList = SorterList.Max(a => a.MinPrice);
-                int Max100Percent = TimeRecommender--; //SorterList.Max(a => a.TimeRecommendPoint);
-                double MaxDistance = SorterList.Max(a => a.Distance);
-                //convert mọi thứ về số int 100% để dễ ưu tiên theo % 0.5 0.3 0.2 hehe
-                for(int j = 0; j < SorterList.Count; j++)
-                {
-                    //2 biến double và decimal đang carry % thôi nhé. WAKE UP
-                    double dummy = SorterList[j].Distance * 100 / MaxDistance;
-                    SorterList[j].DistancePoint = dummy * Max100Percent / 100;
-                    double idontcare = (double)SorterList[j].MinPrice * (double)100 / (double)MaxMinPriceInSorterList;
-                    SorterList[j].PricePoint = idontcare * (double)Max100Percent / (double)100;
-                    //để tránh bug thì tôi cast hết double thế này :v
-                    SorterList[j].RecommendPoint = SorterList[j].TimeRecommendPoint * 0.5
-                        + SorterList[j].PricePoint * 0.2 + SorterList[j].DistancePoint * 0.3;
-                }
-                //final sọt tôi mệt mong RAM ko cháy vì những dòng này
-                SorterList = SorterList.OrderByDescending(a => a.RecommendPoint).Take(3).ToList();
-                IEnumerable<Movie> rawData = await
-                    movieRepository.GetRemainInformationForHomePage(SorterList.Select(a => a.current.MovieId).ToArray());
-                //now query some data for the remain process
-                List<MovieHomePageDTO> result = new List<MovieHomePageDTO>();
-                int linear = 1;
-                foreach(var item in SorterList)
-                {
-                    result.Add(new MovieHomePageDTO
-                    {
-                        Title = rawData.Single(a => a.Id == item.current.MovieId).Title,
-                        PosterImgURL = rawData.Single(a => a.Id == item.current.MovieId).PosterImageUrl,
-                        MaxPrice = item.MaxPrice,
-                        MovieId = item.current.MovieId,
-                        MinPrice = item.MinPrice,
-                        RecommendPoint = 1,
-                        TheaterId = item.current.TheaterId,
-                    });
-                    linear++;
-                }
-                response.MovieHomePages = result;
-                response.Message = Constants.MESSAGE_SUCCESS;
-                return response;
+        //public async Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request)
+        //{
+        //    MovieHomePageResponse response = new MovieHomePageResponse();
+        //    try
+        //    {
+        //        var showtimes = await showRepository.GetRecentlyShowTimeForMovieHomepage();
+        //        //Đổ data ra sao cho có 3 thứ thời gian, vị trí, giá
+        //        List<MovieSorter> SorterList = new List<MovieSorter>();
+        //        foreach(var item in showtimes)
+        //        {
+        //            var Tobiroppo = await tiktokRepository.GetMinAndMaxPriceFromShowTimeId(item.ShowTimeId);
+        //            Coordinate UserLocation = new Coordinate 
+        //            { Latitude = request.Latitude, 
+        //                Longitude = request.Longtitude };
+        //            SorterList.Add(new MovieSorter
+        //            {
+        //                current = item,
+        //                MaxPrice = Tobiroppo.Item2,
+        //                MinPrice = Tobiroppo.Item1,
+        //                Distance = CalculateDistanceByHaversine(item.Location, UserLocation),
+        //            });
+        //        }
+        //        //convert thời gian ra int để so sánh ưu tiên
+        //        // số càng cao thời gian càng xa ko ưu tiên :D
+        //        int TimeRecommender = 1;
+        //        foreach (var item in SorterList.OrderBy(a => a.current.StartTime))
+        //        {
+        //            item.TimeRecommendPoint = TimeRecommender;
+        //            TimeRecommender++; 
+        //        }
+        //        decimal MaxMinPriceInSorterList = SorterList.Max(a => a.MinPrice);
+        //        int Max100Percent = TimeRecommender--; //SorterList.Max(a => a.TimeRecommendPoint);
+        //        double MaxDistance = SorterList.Max(a => a.Distance);
+        //        //convert mọi thứ về số int 100% để dễ ưu tiên theo % 0.5 0.3 0.2 hehe
+        //        for(int j = 0; j < SorterList.Count; j++)
+        //        {
+        //            //2 biến double và decimal đang carry % thôi nhé. WAKE UP
+        //            double dummy = SorterList[j].Distance * 100 / MaxDistance;
+        //            SorterList[j].DistancePoint = dummy * Max100Percent / 100;
+        //            double idontcare = (double)SorterList[j].MinPrice * (double)100 / (double)MaxMinPriceInSorterList;
+        //            SorterList[j].PricePoint = idontcare * (double)Max100Percent / (double)100;
+        //            //để tránh bug thì tôi cast hết double thế này :v
+        //            SorterList[j].RecommendPoint = SorterList[j].TimeRecommendPoint * 0.5
+        //                + SorterList[j].PricePoint * 0.2 + SorterList[j].DistancePoint * 0.3;
+        //        }
+        //        //final sọt tôi mệt mong RAM ko cháy vì những dòng này
+        //        SorterList = SorterList.OrderByDescending(a => a.RecommendPoint).Take(3).ToList();
+        //        IEnumerable<Movie> rawData = await
+        //            movieRepository.GetRemainInformationForHomePage(SorterList.Select(a => a.current.MovieId).ToArray());
+        //        //now query some data for the remain process
+        //        List<MovieHomePageDTO> result = new List<MovieHomePageDTO>();
+        //        int linear = 1;
+        //        foreach(var item in SorterList)
+        //        {
+        //            result.Add(new MovieHomePageDTO
+        //            {
+        //                Title = rawData.Single(a => a.Id == item.current.MovieId).Title,
+        //                PosterImgURL = rawData.Single(a => a.Id == item.current.MovieId).PosterImageUrl,
+        //                MaxPrice = item.MaxPrice,
+        //                MovieId = item.current.MovieId,
+        //                MinPrice = item.MinPrice,
+        //                RecommendPoint = 1,
+        //                TheaterId = item.current.TheaterId,
+        //            });
+        //            linear++;
+        //        }
+        //        response.MovieHomePages = result;
+        //        response.Message = Constants.MESSAGE_SUCCESS;
+        //        return response;
 
-            }
-            catch(Exception ex)
-            {
-                if (ex.Message == "DBCONNECTION")
-                    return new MovieHomePageResponse { Message = "Can't access database" };
-                if (ex.Message == "NOT ENOUGH MANA")
-                {
-                    var rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
-                    List<MovieHomePageDTO> result = new List<MovieHomePageDTO>();
-                    foreach(var item in rawData)
-                    {
-                        result.Add(new MovieHomePageDTO
-                        {
-                            MovieId = item.Id,
-                            PosterImgURL = item.PosterImageUrl,
-                            Title = item.Title,
-                        });
-                    }
-                    response.MovieHomePages = result;
-                    response.Message = "Not enough data to show suggestion movie with showtime.";
-                    return response;
-                }
-                throw new Exception(ex.Message);
-            }
-        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        if (ex.Message == "DBCONNECTION")
+        //            return new MovieHomePageResponse { Message = "Can't access database" };
+        //        if (ex.Message == "NOT ENOUGH MANA")
+        //        {
+        //            var rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
+        //            List<MovieHomePageDTO> result = new List<MovieHomePageDTO>();
+        //            foreach(var item in rawData)
+        //            {
+        //                result.Add(new MovieHomePageDTO
+        //                {
+        //                    MovieId = item.Id,
+        //                    PosterImgURL = item.PosterImageUrl,
+        //                    Title = item.Title,
+        //                });
+        //            }
+        //            response.MovieHomePages = result;
+        //            response.Message = "Not enough data to show suggestion movie with showtime.";
+        //            return response;
+        //        }
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<MovieHomePageResponse> GetMovieRecommendationForHomePage(MovieHomePageRequest request)
         {
@@ -483,7 +484,7 @@ namespace Term7MovieService.Services.Implement
                         MovieId = item.MovieId,
                         Title = item.MovieTitle,
                         TheaterId = item.TheaterId,
-                        PosterImgURL = item.PosterImageURL,
+                        CoverImgURL = item.CoverImageURL,
                         MinPrice = MinMax.Item1,
                         MaxPrice = MinMax.Item2,
                         RecommendPoint = item.MinutesRemain * 0.8 + item.DistanceFromUser * 0.2,
@@ -494,7 +495,8 @@ namespace Term7MovieService.Services.Implement
                         //FormattedStartTime = item.StartTime.ToString("dd") + "/" +
                         //    item.StartTime.ToString("MM") + "/" + item.StartTime.ToString("yyyy")
                         //    + " " + item.StartTime.ToString("HH") + ":" + item.StartTime.ToString("mm")
-                        FormattedStartTime = item.StartTime.ToString("dd/MM/yyyy HH:mm")
+                        FormattedStartTime = item.StartTime.ToString("dd/MM/yyyy HH:mm"),
+                        TheaterName = item.TheaterName
                     });
                 }
                 response.MovieHomePages = result;
@@ -514,7 +516,7 @@ namespace Term7MovieService.Services.Implement
                         result.Add(new MovieHomePageDTO
                         {
                             MovieId = item.Id,
-                            PosterImgURL = item.PosterImageUrl,
+                            CoverImgURL = item.CoverImageUrl,
                             Title = item.Title,
                         });
                     }

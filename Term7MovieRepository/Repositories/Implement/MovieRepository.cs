@@ -215,7 +215,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 {
                     Id = a.Id,
                     Title = a.Title,
-                    PosterImageUrl = a.PosterImageUrl
+                    PosterImageUrl = a.PosterImageUrl,
+                    CoverImageUrl = a.CoverImageUrl,
                 })
                 .Take(3);
             movies = query.ToList();
