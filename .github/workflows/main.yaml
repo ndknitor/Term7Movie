@@ -36,4 +36,4 @@ jobs:
           cd Term7Movie/Term7MovieApi
           git checkout master
           git pull
-          dotnet run -c Release &> /dev/null &
+          dotnet run -c Release > server.log &
