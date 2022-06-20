@@ -53,6 +53,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<IImageHostService, ImageHostService>();
 
+            services.AddScoped<ITicketTypeService, TicketTypeService>();
+
             return services;
         }
 

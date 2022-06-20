@@ -23,16 +23,8 @@ namespace Term7MovieApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCategories()
         {
-            try
-            {
-                var result = await _cateService.GetFullCategory();
-                return Ok(result);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "oh sh*t not good" });
-            }
+            var result = await _cateService.GetFullCategory();
+            return Ok(result);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string count = " SELECT COUNT(1) FROM Movies WHERE ReleaseDate >= ( GETUTCDATE() - 60) ; ";
 
                 string category = 
-                    " SELECT mc.MovieId, c.Id, c.Name " +
+                    " SELECT mc.MovieId, c.Id, c.Name, c.Color " +
                     " FROM MovieCategories mc JOIN Categories c ON mc.CategoryId = c.Id ";
 
                 object param = new { offset, fetch };
@@ -62,7 +62,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 foreach(MovieModelDto m in list)
                 {
-                    m.Categories = movieCategories.Where(mc => m.Id == mc.MovieId).Select(c => new CategoryDTO {Id = c.Category.Id, Name = c.Category.Name });
+                    m.Categories = movieCategories.Where(mc => m.Id == mc.MovieId).Select(c => new CategoryDTO {Id = c.Category.Id, Name = c.Category.Name, Color = c.Category.Color });
                 }
 
                 pagingList = new PagingList<MovieModelDto>(request.PageSize, request.Page, list, total);
@@ -84,7 +84,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " ORDER BY ReleaseDate DESC ; ";
 
                 string category =
-                    " SELECT mc.MovieId, c.Id, c.Name " +
+                    " SELECT mc.MovieId, c.Id, c.Name, c.Color " +
                     " FROM MovieCategories mc JOIN Categories c ON mc.CategoryId = c.Id ; ";
 
                 var multiQ = con.QueryMultiple(query + category);
@@ -99,7 +99,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 foreach (MovieModelDto m in list)
                 {
-                    m.Categories = movieCategories.Where(mc => m.Id == mc.MovieId).Select(c => new CategoryDTO { Id = c.Category.Id, Name = c.Category.Name });
+                    m.Categories = movieCategories.Where(mc => m.Id == mc.MovieId).Select(c => new CategoryDTO { Id = c.Category.Id, Name = c.Category.Name, Color = c.Category.Color });
                 }
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Entities;
@@ -24,23 +25,13 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<CategoryResponse> GetFullCategory()
         {
-            IEnumerable<Category> rawdata = await cateRepository.GetAllCategory();
-            if (rawdata == null)
-                return new CategoryResponse { Message = "Can't access data storage" };
-            if (!rawdata.Any())
-                return new CategoryResponse { Message = "No category given in data storage" };
-            CategoryResponse response = new CategoryResponse();
-            List<CategoryDTO> result = new List<CategoryDTO>();
-            foreach(var category in rawdata)
+            IEnumerable<CategoryDTO> list = await cateRepository.GetAllCategory();
+
+            return new CategoryResponse
             {
-                CategoryDTO dto = new CategoryDTO();
-                dto.Id = category.Id;
-                dto.Name = category.Name;
-                result.Add(dto);
-            }
-            response.categories = result;
-            response.Message = "Successful";
-            return response;
+                Message = Constants.MESSAGE_SUCCESS,
+                Categories = list
+            };
         }
     }
 }
