@@ -29,7 +29,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" SELECT tt.Id, tt.Name 
+                    @" SELECT tt.Id, tt.Name, tt.CompanyId 
                        FROM TicketTypes tt JOIN Companies c ON  tt.CompanyId = c.Id
                        WHERE c.ManagerId = @managerId ";
 
@@ -39,6 +39,25 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return list;
+        }
+
+        public async Task<TicketTypeDto> GetTicketTypeByIdAsync(long id)
+        {
+            TicketTypeDto type = null;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT Id, Name, CompanyId
+                       FROM TicketTypes 
+                       WHERE Id = @id ";
+
+                object param = new { id };
+
+                type = await con.QueryFirstOrDefaultAsync<TicketTypeDto>(sql, param);
+            }
+
+            return type;
         }
 
         public async Task<int> CreateAsync(TicketTypeCreateRequest request, long managerId)
@@ -74,5 +93,25 @@ namespace Term7MovieRepository.Repositories.Implement
             return await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> CanManagerAccessTicketType(long ticketTypeId, long managerId)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT 1
+                       FROM TicketTypes tt JOIN Companies c ON tt.CompanyId = c.Id 
+                       WHERE c.ManagerId = @managerId AND tt.Id = @ticketTypeId  ";
+
+                object param = new
+                {
+                    ticketTypeId,
+                    managerId
+                };
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
+
+                return count == 1;
+            }
+        }
     }
 }
