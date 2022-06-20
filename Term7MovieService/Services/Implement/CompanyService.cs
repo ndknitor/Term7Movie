@@ -86,5 +86,17 @@ namespace Term7MovieService.Services.Implement
                 Message = Constants.MESSAGE_SUCCESS
             };
         }
+
+        public async Task<ParentResponse> CreateCompanyAsync(CompanyCreateRequest request)
+        {
+            int count = await companyRepo.CreateCompany(request);
+
+            if (count == 0) throw new BadRequestException();
+
+            return new ParentResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
     }
 }

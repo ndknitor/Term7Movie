@@ -48,9 +48,18 @@ namespace Term7MovieApi.Controllers
 
         [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPatch]
-        public async Task<IActionResult> UpdateCompany(CompanyUpdateRequest request)
+        public async Task<IActionResult> UpdateCompany([FromBody] CompanyUpdateRequest request)
         {
             var response = await _companyService.UpdateCompanyAsync(request);
+
+            return Ok(response);
+        }
+
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
+        [HttpPost]
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateRequest request)
+        {
+            var response = await _companyService.CreateCompanyAsync(request);
 
             return Ok(response);
         }

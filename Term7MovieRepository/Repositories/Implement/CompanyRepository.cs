@@ -143,9 +143,19 @@ namespace Term7MovieRepository.Repositories.Implement
 
             return company;
         }
-        public int CreateCompany(TheaterCompany company)
+        public async Task<int> CreateCompany(CompanyCreateRequest request)
         {
             int count = 0;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" INSERT INTO Companies (Name, LogoUrl, IsActive) 
+                                VALUES (@Name, @LogoUrl, 1) ";
+
+                count = await con.ExecuteAsync(sql, request);
+
+            }
+
             return count;
         }
         public async Task<int> UpdateCompany(CompanyUpdateRequest request)
@@ -158,8 +168,8 @@ namespace Term7MovieRepository.Repositories.Implement
                     @" UPDATE Companies 
                        SET IsActive = @IsActive " + 
 
-                       (request.Name != null ? " , Name = @Name " : "") +
-                       (request.LogoUrl != null ? " , LogoUrl = @LogoUrl " : "") +
+                       (!string.IsNullOrEmpty(request.Name) ? " , Name = @Name " : "") +
+                       (!string.IsNullOrEmpty(request.LogoUrl) ? " , LogoUrl = @LogoUrl " : "") +
 
                     @" WHERE Id = @Id ; ";
 
