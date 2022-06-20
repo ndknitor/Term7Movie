@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieService.Services.Interface;
@@ -21,6 +23,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetTicketById(long id)
         {
             try
@@ -36,6 +39,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetTicketFromSomething(TicketRequest request)
         {
             try
@@ -51,27 +55,12 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicket(TicketCreateRequest[] request)
+        [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_MANAGER_CREATE_TICKET)]
+        public async Task<IActionResult> CreateTicket(TicketListCreateRequest request)
         {
-            try
-            {
-                if (request.Length > 1)
-                {
-                    var response = await _ticketService.CreateALotOfTicket(request);
-                    return Ok(response);
-                }
-                else if (request.Length == 1)
-                {
-                    var response = await _ticketService.CreateTicket(request.First());
-                    return Ok(response);
-                }
-                return BadRequest(new ParentResponse { Message = "Request gone wrong" });
-            }
-            catch(Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Send this to Nam Tran: " + ex.Message });
-            }
+            var response = await _ticketService.CreateTicketAsync(request);
+
+            return Ok(response);
         }
     }
 }

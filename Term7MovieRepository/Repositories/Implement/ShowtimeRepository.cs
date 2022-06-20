@@ -375,5 +375,31 @@ namespace Term7MovieRepository.Repositories.Implement
                      Math.Cos(d1) * Math.Cos(d2) * Math.Pow(Math.Sin(num2 / 2.0), 2.0);
             return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
         }
+
+        public async Task<bool> CanManagerCreateTicket(long managerId, long showtimeId, DateTime startTime, IEnumerable<long> seatId)
+        {
+            bool valid = false;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT COUNT(*)
+                       FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id
+                            JOIN Rooms r ON r.TheaterId = sh.TheaterId
+                            JOIN Seats s ON s.RoomId = r.Id 
+                       WHERE th.ManagerId = @managerId 
+                            AND sh.Id = @showtimeId 
+                            AND s.Id IN @seatId
+                            AND sh.StartTime = @startTime ";
+
+                object param = new { managerId, showtimeId, startTime, seatId };
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
+
+                if (count == seatId.Count()) return true;
+            }
+
+            return valid;
+        }
     }
 }

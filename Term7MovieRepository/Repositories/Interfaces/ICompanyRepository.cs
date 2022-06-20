@@ -13,7 +13,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<CompanyDto> GetCompanyByManagerId(long managerId);
         int CreateCompany(TheaterCompany company);
-        int UpdateCompany(TheaterCompany company);
+        Task<int> UpdateCompany(CompanyUpdateRequest request);
         int DeleteCompany(int id);
 
         Task<long?> GetManagerIdFromCompanyId(int companyid);

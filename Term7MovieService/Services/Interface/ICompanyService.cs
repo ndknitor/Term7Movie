@@ -7,5 +7,7 @@ namespace Term7MovieService.Services.Interface
     {
         Task<CompanyDetailResponse> GetCompanyDetailAsync(int? companyId, long? managerId = null);
         Task<object> GetAllCompanyAsync(CompanyFilterRequest request);
+
+        Task<ParentResponse> UpdateCompanyAsync(CompanyUpdateRequest request);
     }
 }

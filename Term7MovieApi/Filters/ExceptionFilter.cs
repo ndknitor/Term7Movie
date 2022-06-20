@@ -64,6 +64,15 @@ namespace Term7MovieApi.Filters
 
                     break;
 
+
+                default:
+                    _logger.LogError(context.Exception.StackTrace);
+
+                    response.Message = message;
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Result = new JsonResult(response);
+                    break;
+
             }
         }
     }

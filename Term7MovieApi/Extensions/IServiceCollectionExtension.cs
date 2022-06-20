@@ -51,6 +51,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ICacheProvider, CacheProvider>();
 
+            services.AddScoped<IImageHostService, ImageHostService>();
+
             return services;
         }
 
@@ -66,6 +68,8 @@ namespace Term7MovieApi.Extensions
 
             services.Configure<MomoOption>(config.GetSection(Constants.MOMO_API));
 
+
+            services.Configure<ImgBBOption>(config.GetSection(Constants.IMGBB_COM));
             return services;
         }
 
@@ -84,6 +88,8 @@ namespace Term7MovieApi.Extensions
 
                 option.AddPolicy(Constants.POLICY_COMPANY_FILTER, policy => policy.Requirements.Add(new CompanyFilterRequirement()));
 
+
+                option.AddPolicy(Constants.POLICY_MANAGER_CREATE_TICKET, policy => policy.Requirements.Add(new TicketCreateRequirement()));
             });
 
             services.AddTransient<IAuthorizationHandler, GeneralAuthorizationHandler>();

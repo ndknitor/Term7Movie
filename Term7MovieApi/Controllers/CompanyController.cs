@@ -45,5 +45,14 @@ namespace Term7MovieApi.Controllers
 
             return Ok(response);
         }
+
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
+        [HttpPatch]
+        public async Task<IActionResult> UpdateCompany(CompanyUpdateRequest request)
+        {
+            var response = await _companyService.UpdateCompanyAsync(request);
+
+            return Ok(response);
+        }
     }
 }

@@ -74,5 +74,17 @@ namespace Term7MovieService.Services.Implement
                 Result = list.Where(c => c.ManagerId == null)
             };
         }
+
+        public async Task<ParentResponse> UpdateCompanyAsync(CompanyUpdateRequest request)
+        {
+            int count = await companyRepo.UpdateCompany(request);
+
+            if (count == 0) throw new BadRequestException();
+
+            return new ParentResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
     }
 }

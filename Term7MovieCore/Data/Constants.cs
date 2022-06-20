@@ -37,7 +37,8 @@ namespace Term7MovieCore.Data
         public static DateTime JSON_START_DATE = new DateTime(1970, 1, 1);
 
         public const string GOONG_IO = "Goong.io";
-        public const string MOMO_API = "MoMoAPI"; 
+        public const string MOMO_API = "MoMoAPI";
+        public const string IMGBB_COM = "ImgBB.com";
 
         public const string ROLE_ADMIN = "Admin";
         public const string ROLE_MANAGER = "Manager";
@@ -61,9 +62,11 @@ namespace Term7MovieCore.Data
         public const string CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD = "Invalid field";
         public const string CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO = "Must be greater than zero";
         public const string CONSTRAINT_REQUEST_MESSAGE_MAX_LENGTH = "Max length {1}";
+        public const string CONSTRAINT_REQUEST_MESSAGE_MIN_RANGE = "Min value {1}";
         public const string CONSTRAINT_REQUEST_MESSAGE_START_TIME_NOT_VALID = "Start time not valid";
         public const string CONSTRAINT_REQUEST_MESSAGE_END_TIME_NOT_VALID = "End time not valid";
         public const string CONSTRAINT_REQUEST_SHOWTIME_MUST_BE_IN_40MIN = "Start time must be in next 40 minutes";
+        public const string CONSTRAINT_TICKET_LIST_NOT_VALID = "Ticket list not valid";
 
         public const int DefaultPageSize = 10;
         public const int DefaultPage = 1;
@@ -78,6 +81,8 @@ namespace Term7MovieCore.Data
         public const string POLICY_CREATE_SHOWTIME_SAME_MANAGER = "OnlyCreateShowtimeSameManager";
 
         public const string POLICY_COMPANY_FILTER = "CompanyFilter";
+
+        public const string POLICY_MANAGER_CREATE_TICKET = "OnlyCreateTicketSameManagerShowtime";
 
         public const int LOCK_TICKET_IN_MINUTE = 5;
         public const int CREATE_SHOWTIME_UPPER_BOUND_IN_MINUTE = 40;

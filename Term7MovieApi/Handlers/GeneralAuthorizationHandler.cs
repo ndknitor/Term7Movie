@@ -76,6 +76,14 @@ namespace Term7MovieApi.Handlers
 
                         if (IsCompanyFilterRequestValid(claims, httpContext.Request)) context.Succeed(requirement);
                         break;
+
+                    case TicketCreateRequirement:
+
+                        TicketListCreateRequest ticketCreateRequest = await httpContext.Request.ToObjectAsync<TicketListCreateRequest>();
+
+                        if (await CanManagerCreateOrUpdateTicket(claims, ticketCreateRequest)) context.Succeed(requirement);
+
+                        break;
                 }
             }
         }
@@ -172,6 +180,35 @@ namespace Term7MovieApi.Handlers
             }
 
             return true;
+        }
+
+        private async Task<bool> CanManagerCreateOrUpdateTicket<T>(IEnumerable<Claim> claims, T resource)
+        {
+            if (resource == null) return false;
+
+            long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            bool valid = false;
+            switch(resource)
+            {
+                case TicketListCreateRequest:
+                    var createRequest = resource as TicketListCreateRequest;
+
+                    if (createRequest.Tickets == null || createRequest.Tickets.Count() == 0) return false;
+
+                    TicketCreateRequest firstTicket = createRequest.Tickets.FirstOrDefault();
+
+                    long showtimeId = firstTicket.ShowTimeId;
+                    DateTime startTime = firstTicket.ShowStartTime;
+
+
+                    IEnumerable<long> seatId = createRequest.Tickets.Select(t => t.SeatId);
+
+                    valid = await _unitOfWork.ShowtimeRepository.CanManagerCreateTicket(managerId, showtimeId, startTime, seatId);
+                    
+                    break;
+            }
+
+            return valid;
         }
     }
 }
