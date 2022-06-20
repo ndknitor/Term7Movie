@@ -77,9 +77,7 @@ namespace Term7MovieRepository.Repositories.Implement
                         @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId) 
                            SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, @ReceivePrice + (@OriginalPrice - @ReceivePrice) * @SellingPriceRatio, 1 
                            FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
-                                    JOIN TheaterSeatTypes tst ON st.Id = tst.SeatTypeId
-                                    JOIN Showtimes sh ON tst.TheaterId = sh.TheaterId
-                           WHERE s.Id = @SeatId AND sh.Id = @ShowTimeId ";
+                           WHERE s.Id = @SeatId ";
 
                         object param = new 
                         { 
@@ -187,7 +185,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return Tuple.Create(min, max);
         }
 
-        public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
+        /*public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -243,7 +241,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 dto.PercentTicketSoldChange = 0.69F;
             }
             return dto;
-        }
+        }*/
 
     }
 }
