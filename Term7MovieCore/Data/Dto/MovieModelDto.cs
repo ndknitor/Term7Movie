@@ -16,6 +16,7 @@
         public string Director { set; get; }
 
         public string Actors { set; get; }
+        public string[] BeautifyActors { get; set; }
         public string Languages { set; get; }
 
         public IEnumerable<CategoryDTO> Categories { set; get; }

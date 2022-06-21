@@ -130,5 +130,13 @@ namespace Term7MovieCore.Entities
                 if (name.StartsWith("AspNet")) entityType.SetTableName(name.Substring(6));
             }
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if(!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data Source=sqlserversystem.cnzbwctjbkwm.ap-southeast-1.rds.amazonaws.com;Initial Catalog=F_CINEMA;User ID=admin;Password=areYougay?");
+            }
+        }
     }
 }

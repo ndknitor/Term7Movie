@@ -12,6 +12,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
     {
         Task<PagingList<MovieModelDto>> GetAllMovie(ParentFilterRequest request);
         IEnumerable<MovieModelDto> GetAllMovie();
+        IEnumerable<Movie> MovieEntityToList();
         Task<Movie> GetMovieById(int id);
         Task<bool> CreateMovie(IEnumerable<Movie> movie);
         Task<bool> UpdateMovie(Movie movie);

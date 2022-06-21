@@ -139,9 +139,9 @@ namespace Term7MovieService.Services.Implement
             {
                 rawData = await movieRepository.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize, request.TitleSearch);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                if(ex.Message == "PAGESMALLER")
+                if (ex.Message == "PAGESMALLER")
                     return new MoviePagingResponse { Message = "Page index is smaller than 1" };
             }
             //checking database connection
@@ -151,7 +151,7 @@ namespace Term7MovieService.Services.Implement
             if (!rawData.Any())
                 return new MoviePagingResponse { Message = "Empty Data" };
             //checking input logical
-            int maxpage = movieRepository.Count() / 16 + 1;
+            int maxpage = movieRepository.Count() / request.PageSize + 1;
             if (request.PageIndex > maxpage) //madness shit
                 return new MoviePagingResponse { Message = "Page index is more than total page" };
 
@@ -165,7 +165,7 @@ namespace Term7MovieService.Services.Implement
             Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
             //The code below effect RAM only
             bool DoesItNull = false;
-            List<MovieDTO> list = new List<MovieDTO>();
+            List<MovieDTO> loserlist = new List<MovieDTO>();
             foreach (var item in rawData)
             {
                 MovieDTO movie = new MovieDTO();
@@ -180,15 +180,118 @@ namespace Term7MovieService.Services.Implement
                 //movie.Types = categories.GetValueOrDefault(item.Id);
                 movie.Categories = categories.GetValueOrDefault(item.Id);
                 if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
-                list.Add(movie);
+                loserlist.Add(movie);
             }
             if (!DoesItNull)
                 mlr.Message = Constants.MESSAGE_SUCCESS;
             else mlr.Message = "Some movie categories is null";
-            mlr.MovieList = list;
+            mlr.MovieList = loserlist;
             mlr.CurrentPage = request.PageIndex;
             mlr.TotalPages = maxpage;
             return mlr;
+
+
+
+            //IEnumerable<Movie> list = await _cacheProvider.GetValueAsync<IEnumerable<Movie>>(Constants.REDIS_KEY_MOVIE);
+            //mừng hụt -.-
+            //if (list == null)
+            //{//ko vào redis dc thì vào database
+            //    IEnumerable<Movie> rawData = new List<Movie>();
+            //    try
+            //    {
+            //        rawData = await movieRepository.GetMoviesFromSpecificPage(request.PageIndex, request.PageSize, request.TitleSearch);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        if (ex.Message == "PAGESMALLER")
+            //            return new MoviePagingResponse { Message = "Page index is smaller than 1" };
+            //    }
+            //    //checking database connection
+            //    if (rawData == null)
+            //        return new MoviePagingResponse { Message = "Cant access database at the moment" };
+            //    //checking if there is any data in database
+            //    if (!rawData.Any())
+            //        return new MoviePagingResponse { Message = "Empty Data" };
+            //    //checking input logical
+            //    int maxpage = movieRepository.Count() / request.PageSize + 1;
+            //    if (request.PageIndex > maxpage) //madness shit
+            //        return new MoviePagingResponse { Message = "Page index is more than total page" };
+
+            //    // ********* End validating or checking shet *********** //
+            //    MoviePagingResponse mlr = new MoviePagingResponse();
+            //    int[] movieIds = new int[rawData.Count()];
+            //    for (int j = 0; j < rawData.Count(); j++)
+            //    {
+            //        movieIds[j] = rawData.ElementAt(j).Id;
+            //    }
+            //    Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
+            //    //The code below effect RAM only
+            //    bool DoesItNull = false;
+            //    List<MovieDTO> loserlist = new List<MovieDTO>();
+            //    foreach (var item in rawData)
+            //    {
+            //        MovieDTO movie = new MovieDTO();
+            //        movie.MovieId = item.Id;
+            //        movie.CoverImgURL = item.CoverImageUrl;
+            //        movie.PosterImgURL = item.PosterImageUrl;
+            //        movie.Title = item.Title;
+            //        movie.AgeRestrict = item.RestrictedAge;
+            //        movie.Duration = item.Duration;
+            //        DateTime dt = item.ReleaseDate;
+            //        movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
+            //        //movie.Types = categories.GetValueOrDefault(item.Id);
+            //        movie.Categories = categories.GetValueOrDefault(item.Id);
+            //        if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
+            //        loserlist.Add(movie);
+            //    }
+            //    if (!DoesItNull)
+            //        mlr.Message = Constants.MESSAGE_SUCCESS;
+            //    else mlr.Message = "Some movie categories is null";
+            //    mlr.MovieList = loserlist;
+            //    mlr.CurrentPage = request.PageIndex;
+            //    mlr.TotalPages = maxpage;
+            //    return mlr;
+            //}
+            //else
+            //{
+            //    var pagingList = list.Skip(request.PageSize * (request.PageIndex - 1)).Take(request.PageSize);
+            //    List<MovieDTO> lazylist = new List<MovieDTO>();
+            //    //I have no time for optimization. But if it go slow I will reconsidering :v RAM problem
+            //    foreach(var item in pagingList)
+            //    {
+            //        MovieDTO movie = new MovieDTO();
+            //        movie.MovieId = item.Id;
+            //        movie.CoverImgURL = item.CoverImageUrl;
+            //        movie.PosterImgURL = item.PosterImageUrl;
+            //        movie.Title = item.Title;
+            //        movie.AgeRestrict = item.RestrictedAge;
+            //        movie.Duration = item.Duration;
+            //        DateTime dt = item.ReleaseDate;
+            //        movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
+            //        List<MovieType> GodDamn = new List<MovieType>();
+            //        foreach(var cate in item.MovieCategories)
+            //        {
+            //            GodDamn.Add(new MovieType
+            //            {
+            //                CateColor = cate.Category.Color,
+            //                CateId = cate.Category.Id,
+            //                CateName = cate.Category.Name
+            //            });
+            //        }
+            //        movie.Categories = GodDamn;
+            //        lazylist.Add(movie);
+            //    }
+            //    return new MoviePagingResponse
+            //    {
+            //        Message = Constants.MESSAGE_SUCCESS,
+            //        MovieList = lazylist,
+            //        CurrentPage = request.PageIndex,
+            //        PageSize = request.PageSize,
+            //        TotalPages = list.Count() / request.PageSize + 1
+            //    };
+            //}
+
+            
         }
 
         public async Task<MovieDetailResponse> GetMovieDetailFromMovieId(int movieId)
@@ -466,7 +569,6 @@ namespace Term7MovieService.Services.Implement
         //        throw new Exception(ex.Message);
         //    }
         //}
-
         public async Task<MovieHomePageResponse> GetMovieRecommendationForHomePage(MovieHomePageRequest request)
         {
             MovieHomePageResponse response = new MovieHomePageResponse();
@@ -772,6 +874,46 @@ namespace Term7MovieService.Services.Implement
             response.Message = "Hàng pha ke";
             return response;
         }
+
+        /// <summary>
+        /// Saved for someday
+        /// </summary>
+        private void ActorsFakeData()
+        {
+            //try
+            //{
+            //    List<string> actors = new List<string>();
+            //    foreach (string line in System.IO.File.ReadLines("Actors.txt"))
+            //    {
+            //        actors.Add(line);
+            //    }
+            //    int counter = 1;
+            //    Random random = new Random();
+            //    using (var _context = new F_CINEMAContext())
+            //    {
+            //        foreach (var movie in _context.Movies.ToList())
+            //        {
+            //            int HowManyActorsDoYouWant = random.Next(3, 6);
+            //            string[] ChoosenActor = new string[HowManyActorsDoYouWant];
+            //            for (int i = 0; i < HowManyActorsDoYouWant; i++)
+            //            {
+            //                ChoosenActor[i] = actors[random.Next(actors.Count)];
+            //            }
+            //            movie.Actors = JsonConvert.SerializeObject(ChoosenActor);
+            //            _context.Movies.Update(movie);
+            //            await _context.SaveChangesAsync();
+            //            Console.WriteLine(counter + " movies has been updated");
+            //            counter++;
+            //        }
+            //    }
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+        }
+        
         /* ------------ END FAKE DATA ZONE ------------------- */
     }
 
