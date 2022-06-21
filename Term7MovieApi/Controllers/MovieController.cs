@@ -67,7 +67,7 @@ namespace Term7MovieApi.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetMoviesDetailFromID(int id)
         {
-            var result = await _movieService.GetMovieDetailFromMovieId(id);
+            var result = await _movieService.GetMovieById(id);
             return Ok(result);
         }
 

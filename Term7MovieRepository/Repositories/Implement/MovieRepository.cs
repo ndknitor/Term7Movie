@@ -106,6 +106,42 @@ namespace Term7MovieRepository.Repositories.Implement
             return list;
         }
 
+        public async Task<MovieModelDto> GetMovieByIdAsync(int id)
+        {
+            MovieModelDto movie = null;
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string query =
+                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating " +
+                    " FROM Movies " +
+                    " WHERE Id = @id ";
+
+                string category =
+                    " SELECT mc.MovieId, c.Id, c.Name, c.Color " +
+                    " FROM MovieCategories mc JOIN Categories c ON mc.CategoryId = c.Id " +
+                    " WHERE mc.MovieId = @id  ; ";
+
+                object param = new { id };
+
+                var multiQ = con.QueryMultiple(query + category, param);
+
+                movie = await multiQ.ReadFirstOrDefaultAsync<MovieModelDto>();
+
+                if (movie != null)
+                {
+                    IEnumerable<MovieCategory> movieCategories = multiQ.Read<MovieCategory, Category, MovieCategory>((mc, c) =>
+                    {
+                        mc.Category = c;
+                        return mc;
+                    });
+
+                    movie.Categories = movieCategories.Where(mc => id == mc.MovieId).Select(c => new CategoryDTO { Id = c.Category.Id, Name = c.Category.Name, Color = c.Category.Color });
+                }
+            }
+
+            return movie;
+        }
+
         public IEnumerable<Movie> MovieEntityToList()
         {
             //if (!_context.Database.CanConnect())

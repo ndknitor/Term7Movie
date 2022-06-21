@@ -15,6 +15,7 @@ using Term7MovieCore.Data;
 using Term7MovieRepository.Cache.Interface;
 using Term7MovieCore.Data.Utility;
 using Term7MovieCore.Data.Dto.Theater;
+using Term7MovieCore.Data.Exceptions;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -55,6 +56,29 @@ namespace Term7MovieService.Services.Implement
             {
                 Message = "Success",
                 Movies = movies
+            };
+        }
+
+        public async Task<ParentResultResponse> GetMovieById(int id)
+        {
+            IEnumerable<MovieModelDto> list = await _cacheProvider.GetValueAsync<IEnumerable<MovieModelDto>>(Constants.REDIS_KEY_MOVIE);
+            
+            MovieModelDto movie = null;
+
+            if (list != null)
+            {
+                movie = list.FirstOrDefault(m => m.Id == id);
+            } else
+            {
+                movie = await movieRepository.GetMovieByIdAsync(id);
+            }
+
+            if (movie == null) throw new DbNotFoundException();
+
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = movie
             };
         }
 

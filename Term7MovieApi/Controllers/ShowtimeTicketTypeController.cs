@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Term7MovieCore.Entities;
 
 namespace Term7MovieApi.Controllers
 {
@@ -7,6 +9,6 @@ namespace Term7MovieApi.Controllers
     [ApiController]
     public class ShowtimeTicketTypeController : ControllerBase
     {
-
+            
     }
 }

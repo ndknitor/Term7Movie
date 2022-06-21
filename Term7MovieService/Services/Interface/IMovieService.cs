@@ -8,6 +8,8 @@ namespace Term7MovieService.Services.Interface
     public interface IMovieService
     {
         Task<MovieListResponse> GetAllMovie(ParentFilterRequest request);
+
+        Task<ParentResultResponse> GetMovieById(int id);
         
         Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage();
 
