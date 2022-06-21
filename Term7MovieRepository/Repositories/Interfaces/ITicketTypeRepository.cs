@@ -10,5 +10,6 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<int> CreateAsync(TicketTypeCreateRequest request, long managerId);
         Task<int> UpdateAsync(TicketTypeUpdateRequest request);
         Task<bool> CanManagerAccessTicketType(long ticketTypeId, long managerId);
+        Task<bool> CanManagerAccessTicketTypes(IEnumerable<long> ticketTypeId, long managerId);
     }
 }

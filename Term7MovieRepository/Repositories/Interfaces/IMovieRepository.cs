@@ -11,6 +11,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
     public interface IMovieRepository
     {
         Task<PagingList<MovieModelDto>> GetAllMovie(ParentFilterRequest request);
+        Task<MovieModelDto> GetMovieByIdAsync(int id);
         IEnumerable<MovieModelDto> GetAllMovie();
         IEnumerable<Movie> MovieEntityToList();
         Task<Movie> GetMovieById(int id);

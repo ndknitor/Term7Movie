@@ -11,5 +11,6 @@
         public string TheaterName { set; get; }
         public DateTime StartTime { set; get; }
         public DateTime EndTime { set; get; }
+        public IEnumerable<ShowtimeTicketTypeDto> ShowtimeTicketTypes { set; get; }
     }
 }

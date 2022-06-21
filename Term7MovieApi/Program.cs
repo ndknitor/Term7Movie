@@ -20,7 +20,9 @@ var config = builder.Configuration;
 
 // Add services to the container.
 
-builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
+builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)))
+    .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection"), b => b.MigrationsAssembly("Term7MovieApi")));

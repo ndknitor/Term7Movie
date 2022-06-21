@@ -166,6 +166,13 @@ namespace Term7MovieApi.Handlers
             {
                 case ShowtimeCreateRequest:
                     valid = await _unitOfWork.ShowtimeRepository.CanManagerCreateShowtime(resource as ShowtimeCreateRequest, managerId);
+
+                    if (!valid) return false;
+
+                    IEnumerable<long> idList = (resource as ShowtimeCreateRequest).ShowtimeTicketTypes.Select(t => t.TicketTypeId);
+
+                    valid = await _unitOfWork.TicketTypeRepository.CanManagerAccessTicketTypes(idList, managerId);
+
                     break;
             }
 
