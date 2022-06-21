@@ -23,5 +23,6 @@ namespace Term7MovieCore.Data.Dto.Movie
     {
         public int CateId { get; set; }
         public string CateName { get; set; }
+        public string CateColor { get; set; }
     }
 }

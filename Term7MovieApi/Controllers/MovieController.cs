@@ -40,27 +40,28 @@ namespace Term7MovieApi.Controllers
 
             switch(request.Action)
             {
-                case "all":
+                case "page":
                     return await GetAllMovie(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize});
                 case "home":
                     return await GetMoviesForMobileHome(new MovieHomePageRequest { Latitude = request.Latitude, Longtitude = request.Longitude });
+                case "incoming":
+                    return await GetIncomingMovies();
+                case "latest":
+                    return await GetEightLatestMovies();
+                case "undermaintain-page":
+                    return await GetMoviesPaging(new MovieListPageRequest
+                    {
+                        PageIndex = request.PageIndex,
+                        PageSize = request.PageSize,
+                        TitleSearch = request.SearchKey
+                    });
+                case "detail":
+                    return await GetMoviesDetailFromID(request.MovieId);
+                case "titles":
+                        return await GetMovieTitles();
+                default:
+                    return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
             }
-
-            if (request.Action == "incoming")
-                return await GetIncomingMovies();
-            if (request.Action == "latest")
-                return await GetEightLatestMovies();
-            if (request.Action == "page")
-            {
-                return await GetMoviesPaging(new MovieListPageRequest 
-                { PageIndex = request.PageIndex, PageSize = request.PageSize,
-                    TitleSearch = request.SearchKey});
-            }
-            if (request.Action == "detail")
-                return await GetMoviesDetailFromID(request.MovieId);
-            if (request.Action == "titles")
-                return await GetMovieTitles();
-            return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 
         [HttpGet("{id:int}")]
@@ -70,7 +71,7 @@ namespace Term7MovieApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Roles = Constants.ROLE_ADMIN)]
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPost]
         public async Task<IActionResult> CreateMovie(MovieCreateRequest[] request)
         {
@@ -93,7 +94,7 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        //[Authorize(Roles = Constants.ROLE_ADMIN)]
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPut]
         public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
         {

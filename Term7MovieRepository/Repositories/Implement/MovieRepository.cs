@@ -106,6 +106,17 @@ namespace Term7MovieRepository.Repositories.Implement
             return list;
         }
 
+        public IEnumerable<Movie> MovieEntityToList()
+        {
+            //if (!_context.Database.CanConnect())
+            //    return null;
+            var query = _context.Movies
+                                    .Include(a => a.MovieCategories)
+                                    .ThenInclude(a => a.Category)
+                                    .ToList();
+            return query;
+        }
+
         public async Task<Movie> GetMovieById(int id)
         {
             Movie movie = await _context.Movies.FindAsync(id);

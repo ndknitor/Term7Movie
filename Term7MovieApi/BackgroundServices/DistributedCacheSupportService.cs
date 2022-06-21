@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Options;
+using Term7MovieCore.Entities;
 using Term7MovieRepository.Cache.Implement;
 using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Implement;
@@ -49,6 +50,9 @@ namespace Term7MovieApi.BackgroundServices
             _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
 
             IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
+            //IEnumerable<Movie> movies = movieRepo.MovieEntityToList();
+            //I will take everything you have bois
+            //God damn I can't do it. Without LINQ am useless... for now
 
             _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
             _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);
