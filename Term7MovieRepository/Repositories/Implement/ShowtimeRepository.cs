@@ -111,11 +111,17 @@ namespace Term7MovieRepository.Repositories.Implement
                     " FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id " +
                     " WHERE th.ManagerId = @managerId " +
 
-                    GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET);
+                    GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) + 
+                    " ; ";
+
+                string showtimeTiketType =
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                      FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
                 object param = new { managerId, offset, fetch };
 
-                var multiQ = await con.QueryMultipleAsync(query + count, param);
+                var multiQ = await con.QueryMultipleAsync(query + count + showtimeTiketType, param);
+
                 IEnumerable<ShowtimeDto> results = multiQ.Read<ShowtimeDto, MovieModelDto, RoomDto,ShowtimeDto>((sh, m, r) =>
                 {
                     sh.Movie = m;
@@ -123,6 +129,17 @@ namespace Term7MovieRepository.Repositories.Implement
                     return sh;
                 }, splitOn: "Id");
                 int total = await multiQ.ReadFirstOrDefaultAsync<int>();
+
+                IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
+                {
+                    shtt.TicketType = tt;
+                    return shtt;
+                });
+
+                foreach (ShowtimeDto showtime in results)
+                {
+                    showtime.ShowtimeTicketTypes = showtimeTicketTypes.Where(shtt => shtt.ShowtimeId == showtime.Id);
+                }
 
                 list = new PagingList<ShowtimeDto>(request.PageSize, request.Page, results, total);
             }
@@ -138,21 +155,31 @@ namespace Term7MovieRepository.Repositories.Implement
                     " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl, r.Id, r.No, r.TheaterId, r.NumberOfRow, r.NumberOfColumn, r.Status " +
                     " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
                     "       JOIN Rooms r ON sh.RoomId = r.Id " +
-                    " WHERE sh.Id = @id ";
+                    " WHERE sh.Id = @id ; ";
+
+                string showtimeTiketType =
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                      FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
+                      WHERE shtt.ShowtimeId = @id ";
 
                 object param = new { id };
 
-                var list = await con.QueryAsync<ShowtimeDto, MovieModelDto, RoomDto, ShowtimeDto>(query, (sh, m, r) =>
+                var multiQ = await con.QueryMultipleAsync(query + showtimeTiketType, param);
+
+                var list = multiQ.Read<ShowtimeDto, MovieModelDto, RoomDto, ShowtimeDto>((sh, m, r) =>
                 {
                     sh.Movie = m;
                     sh.Room = r;
                     return sh;
-                }, param, splitOn: "Id");
+                }, splitOn: "Id");
 
-                if (list != null)
+                showtime = list.FirstOrDefault();
+
+                IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
                 {
-                    showtime = list.FirstOrDefault();
-                }
+                    shtt.TicketType = tt;
+                    return shtt;
+                });
             }
             return showtime;
         }
