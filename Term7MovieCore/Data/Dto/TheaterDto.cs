@@ -13,5 +13,7 @@ namespace Term7MovieCore.Data.Dto
         public bool Status { set; get; }
 
         public IEnumerable<ShowtimeDto> Showtimes { set; get; }
+        public IEnumerable<RoomDto> Rooms { set; get; }
+        public int TotalRoom { set; get; }
     }
 }

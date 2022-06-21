@@ -55,6 +55,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ITicketTypeService, TicketTypeService>();
 
+            services.AddScoped<IShowtimeTicketTypeService, ShowtimeTicketTypeService>();
+
             return services;
         }
 

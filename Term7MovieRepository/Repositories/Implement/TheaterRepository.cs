@@ -38,14 +38,28 @@ namespace Term7MovieRepository.Repositories.Implement
                     " FROM Theaters " +
                     " WHERE Status = 1 ";
 
+                string roomQuery =
+                    @" ; SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status 
+                         FROM Rooms 
+                         WHERE Status = 1 ";
+
                 string sql = ConcatQueryWithFilter(query, count, request);
 
                 object param = new { offset, fetch, CompanyId = request.CompanyId ?? 0 };
 
-                var multiQ = await con.QueryMultipleAsync(sql, param);
+                var multiQ = await con.QueryMultipleAsync(sql + roomQuery, param);
 
                 IEnumerable<TheaterDto> results = await multiQ.ReadAsync<TheaterDto>();
+
                 int total = await multiQ.ReadFirstOrDefaultAsync<int>();
+
+                IEnumerable<RoomDto> rooms = await multiQ.ReadAsync<RoomDto>();
+
+                foreach(TheaterDto t in results)
+                {
+                    t.Rooms = rooms.Where(r => r.TheaterId == t.Id);
+                    t.TotalRoom = t.Rooms.Count();
+                }
 
                 list = new PagingList<TheaterDto>(pageSize: request.PageSize, page: request.Page, results, total);
             }

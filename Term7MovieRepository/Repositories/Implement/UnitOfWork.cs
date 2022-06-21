@@ -44,6 +44,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
         public IPaymentRequestRepository PaymentRequestRepository { get => new PaymentRequestRepository(_context, _connectionOption); }
         public ITicketTypeRepository TicketTypeRepository { get => new TicketTypeRepository(_context, _connectionOption); }
+        public IShowtimeTicketTypeRepository ShowtimeTicketTypeRepository { get => new ShowtimeTicketTypeRepository(_context, _connectionOption); }
         public bool HasChange()
         {
             return _context.ChangeTracker.HasChanges();
