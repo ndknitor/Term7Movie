@@ -33,7 +33,8 @@ namespace Term7MovieApi.BackgroundServices
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Timer timer = new Timer(DoWork, null, TimeSpan.FromMinutes(DELAY_FIRST_START_IN_MINUTE), TimeSpan.FromMinutes(Constants.REDIS_CACHE_LOAD_IN_MINUTE));
+            _logger.LogInformation(DateTime.UtcNow + " - Redis start in 1 minute");
+            timer = new Timer(DoWork, null, TimeSpan.FromMinutes(DELAY_FIRST_START_IN_MINUTE), TimeSpan.FromMinutes(Constants.REDIS_CACHE_LOAD_IN_MINUTE));
 
             await Task.CompletedTask;
         }
@@ -50,9 +51,6 @@ namespace Term7MovieApi.BackgroundServices
             _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
 
             IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
-            //IEnumerable<Movie> movies = movieRepo.MovieEntityToList();
-            //I will take everything you have bois
-            //God damn I can't do it. Without LINQ am useless... for now
 
             _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
             _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);

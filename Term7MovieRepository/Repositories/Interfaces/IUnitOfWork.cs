@@ -24,6 +24,7 @@
         IRoleRepository RoleRepository { get; }
         IPaymentRequestRepository PaymentRequestRepository { get; }
         ITicketTypeRepository TicketTypeRepository { get; }
+        IShowtimeTicketTypeRepository ShowtimeTicketTypeRepository { get; }
         bool HasChange();
 
         Task<bool> CompleteAsync();
