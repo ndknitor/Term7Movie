@@ -6,5 +6,6 @@ namespace Term7MovieCore.Data.Dto
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Color { set; get; }
     }
 }

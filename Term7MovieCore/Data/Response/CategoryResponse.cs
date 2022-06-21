@@ -4,6 +4,6 @@ namespace Term7MovieCore.Data.Response
 {
     public class CategoryResponse : ParentResponse
     {
-        public IEnumerable<CategoryDTO> categories { get; set; }
+        public IEnumerable<CategoryDTO> Categories { get; set; }
     }
 }

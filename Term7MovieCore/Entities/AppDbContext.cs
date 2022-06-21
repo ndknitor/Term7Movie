@@ -24,6 +24,7 @@ namespace Term7MovieCore.Entities
         public virtual DbSet<Transaction> Transactions { set; get; }
         public virtual DbSet<TransactionHistory> TransactionHistories { set; get; }
         public virtual DbSet<TransactionStatus> TransactionStatuses { get; set; }
+        public virtual DbSet<TicketType> TicketTypes { set; get; }
         public virtual DbSet<ShowtimeTicketType> ShowtimeTicketTypes { set; get; }
         public virtual DbSet<MomoPaymentCreateRequest> PaymentRequests { set; get; }
         protected override void OnModelCreating(ModelBuilder builder)

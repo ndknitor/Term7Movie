@@ -23,6 +23,7 @@
         IUserLoginRepository UserLoginRepository { get; }
         IRoleRepository RoleRepository { get; }
         IPaymentRequestRepository PaymentRequestRepository { get; }
+        ITicketTypeRepository TicketTypeRepository { get; }
         bool HasChange();
 
         Task<bool> CompleteAsync();

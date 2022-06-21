@@ -2,16 +2,14 @@
 
 namespace Term7MovieCore.Data.Request
 {
-    public class CompanyUpdateRequest
+    public class CompanyCreateRequest
     {
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        public int Id { set; get; }
         [MaxLength(30, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_MAX_LENGTH)]
-        public string Name { set; get; }
+        public string Name { get; set; }
+
         [MaxLength(200, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_MAX_LENGTH)]
         [Url]
         public string LogoUrl { set; get; }
-        [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        public bool IsActive { set; get; } = true;
     }
 }
