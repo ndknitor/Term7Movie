@@ -60,16 +60,13 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<ShowtimeCreateResponse> CreateShowtimeAsync(ShowtimeCreateRequest request, long managerId)
+        public async Task<ShowtimeCreateResponse> CreateShowtimeAsync(ShowtimeCreateRequest request)
         {
-
-            Showtime showtime = _mapper.Map<Showtime>(request);
-
             bool notOverlap = await showtimeRepo.IsShowtimeNotOverlap(request);
 
             if (!notOverlap) throw new BadRequestException(ErrorMessageConstants.ERROR_MESSAGE_SHOWTIME_OVERLAP);
 
-            long scopeIdentity = await showtimeRepo.CreateShowtimeAsync(showtime);
+            long scopeIdentity = await showtimeRepo.CreateShowtimeAsync(request);
 
             if (scopeIdentity == 0) throw new DbOperationException();
 

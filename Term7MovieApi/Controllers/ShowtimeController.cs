@@ -41,9 +41,7 @@ namespace Term7MovieApi.Controllers
         [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_CREATE_SHOWTIME_SAME_MANAGER)]
         public async Task<IActionResult> CreateShowtimeAsync(ShowtimeCreateRequest request)
         {
-            long managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
-
-            var response = await _showtimeService.CreateShowtimeAsync(request, managerId);
+            var response = await _showtimeService.CreateShowtimeAsync(request);
             return Ok(response);
         }
 

@@ -113,5 +113,26 @@ namespace Term7MovieRepository.Repositories.Implement
                 return count == 1;
             }
         }
+
+        public async Task<bool> CanManagerAccessTicketTypes(IEnumerable<long> ticketTypeId, long managerId)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT COUNT(*)
+                       FROM TicketTypes tt JOIN Companies c ON tt.CompanyId = c.Id 
+                       WHERE c.ManagerId = @managerId AND tt.Id IN @ticketTypeId  ";
+
+                object param = new
+                {
+                    ticketTypeId,
+                    managerId
+                };
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
+
+                return count == ticketTypeId.Count();
+            }
+        }
     }
 }

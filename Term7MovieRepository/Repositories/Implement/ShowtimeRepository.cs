@@ -137,20 +137,56 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return showtime;
         }
-        public async Task<long> CreateShowtimeAsync(Showtime showtime)
+        public async Task<long> CreateShowtimeAsync(ShowtimeCreateRequest request)
         {
             long scopeIdentity = 0;
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
-                string sql = 
-                    " INSERT INTO Showtimes (MovieId, RoomId, StartTime, EndTime, TheaterId) " +
-                    " SELECT @MovieId, @RoomId, @StartTime, DATEADD(MINUTE, Duration, @StartTime), @TheaterId " +
-                    " FROM Movies " +
-                    " WHERE Id = @MovieId ; ";
+                await con.OpenAsync();
+                var transaction = await con.BeginTransactionAsync();
+                try
+                {
+                    string sql =
+                    @" INSERT INTO Showtimes (MovieId, RoomId, StartTime, EndTime, TheaterId) 
+                       SELECT @MovieId, @RoomId, @StartTime, DATEADD(MINUTE, Duration, @StartTime), @TheaterId 
+                       FROM Movies 
+                       WHERE Id = @MovieId ; ";
 
-                string getIdentity = @" SELECT SCOPE_IDENTITY() ; ";
+                    string getIdentity = @" SELECT SCOPE_IDENTITY() ; ";
 
-                scopeIdentity = await con.QueryFirstOrDefaultAsync<long>(sql + getIdentity, showtime);
+                    scopeIdentity = await con.QueryFirstOrDefaultAsync<long>(sql + getIdentity, request, transaction:transaction);
+
+                    string insertShowtimeTicketType =
+                        @" INSERT INTO ShowtimeTicketTypes (Id, ShowtimeId, TicketTypeId, OriginalPrice, ReceivePrice) 
+                           VALUES (NEWID(), @scopeIdentity, @TicketTypeId, @OriginalPrice, @ReceivePrice) ";
+
+                    object param;
+
+                    int count = 0;
+                    foreach (var showtimeTicketType in request.ShowtimeTicketTypes)
+                    {
+                        param = new
+                        {
+                            showtimeTicketType.TicketTypeId,
+                            showtimeTicketType.OriginalPrice,
+                            showtimeTicketType.ReceivePrice,
+                            scopeIdentity
+                        };
+
+                        count += await con.ExecuteAsync(insertShowtimeTicketType, param, transaction: transaction);
+                    }
+
+                    if (count == request.ShowtimeTicketTypes.Count())
+                    {
+                        transaction.Commit();
+                        return scopeIdentity;
+                    }
+                }
+                catch(DbUpdateException e)
+                {
+                    await transaction.RollbackAsync();
+                    throw e;
+                }
             }
             return scopeIdentity;
         }
