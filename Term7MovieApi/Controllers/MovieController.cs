@@ -70,7 +70,7 @@ namespace Term7MovieApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Roles = Constants.ROLE_ADMIN)]
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPost]
         public async Task<IActionResult> CreateMovie(MovieCreateRequest[] request)
         {
@@ -93,7 +93,7 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        //[Authorize(Roles = Constants.ROLE_ADMIN)]
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPut]
         public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
         {
