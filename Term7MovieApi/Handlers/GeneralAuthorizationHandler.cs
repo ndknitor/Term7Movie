@@ -112,6 +112,8 @@ namespace Term7MovieApi.Handlers
         {
             long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
 
+            if (resource == null) return false;
+
             ITheaterRepository theaterRepo = _unitOfWork.TheaterRepository;
 
             var theaters = await theaterRepo.GetTheaterByManagerIdAsync(managerId);
@@ -127,6 +129,8 @@ namespace Term7MovieApi.Handlers
         {
             IRoomRepository theaterRepo = _unitOfWork.RoomRepository;
 
+            if (resource == null) return false;
+
             long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
 
             var rooms = await theaterRepo.GetRoomByManagerIdAsync(managerId);
@@ -140,6 +144,8 @@ namespace Term7MovieApi.Handlers
 
         private async Task<bool> IsTransactionCreateRequestValid(IEnumerable<Claim> claims, TransactionCreateRequest resource)
         {
+            if (resource == null) return false;
+
             ITicketRepository ticketRepository = _unitOfWork.TicketRepository;
 
             return await ticketRepository.IsTicketInShowtimeValid(resource.ShowtimeId, resource.IdList);
@@ -147,6 +153,7 @@ namespace Term7MovieApi.Handlers
 
         private async Task<bool> IsShowtimeNotOverlapValid<T>( T resource)
         {
+            if (resource == null) return false;
             bool valid = false;
             switch(resource)
             {
@@ -160,6 +167,7 @@ namespace Term7MovieApi.Handlers
 
         private async Task<bool> CanManagerCreateShowtime<T>(IEnumerable<Claim> claims, T resource)         
         {
+            if (resource == null) return false;
             bool valid = false;
             long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
             switch(resource)
@@ -199,6 +207,7 @@ namespace Term7MovieApi.Handlers
 
         private async Task<bool> CanManagerCreateOrUpdateTicket<T>(IEnumerable<Claim> claims, T resource)
         {
+
             if (resource == null) return false;
 
             long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
