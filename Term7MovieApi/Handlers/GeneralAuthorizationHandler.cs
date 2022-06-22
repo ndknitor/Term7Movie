@@ -177,7 +177,7 @@ namespace Term7MovieApi.Handlers
 
                     if (!valid) return false;
 
-                    IEnumerable<long> idList = (resource as ShowtimeCreateRequest).ShowtimeTicketTypes.Select(t => t.TicketTypeId);
+                    IEnumerable<long> idList = (resource as ShowtimeCreateRequest).ShowtimeTicketTypes?.Select(t => t.TicketTypeId);
 
                     valid = await _unitOfWork.TicketTypeRepository.CanManagerAccessTicketTypes(idList, managerId);
 
@@ -219,15 +219,11 @@ namespace Term7MovieApi.Handlers
 
                     if (createRequest.Tickets == null || createRequest.Tickets.Count() == 0) return false;
 
-                    TicketCreateRequest firstTicket = createRequest.Tickets.FirstOrDefault();
-
-                    long showtimeId = firstTicket.ShowTimeId;
-                    DateTime startTime = firstTicket.ShowStartTime;
-
+                    IEnumerable<Guid> showtimeTicketTypeId = createRequest.Tickets.Select(t => t.ShowtimeTicketTypeId);
 
                     IEnumerable<long> seatId = createRequest.Tickets.Select(t => t.SeatId);
 
-                    valid = await _unitOfWork.ShowtimeRepository.CanManagerCreateTicket(managerId, showtimeId, startTime, seatId);
+                    valid = await _unitOfWork.ShowtimeRepository.CanManagerCreateTicket(managerId, showtimeTicketTypeId, seatId);
                     
                     break;
             }

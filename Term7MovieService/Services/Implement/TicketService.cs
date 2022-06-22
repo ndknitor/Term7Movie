@@ -144,7 +144,7 @@ namespace Term7MovieService.Services.Implement
                 };
             }
 
-            throw new BadRequestException();
+            throw new BadRequestException("Invalid Seat Id or ShowtimeTicketTypeId");
         }
     }
 }
