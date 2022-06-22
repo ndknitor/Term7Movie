@@ -19,6 +19,7 @@
         public string[] BeautifyActors { get; set; }
         public string Languages { set; get; }
 
+        public string[] LanguageList { set; get; }
         public IEnumerable<CategoryDTO> Categories { set; get; }
     }
 }

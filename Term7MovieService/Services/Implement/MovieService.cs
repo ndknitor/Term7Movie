@@ -16,6 +16,7 @@ using Term7MovieRepository.Cache.Interface;
 using Term7MovieCore.Data.Utility;
 using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Exceptions;
+using Term7MovieCore.Extensions;
 
 namespace Term7MovieService.Services.Implement
 {
@@ -52,6 +53,12 @@ namespace Term7MovieService.Services.Implement
                 movies = new PagingList<MovieModelDto>(request.PageSize, request.Page, pagingList, list.Count());
             }
 
+            foreach(var m in movies.Results)
+            {
+                m.BeautifyActors = m.Actors.ToObject<string[]>();
+                m.LanguageList = m.Actors.ToObject<string[]>();
+            }
+
             return new MovieListResponse
             {
                 Message = "Success",
@@ -74,6 +81,9 @@ namespace Term7MovieService.Services.Implement
             }
 
             if (movie == null) throw new DbNotFoundException();
+
+            movie.BeautifyActors = movie.Actors.ToObject<string[]>();
+            movie.LanguageList = movie.Actors.ToObject<string[]>();
 
             return new ParentResultResponse
             {
