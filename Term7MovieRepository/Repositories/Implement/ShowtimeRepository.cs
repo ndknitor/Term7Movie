@@ -458,23 +458,24 @@ namespace Term7MovieRepository.Repositories.Implement
             return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
         }
 
-        public async Task<bool> CanManagerCreateTicket(long managerId, long showtimeId, DateTime startTime, IEnumerable<long> seatId)
+        public async Task<bool> CanManagerCreateTicket(long managerId, IEnumerable<Guid> showtimeTicketTypeId, IEnumerable<long> seatId)
         {
             bool valid = false;
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" SELECT COUNT(*)
+                    @" SELECT COUNT(*) OVER()
                        FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id
-                            JOIN Rooms r ON r.TheaterId = sh.TheaterId
-                            JOIN Seats s ON s.RoomId = r.Id 
+                            JOIN Seats s ON s.RoomId = sh.RoomId
+                            JOIN ShowtimeTicketTypes shtt ON shtt.ShowtimeId = sh.Id
                        WHERE th.ManagerId = @managerId 
-                            AND sh.Id = @showtimeId 
+                            AND shtt.Id IN @showtimeTicketTypeId 
                             AND s.Id IN @seatId
-                            AND sh.StartTime = @startTime ";
+                            AND sh.StartTime > GETUTCDATE()
+                       GROUP BY s.Id ";   // count(*) over(): count after group by
 
-                object param = new { managerId, showtimeId, startTime, seatId };
+                object param = new { managerId, showtimeTicketTypeId, seatId };
 
                 int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
 

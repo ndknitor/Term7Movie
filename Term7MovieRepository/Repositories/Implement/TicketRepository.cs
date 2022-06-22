@@ -74,18 +74,18 @@ namespace Term7MovieRepository.Repositories.Implement
                     foreach(TicketCreateRequest ticket in request.Tickets)
                     {
                         string sql =
-                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId) 
-                           SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, @ReceivePrice + (@OriginalPrice - @ReceivePrice) * @SellingPriceRatio, 1 
-                           FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
-                           WHERE s.Id = @SeatId ";
+                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId, ShowtimeTicketTypeId ) 
+                           SELECT @SeatId, sh.Id, sh.StartTime, shtt.OriginalPrice , shtt.ReceivePrice, shtt.ReceivePrice + (shtt.OriginalPrice - shtt.ReceivePrice) * @SellingPriceRatio, 1, @ShowtimeTicketTypeId
+                           FROM ShowtimeTicketTypes shtt 
+                                JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
+                                JOIN Seats s ON s.RoomId = sh.RoomId
+                           WHERE s.Id = @SeatId 
+                                AND shtt.Id = @ShowtimeTicketTypeId ";
 
                         object param = new 
                         { 
                             ticket.SeatId,
-                            ticket.ShowTimeId,
-                            ticket.ShowStartTime,
-                            ticket.OriginalPrice,
-                            ticket.ReceivePrice,
+                            ticket.ShowtimeTicketTypeId,
                             _profitFormulaOption.SellingPriceRatio };
 
                         count += await con.ExecuteAsync(sql, param, transaction: transaction);

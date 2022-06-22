@@ -14,7 +14,6 @@ namespace Term7MovieApi.Controllers
     {
         private readonly ILogger<MovieController> _logger;
         private readonly ITicketService _ticketService;
-        //private readonly IUnitOfWork _unitOfWork;
 
         public TicketController(ILogger<MovieController> logger, ITicketService ticketService)
         {
