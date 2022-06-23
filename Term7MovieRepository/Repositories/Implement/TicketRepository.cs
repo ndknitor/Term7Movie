@@ -185,7 +185,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return Tuple.Create(min, max);
         }
 
-        /*public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
+        public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -201,25 +201,16 @@ namespace Term7MovieRepository.Repositories.Implement
             //lấy ra số ticket có trong toàn bộ showtimeids có được từ query trên và count lại toàn bộ để ra quantity
             //đây chỉ là tuần hiện tại
             var firstquery = await _context.Showtimes
-                                .Include(a => a.Tickets)
-                                .Where(a => a.Tickets.Any(
-                                    a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1))
+                                .Where(a => showtimeids.Contains(a.Id)
                                     && a.StartTime <= DateTime.UtcNow.Date && a.StartTime >= ThisMondayWeek)
-                                .SelectMany(a => a.Tickets)
                                 .CountAsync();
             //lấy tuần trước
             var secondquery = await _context.Showtimes
-                                .Include(a => a.Tickets)
-                                .Where(a => a.Tickets.Any(
-                                    a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1))
+                                .Where(a => showtimeids.Contains(a.Id)
                                     && a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
-                                .SelectMany(a => a.Tickets)
                                 .CountAsync();
             var thirdquery = await _context.Showtimes
-                                .Include(a => a.Tickets)
-                                .Where(a => a.Tickets.Any
-                                (a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1)))
-                                .SelectMany(a => a.Tickets)
+                                .Where(a => showtimeids.Contains(a.Id))
                                 .CountAsync();
             if (firstquery == 0 && secondquery == 0 && thirdquery == 0)
             {
@@ -247,7 +238,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 dto.PercentTicketSoldChange = 0.69F;
             }
             return dto;
-        }*/
+        }
 
     }
 }
