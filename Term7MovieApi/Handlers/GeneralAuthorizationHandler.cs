@@ -170,6 +170,7 @@ namespace Term7MovieApi.Handlers
             if (resource == null) return false;
             bool valid = false;
             long managerId = Convert.ToInt64(claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+
             switch(resource)
             {
                 case ShowtimeCreateRequest:
@@ -177,7 +178,9 @@ namespace Term7MovieApi.Handlers
 
                     if (!valid) return false;
 
-                    IEnumerable<long> idList = (resource as ShowtimeCreateRequest).ShowtimeTicketTypes?.Select(t => t.TicketTypeId);
+                    IEnumerable<long> idList = (resource as ShowtimeCreateRequest)?.ShowtimeTicketTypes?.Select(t => t.TicketTypeId);
+
+                    if (idList == null || !idList.Any()) return false;
 
                     valid = await _unitOfWork.TicketTypeRepository.CanManagerAccessTicketTypes(idList, managerId);
 
@@ -217,7 +220,7 @@ namespace Term7MovieApi.Handlers
                 case TicketListCreateRequest:
                     var createRequest = resource as TicketListCreateRequest;
 
-                    if (createRequest.Tickets == null || createRequest.Tickets.Count() == 0) return false;
+                    if (createRequest.Tickets == null || !createRequest.Tickets.Any()) return false;
 
                     IEnumerable<Guid> showtimeTicketTypeId = createRequest.Tickets.Select(t => t.ShowtimeTicketTypeId);
 

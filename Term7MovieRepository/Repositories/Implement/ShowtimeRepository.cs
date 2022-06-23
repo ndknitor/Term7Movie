@@ -53,7 +53,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
 
@@ -115,7 +115,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " ; ";
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
                 object param = new { managerId, offset, fetch };
@@ -158,7 +158,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " WHERE sh.Id = @id ; ";
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
                       WHERE shtt.ShowtimeId = @id ";
 
@@ -203,8 +203,8 @@ namespace Term7MovieRepository.Repositories.Implement
                     scopeIdentity = await con.QueryFirstOrDefaultAsync<long>(sql + getIdentity, request, transaction:transaction);
 
                     string insertShowtimeTicketType =
-                        @" INSERT INTO ShowtimeTicketTypes (Id, ShowtimeId, TicketTypeId, OriginalPrice, ReceivePrice) 
-                           VALUES (NEWID(), @scopeIdentity, @TicketTypeId, @OriginalPrice, @ReceivePrice) ";
+                        @" INSERT INTO ShowtimeTicketTypes (Id, ShowtimeId, TicketTypeId, ReceivePrice) 
+                           VALUES (NEWID(), @scopeIdentity, @TicketTypeId, @ReceivePrice) ";
 
                     object param;
 
@@ -214,7 +214,7 @@ namespace Term7MovieRepository.Repositories.Implement
                         param = new
                         {
                             showtimeTicketType.TicketTypeId,
-                            showtimeTicketType.OriginalPrice,
+                            //showtimeTicketType.OriginalPrice,
                             showtimeTicketType.ReceivePrice,
                             scopeIdentity
                         };

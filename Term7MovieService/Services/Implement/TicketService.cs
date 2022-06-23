@@ -60,7 +60,7 @@ namespace Term7MovieService.Services.Implement
                 dto.TransactionId = ticket.TransactionId;
                 dto.ShowTimeId = ticket.ShowTimeId;
                 dto.ShowStartTime = ticket.ShowStartTime;
-                dto.OriginalPrice = ticket.OriginalPrice;
+                //dto.OriginalPrice = ticket.OriginalPrice;
                 dto.ReceivePrice = ticket.ReceivePrice;
                 dto.SellingPrice = ticket.SellingPrice;
                 dto.StatusId = ticket.StatusId;
@@ -90,7 +90,7 @@ namespace Term7MovieService.Services.Implement
                 dto.TransactionId = ticket.TransactionId;
                 dto.ShowTimeId = ticket.ShowTimeId;
                 dto.ShowStartTime = ticket.ShowStartTime;
-                dto.OriginalPrice = ticket.OriginalPrice;
+                //dto.OriginalPrice = ticket.OriginalPrice;
                 dto.ReceivePrice = ticket.ReceivePrice;
                 dto.SellingPrice = ticket.SellingPrice;
                 dto.StatusId = ticket.StatusId;
@@ -120,7 +120,7 @@ namespace Term7MovieService.Services.Implement
                         TransactionId = rawdata.TransactionId,
                         ShowTimeId = rawdata.ShowTimeId,
                         ShowStartTime = rawdata.ShowStartTime,
-                        OriginalPrice = rawdata.OriginalPrice,
+                        //OriginalPrice = rawdata.OriginalPrice,
                         ReceivePrice = rawdata.ReceivePrice,
                         SellingPrice = rawdata.SellingPrice,
                         StatusId = rawdata.StatusId,

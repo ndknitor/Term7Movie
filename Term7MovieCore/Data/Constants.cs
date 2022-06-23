@@ -68,6 +68,7 @@ namespace Term7MovieCore.Data
         public const string CONSTRAINT_REQUEST_MESSAGE_END_TIME_NOT_VALID = "End time not valid";
         public const string CONSTRAINT_REQUEST_SHOWTIME_MUST_BE_IN_40MIN = "Start time must be in next 40 minutes";
         public const string CONSTRAINT_TICKET_LIST_NOT_VALID = "Ticket list not valid";
+        public const string CONSTRAINT_LIST_CAN_NOT_EMPTY = "List cannot empty";
 
         public const int DefaultPageSize = 10;
         public const int DefaultPage = 1;

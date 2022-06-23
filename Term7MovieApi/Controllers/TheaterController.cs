@@ -27,7 +27,11 @@ namespace Term7MovieApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetTheatersAsync([FromQuery] TheaterFilterRequest request)
         {
-            var response = await _theaterService.GetTheatersAsync(request);
+            string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+
+            long userId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+
+            var response = await _theaterService.GetTheatersAsync(request, userId, role);
             return Ok(response);
         }
 
