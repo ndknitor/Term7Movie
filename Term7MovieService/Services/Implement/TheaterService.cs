@@ -29,9 +29,18 @@ namespace Term7MovieService.Services.Implement
             _locationService = locationService;
         }
 
-        public async Task<TheaterListResponse> GetTheatersAsync(TheaterFilterRequest request)
+        public async Task<TheaterListResponse> GetTheatersAsync(TheaterFilterRequest request, long userId, string role)
         {
-            PagingList<TheaterDto> theaters = await theaterRepo.GetAllTheaterAsync(request);
+            PagingList<TheaterDto> theaters;
+
+            if (Constants.ROLE_MANAGER.Equals(role))
+            {
+                theaters = await theaterRepo.GetAllTheaterByManagerIdAsync(request, userId);
+            } else
+            {
+                theaters = await theaterRepo.GetAllTheaterAsync(request);
+            }
+            
             return new TheaterListResponse
             {
                 Message = Constants.MESSAGE_SUCCESS,

@@ -45,7 +45,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " WHERE Id = @id AND Status = 1 ; ";
 
                 string seatSql =
-                    " SELECT s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, st.BonusPrice " +
+                    " SELECT s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name " +
                     " FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
                     " WHERE s.RoomId = @id ";
 

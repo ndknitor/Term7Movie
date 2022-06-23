@@ -14,7 +14,6 @@ namespace Term7MovieCore.Data.Request
         [Range((int)SeatTypeEnum.Normal, (int)SeatTypeEnum.Vip, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD)]
         public int Id { get; set; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        [Range(1, long.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_GREATER_THAN_ZERO)]
-        public decimal BonusPrice { get; set; }
+        public string Name { set; get; }
     }
 }

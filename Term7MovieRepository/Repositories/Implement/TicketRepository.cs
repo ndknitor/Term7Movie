@@ -74,8 +74,8 @@ namespace Term7MovieRepository.Repositories.Implement
                     foreach(TicketCreateRequest ticket in request.Tickets)
                     {
                         string sql =
-                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId, ShowtimeTicketTypeId ) 
-                           SELECT @SeatId, sh.Id, sh.StartTime, shtt.OriginalPrice , shtt.ReceivePrice, shtt.ReceivePrice + (shtt.OriginalPrice - shtt.ReceivePrice) * @SellingPriceRatio, 1, @ShowtimeTicketTypeId
+                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, ReceivePrice, SellingPrice, StatusId, ShowtimeTicketTypeId ) 
+                           SELECT @SeatId, sh.Id, sh.StartTime , shtt.ReceivePrice, ROUND(shtt.ReceivePrice*(1 + @SellingPriceRatio), 0), 1, @ShowtimeTicketTypeId
                            FROM ShowtimeTicketTypes shtt 
                                 JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
                                 JOIN Seats s ON s.RoomId = sh.RoomId
@@ -138,7 +138,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    " SELECT t.Id, t.SellingPrice, s.Id, s.Name, s.RoomId, st.Id, st.Name, st.BonusPrice " +
+                    " SELECT t.Id, t.SellingPrice, s.Id, s.Name, s.RoomId, st.Id, st.Name " +
                     " FROM Tickets t JOIN Seats s ON t.SeatId = s.Id " +
                     "   JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
                     " WHERE t.Id IN @idList ";
