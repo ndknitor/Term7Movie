@@ -23,7 +23,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    " SELECT Id, Name, BonusPrice " +
+                    " SELECT Id, Name " +
                     " FROM SeatTypes ";
                 list = await con.QueryAsync<SeatTypeDto>(sql);
             }
@@ -37,7 +37,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    " SELECT Id, Name, BonusPrice " +
+                    " SELECT Id, Name " +
                     " FROM SeatTypes " +
                     " WHERE Id = @id ";
                 object param = new { id };

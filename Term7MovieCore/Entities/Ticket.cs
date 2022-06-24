@@ -14,8 +14,8 @@ namespace Term7MovieCore.Entities
         public long ShowTimeId { get; set; }
         [Required]
         public DateTime ShowStartTime { get; set; }
-        [Column(TypeName = "money"), Required]
-        public decimal OriginalPrice { get; set; }
+        //[Column(TypeName = "money"), Required]
+        //public decimal OriginalPrice { get; set; }
         [Column(TypeName = "money"), Required]
         public decimal ReceivePrice { get; set; }
         [Column(TypeName = "money"), Required]

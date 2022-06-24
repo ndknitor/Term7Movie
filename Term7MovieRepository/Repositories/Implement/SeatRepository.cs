@@ -24,7 +24,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    " SELECT s.Id, s.Name, RoomId, ColumnPos, RowPos, SeatTypeId, st.Id, st.Name, st.BonusPrice " +
+                    " SELECT s.Id, s.Name, RoomId, ColumnPos, RowPos, SeatTypeId, st.Id, st.Name " +
                     " FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
                     " WHERE RoomId = @roomId AND s.Status = 1 ";
 
@@ -45,7 +45,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql = 
-                    " SELECT s.Id, s.Name, RoomId, ColumnPos, RowPos, SeatTypeId, st.Id, st.Name, st.BonusPrice " +
+                    " SELECT s.Id, s.Name, RoomId, ColumnPos, RowPos, SeatTypeId, st.Id, st.Name " +
                     " FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
                     " WHERE s.Id = @id AND s.Status = 1 ";
                 object param = new { id };
