@@ -32,6 +32,15 @@ namespace Term7MovieCore.Data.Dto.Analyst
         public bool IsTicketSoldUpOrDown { get; set; }
     }
 
+    public class ShowtimeQuanityDTO
+    {
+        public int TotalShowtimeQuantity { get; set; }
+        public int OldShowtimeQuantity { get; set; } //tháng trước
+        public int NewShowtimeQuantity { get; set; } //current
+        public float PercentShowtimeChange { get; set; }
+        public bool IsShowtimeUpOrDown { get; set; }
+    }
+
     public class TicketSoldDTO
     {
         public int TotalTicketSoldQuantity { get; set; }

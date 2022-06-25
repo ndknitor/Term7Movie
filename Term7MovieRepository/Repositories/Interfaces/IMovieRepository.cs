@@ -19,7 +19,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<bool> UpdateMovie(Movie movie);
         Task<bool> DeleteMovie(int movieid);
         int Count();
-        Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies();
+        Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies();
         Task<IEnumerable<Movie>> GetEightLatestMovies();
         Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds);
         Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity, string searchKey);

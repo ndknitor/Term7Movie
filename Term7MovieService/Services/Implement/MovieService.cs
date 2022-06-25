@@ -92,32 +92,19 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage()
+        public async Task<IncomingMovieResponse> GetThreeLosslessLatestMovieForHomepage()
         {
             //Handle Error
-            IMovieRepository movierepo = _unitOfWork.MovieRepository;
-            if (movierepo == null) 
-                return new IncomingMovieResponse { Message = "REPOSITORY NULL" };
-            IEnumerable<Movie> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
+            IEnumerable<SmallMovieHomePageDTO> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
             if (!rawData.Any()) 
                 return new IncomingMovieResponse { Message = "DATABASE IS EMPTY" };
 
             //Start making process
-            IncomingMovieResponse IMR = new IncomingMovieResponse();
-            List<SmallMovieHomePageDTO> list = new List<SmallMovieHomePageDTO>();
-            foreach(var item in rawData)
+            return new IncomingMovieResponse
             {
-                SmallMovieHomePageDTO smp = new SmallMovieHomePageDTO();
-                smp.MovieId = item.Id;
-                //cover.CoverImgURL = item.CoverImageUrl;
-                smp.PosterImgURL = item.PosterImageUrl;
-                list.Add(smp);
-            }
-            if (list.Count == 0) IMR.Message = "No data for incoming movies :(";
-            else if (list.Count < 3) IMR.Message = "Missing incoming movie from database";
-            else IMR.Message = Constants.MESSAGE_SUCCESS;
-            IMR.LosslessMovieList = list;
-            return IMR;
+                LosslessMovieList = rawData,
+                Message = Constants.MESSAGE_SUCCESS,
+            };
         }
 
         public async Task<MovieNotListResponse> GetEightLatestMovieForHomepage()
@@ -651,9 +638,10 @@ namespace Term7MovieService.Services.Implement
                     {
                         result.Add(new MovieHomePageDTO
                         {
-                            MovieId = item.Id,
-                            CoverImgURL = item.CoverImageUrl,
+                            MovieId = item.MovieId,
+                            CoverImgURL = item.CoverImgURL,
                             Title = item.Title,
+                            
                         });
                     }
                     response.MovieHomePages = result;
