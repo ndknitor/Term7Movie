@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Ticket;
 using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
@@ -23,6 +25,17 @@ namespace Term7MovieService.Services.Implement
         {
             _unitOfWork = unitOfWork;
             tiktokRepository = _unitOfWork.TicketRepository;
+        }
+
+        public async Task<ParentResultResponse> GetTicketAsync(TicketFilterRequest request)
+        {
+            PagingList<TicketDto> list = await tiktokRepository.GetAllTicketAsync(request);
+
+            return new ParentResultResponse
+            {
+                Result = list,
+                Message = Constants.MESSAGE_SUCCESS
+            };
         }
 
         public async Task<TicketResponse> GetTicketForSomething(TicketRequest request)
