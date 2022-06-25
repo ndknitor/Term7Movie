@@ -1,11 +1,14 @@
 ﻿using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 ﻿using Term7MovieCore.Data.Dto.Analyst;
+using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface ITicketRepository
     {
+        Task<PagingList<TicketDto>> GetAllTicketAsync(TicketFilterRequest request);
         Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid);
         Task<IEnumerable<Ticket>> GetAllTicketByTransactionId(Guid id);
         Task<Ticket> GetTicketById(long id);

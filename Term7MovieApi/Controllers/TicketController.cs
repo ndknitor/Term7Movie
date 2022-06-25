@@ -39,18 +39,11 @@ namespace Term7MovieApi.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetTicketFromSomething(TicketRequest request)
+        public async Task<IActionResult> GetTicketFromSomething(TicketFilterRequest request)
         {
-            try
-            {
-                var response = await _ticketService.GetTicketForSomething(request);
-                return Ok(response);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Send this to Nam Tran: " });
-            }
+            var response = await _ticketService.GetTicketAsync(request);
+
+            return Ok(response);
         }
 
         [HttpPost]

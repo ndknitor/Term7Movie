@@ -37,14 +37,10 @@ namespace Term7MovieApi.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetRoomsByTheaterId([FromQuery][Required] int theaterId)
+        public async Task<IActionResult> GetRoomsByTheaterId([FromQuery] RoomFilterRequest request)
         {
-            var response = await _roomService.GetRoomsByTheaterId(theaterId);
+            var response = await _roomService.GetRoomsByTheaterId(request);
 
-            if (response == null)
-            {
-                return BadRequest(new ParentResponse { Message = Constants.MESSAGE_NOT_FOUND });
-            }
             return Ok(response);
         }
 

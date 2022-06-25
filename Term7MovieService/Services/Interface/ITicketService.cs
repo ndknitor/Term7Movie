@@ -5,6 +5,7 @@ namespace Term7MovieService.Services.Interface
 {
     public interface ITicketService
     {
+        Task<ParentResultResponse> GetTicketAsync(TicketFilterRequest request);
         Task<TicketResponse> GetTicketForSomething(TicketRequest request);
 
         //Task<TicketResponse> GetTicketForAShowTime(int showtimeid);
