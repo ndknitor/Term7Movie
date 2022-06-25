@@ -246,24 +246,24 @@ namespace Term7MovieRepository.Repositories.Implement
         //                join tick in _context.Tickets on st.
         //}
 
-        public async Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies()
+        public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
                 //throw new Exception();
                 return null;
-            List<Movie> movies = new List<Movie>();
+            List<SmallMovieHomePageDTO> movies = new List<SmallMovieHomePageDTO>();
             var query = _context.Movies
                 .Where(a => a.ReleaseDate > DateTime.Now
                             && a.ReleaseDate < DateTime.Now.AddMonths(1)
                             && !string.IsNullOrEmpty(a.CoverImageUrl)
                             && !string.IsNullOrEmpty(a.PosterImageUrl))
                 .OrderByDescending(a => a.ReleaseDate)
-                .Select(a => new Movie
+                .Select(a => new SmallMovieHomePageDTO
                 {
-                    Id = a.Id,
-                    Title = a.Title,
-                    PosterImageUrl = a.PosterImageUrl,
-                    CoverImageUrl = a.CoverImageUrl,
+                    MovieId = a.Id,
+                    CoverImgURL = a.CoverImageUrl,
+                    PosterImgURL = a.PosterImageUrl,
+                    Title = a.Title
                 })
                 .Take(3);
             movies = query.ToList();
