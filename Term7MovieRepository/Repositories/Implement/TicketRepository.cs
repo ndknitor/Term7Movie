@@ -47,7 +47,8 @@ namespace Term7MovieRepository.Repositories.Implement
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
                             JOIN TicketStatuses ts ON t.StatusId = ts.Id 
                             JOIN ShowtimeTicketTypes shtt ON shtt.Id = t.ShowtimeTicketTypeId 
-                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id " + 
+                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id
+                       WHERE 1 = 1 " + 
 
                             GetAdditionalTicketFilter(request, FILTER_BY_SHOWTIME) +
                             GetAdditionalTicketFilter(request, FILTER_BY_ID) +
@@ -60,7 +61,8 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 string count =
                     @" SELECT COUNT(*) 
-                       FROM Tickets t " +
+                       FROM Tickets t 
+                       WHERE 1 = 1 " +
                        GetAdditionalTicketFilter(request, FILTER_BY_SHOWTIME) +
                        GetAdditionalTicketFilter(request, FILTER_BY_ID) +
                        GetAdditionalTicketFilter(request, FILTER_BY_IS_SHOWED) +
@@ -312,7 +314,26 @@ namespace Term7MovieRepository.Repositories.Implement
             string sql = "";
             switch(filter)
             {
+                case FILTER_BY_SHOWTIME:
 
+                    if (request.ShowtimeId != null) sql = " AND t.ShowtimeId = @ShowtimeId ";
+
+                    break;
+                case FILTER_BY_ID:
+
+                    if (request.TicketId != null) sql = " AND t.Id = @TicketId ";
+
+                    break;
+                case FILTER_BY_IS_PURCHASED:
+
+                    if (request.IsPurchased) sql = " AND t.TransactionId IS NOT NULL ";
+
+                    break;
+                case FILTER_BY_IS_SHOWED:
+
+                    if (request.IsNotShowedYet) sql = " AND t.ShowStartTime > GETUTCDATE() ";
+
+                    break;
             }
             return sql;
         }
