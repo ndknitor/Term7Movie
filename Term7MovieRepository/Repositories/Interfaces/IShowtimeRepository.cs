@@ -1,5 +1,6 @@
 ﻿using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Utility;
@@ -24,5 +25,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<TheaterShowTimeLocationDTO>> GetRecentlyShowTimeForMovieHomepage();
 
         Task<IEnumerable<TheaterShowTimeDTO>> GetRecentlyShowTimeWithMinutesRemain(Coordinate UserLocation);
+
+        Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(int companyid, 
+            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
     }
 }
