@@ -1,4 +1,5 @@
 ﻿
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Response.Analyst;
 using Term7MovieRepository.Repositories.Interfaces;
@@ -21,26 +22,40 @@ namespace Term7MovieService.Services.Implement
             tranHisRepository = _unitOfWork.TransactionHistoryRepository;
         }
 
-        public Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid)
+        public async Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid)
         {
-            throw new NotImplementedException();
+            var result = await GettingAnalystForOneWeek(companyid);
+            bool S1mple = IsItSundayYet(DateTime.UtcNow);
+            return new DashboardResponse
+            {
+                ShowtimeDashboard = result.Item1,
+                TicketSoldDashboard = result.Item2,
+                IncomeDashboard = result.Item3,
+                IsItStatistical = S1mple,
+                Message = Constants.MESSAGE_SUCCESS
+            };
         }
 
-        /* --------- START PRIVATE FUNCTION ------- */
 
-        /* -------- START GETTING QUICK ANALYST ------ */
-        /*
-        private async Task<TicketQuanityDTO> GettingAnalystForOneWeek(int companyid)
+        /* ------------------------------------- START PRIVATE FUNCTION --------------------------------- */
+        
+        //______ START GETTING QUICK ANALYST
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek(int companyid)
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var quanity = await ticketRepository.GetQuickTicketQuanityInTwoWeek(companyid, 
-                MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            return quanity;
-        }*/
-        /* -------- END GETTING QUICK ANALYST ------ */
+            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(companyid
+                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(companyid
+                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(companyid
+                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            //trả 404 nếu 1 trong những thứ trên có vấn đề hence
+            return Tuple.Create(showtimeQuanity, ticketSold, Income);
+        }
+        //______ END GETTING QUICK ANALYST
 
         /// <summary>
         /// Below are function to convert right damn now into 3 different time so we can get a part of 
@@ -55,7 +70,7 @@ namespace Term7MovieService.Services.Implement
             switch (DayOfTheWeek)
             {
                 case 0: return InTheMeantime.AddDays(-6).Date;
-                case 1: return InTheMeantime.AddDays(0).Date; //so it wont block the constraint
+                case 1: return InTheMeantime.AddDays(0).Date;
                 case 2: return InTheMeantime.AddDays(-1).Date;
                 case 3: return InTheMeantime.AddDays(-2).Date;
                 case 4: return InTheMeantime.AddDays(-3).Date;
@@ -70,7 +85,7 @@ namespace Term7MovieService.Services.Implement
             switch (DayOfTheWeek)
             {
                 case 0: return InTheMeantime.AddDays(-6 - 7).Date;
-                case 1: return InTheMeantime.AddDays(0 - 7).Date; //so it wont block the constraint
+                case 1: return InTheMeantime.AddDays(0 - 7).Date;
                 case 2: return InTheMeantime.AddDays(-1 - 7).Date;
                 case 3: return InTheMeantime.AddDays(-2 - 7).Date;
                 case 4: return InTheMeantime.AddDays(-3 - 7).Date;
@@ -85,7 +100,7 @@ namespace Term7MovieService.Services.Implement
             switch (DayOfTheWeek)
             {
                 case 0: return InTheMeantime.AddDays(0 - 7).Date;
-                case 1: return InTheMeantime.AddDays(6 - 7).Date; //so it wont block the constraint
+                case 1: return InTheMeantime.AddDays(6 - 7).Date;
                 case 2: return InTheMeantime.AddDays(5 - 7).Date;
                 case 3: return InTheMeantime.AddDays(4 - 7).Date;
                 case 4: return InTheMeantime.AddDays(3 - 7).Date;
@@ -94,13 +109,10 @@ namespace Term7MovieService.Services.Implement
                 default: throw new NotSupportedException();
             }
         }
-
         private bool IsItSundayYet(DateTime WhichDayIsIt)
         {
             return (int)WhichDayIsIt.DayOfWeek == 0 ? true : false;
         }
-
-
-        /* --------- END PRIVATE FUNCTION ----------*/
+        /* ------------------------------------- END PRIVATE FUNCTION --------------------------------- */
     }
 }

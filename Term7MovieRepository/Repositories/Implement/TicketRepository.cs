@@ -266,8 +266,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                 .Where(a => a.CompanyId == companyid)
                                 .SelectMany(a => a.Showtimes)
                                 .Select(a => a.Id).ToListAsync();
-            if (!showtimeids.Any())
-                return null; //công ty này chưa có cái rạp nào cả...
             //lấy ra số ticket có trong toàn bộ showtimeids có được từ query trên và count lại toàn bộ để ra quantity
             //đây chỉ là tuần hiện tại
             var firstquery = await _context.Showtimes
