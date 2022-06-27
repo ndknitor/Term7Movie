@@ -19,7 +19,7 @@ namespace Term7MovieCore.Data.Dto.Analyst
         public decimal TotalIncomeQuantity { get; set; }
         public decimal OldIncomeQuantity { get; set; } //tháng trước
         public decimal NewIncomeQuantity { get; set; } //current
-        public float PercentIncomeChange { get; set; }
+        public decimal PercentIncomeChange { get; set; }
         public bool IsIncomeUpOrDown { get; set; } // trưởng hợp ngang nhau thì cho là có lên
     }
 
