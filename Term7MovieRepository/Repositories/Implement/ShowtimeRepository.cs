@@ -19,6 +19,9 @@ namespace Term7MovieRepository.Repositories.Implement
         private readonly ConnectionOption _connectionOption;
 
         private const string FILTER_NOT_SHOWED_YET = "NOT_SHOWED";
+        private const string FILTER_BY_MOVIE = "BY_MOVIE";
+        private const string FILTER_BY_THEATER = "BY_THEATER";
+        private const string FILTER_BY_DATE = "BY_DATE";
 
         public ShowtimeRepository(AppDbContext context, ConnectionOption connectionOption)
         {
@@ -34,51 +37,72 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string query =
-                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl " +
-                    " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
-                    " WHERE TheaterId = @TheaterId " +
+                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime " + 
+                    (request.IsIncludeMovie ? ", m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl ": "")  +
+                    " FROM Showtimes sh " +
+                    (request.IsIncludeMovie ? " JOIN Movies m ON sh.MovieId = m.Id " : "") +
+                    " WHERE 1 = 1 " +
 
                     GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) +
+                    GetAdditionQueryString(request, FILTER_BY_MOVIE) +
+                    GetAdditionQueryString(request, FILTER_BY_THEATER) +
+                    GetAdditionQueryString(request, FILTER_BY_DATE) +
 
-                    " ORDER BY StartTime " +
+                    " ORDER BY sh.Id " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
 
                 string count =
                     " SELECT COUNT(1) " +
-                    " FROM Showtimes " +
-                    " WHERE TheaterId = @TheaterId " +
+                    " FROM Showtimes sh " +
+                    " WHERE 1 = 1 " +
 
                     GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) +
+                    GetAdditionQueryString(request, FILTER_BY_MOVIE) +
+                    GetAdditionQueryString(request, FILTER_BY_THEATER) +
+                    GetAdditionQueryString(request, FILTER_BY_DATE) +
                     " ; ";
                     
 
-                string showtimeTiketType =
+                string showtimeTiketType = 
+                    !request.IsIncludeTicketType ? "" : 
                    @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
 
-                object param = new { request.TheaterId,  offset, fetch };
+                object param = new { request.TheaterId, request.Date?.Date, request.MovieId, offset, fetch };
 
                 var multiQ = await con.QueryMultipleAsync(query + count + showtimeTiketType, param);
 
-                IEnumerable<ShowtimeDto> results = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>((sh, m) =>
+                IEnumerable<ShowtimeDto> results;
+
+                if (request.IsIncludeMovie)
                 {
-                    sh.Movie = m;
-                    return sh;
-                }, splitOn : "Id");
+                    results = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>((sh, m) =>
+                    {
+                        sh.Movie = m;
+                        return sh;
+                    }, splitOn: "Id");
+                } 
+                else
+                {
+                    results = await multiQ.ReadAsync<ShowtimeDto>();
+                }
 
                 int total = await multiQ.ReadFirstOrDefaultAsync<int>();
 
-                IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt , tt) =>
+                if (request.IsIncludeTicketType)
                 {
-                    shtt.TicketType = tt;
-                    return shtt;
-                });
+                    IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
+                    {
+                        shtt.TicketType = tt;
+                        return shtt;
+                    });
 
-                foreach(ShowtimeDto showtime in results)
-                {
-                    showtime.ShowtimeTicketTypes = showtimeTicketTypes.Where(shtt => shtt.ShowtimeId == showtime.Id);
+                    foreach (ShowtimeDto showtime in results)
+                    {
+                        showtime.ShowtimeTicketTypes = showtimeTicketTypes.Where(shtt => shtt.ShowtimeId == showtime.Id);
+                    }
                 }
 
                 list = new PagingList<ShowtimeDto>(request.PageSize, request.Page, results, total);
@@ -337,7 +361,16 @@ namespace Term7MovieRepository.Repositories.Implement
             switch(filter)
             {
                 case FILTER_NOT_SHOWED_YET:
-                    if (request.IsNotShowedYet) query = " AND StartTime > GETUTCDATE() ";
+                    if (request.IsNotShowedYet) query = " AND sh.StartTime > GETUTCDATE() ";
+                    break;
+                case FILTER_BY_THEATER:
+                    if (request.TheaterId != null) query = " AND sh.TheaterId = @TheaterId ";
+                    break;
+                case FILTER_BY_MOVIE:
+                    if (request.MovieId != null) query = " AND sh.MovieId = @MovieId ";
+                    break;
+                case FILTER_BY_DATE:
+                    if (request.Date != null) query = " AND CAST(sh.StartTime AS DATE) = @Date ";
                     break;
             }
 

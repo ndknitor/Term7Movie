@@ -99,5 +99,11 @@ namespace Term7MovieCore.Data
         public const string MOMO_ITEM_NAME = "Ticket";
 
         public const string REDIS_KEY_MOVIE = "MOVIES";
+
+        public const string REDIS_KEY_TICKET = "TICKETS";
+
+        public const string REDIS_KEY_LOCKED_TICKET = "LOCKED_TICKETS";
+
+        public const string REDIS_KEY_SHOWTIME_ID = "SHOWTIME_";
     }
 }

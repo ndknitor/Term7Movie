@@ -26,7 +26,8 @@ namespace Term7MovieApi.Controllers
         public async Task<IActionResult> GetShowtimesAsync([FromQuery] ShowtimeFilterRequest request)
         {
             long userId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
-            ShowtimeListResponse response = await _showtimeService.GetShowtimesAsync(request, userId);
+            string roleName = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+            ShowtimeListResponse response = await _showtimeService.GetShowtimesAsync(request, userId, roleName);
             return Ok(response);
         }
 
