@@ -7,8 +7,10 @@ class MovieModel {
   int? ageRestrict;
   int? duration;
   String? releaseDate;
-  String? coverImgURL;
-  String? posterImgURL;
+  String? coverImgUrl;
+  String? posterImgUrl;
+  String? trailerUrl;
+  String? description;
 
   MovieModel(
       {this.movieId,
@@ -17,8 +19,8 @@ class MovieModel {
         this.ageRestrict,
         this.duration,
         this.releaseDate,
-        this.coverImgURL,
-        this.posterImgURL});
+        this.coverImgUrl,
+        this.posterImgUrl, this.trailerUrl, this.description});
 
   MovieModel.fromJson(Map<String, dynamic> json) {
     movieId = json['movieId'];
@@ -29,11 +31,13 @@ class MovieModel {
         categories!.add(new Categories.fromJson(v));
       });
     }
-    ageRestrict = json['ageRestrict'];
+    ageRestrict = json['restrictedAge'];
     duration = json['duration'];
     releaseDate = json['releaseDate'];
-    coverImgURL = json['coverImgURL'];
-    posterImgURL = json['posterImgURL'];
+    coverImgUrl = json['coverImgUrl'] ?? json['coverImgURL'];
+    posterImgUrl = json['posterImgUrl'] ?? json['posterImgURL'];
+    trailerUrl = json['trailerUrl'];
+    description = json['description'];
   }
 
   Map<String, dynamic> toJson() {
@@ -41,13 +45,15 @@ class MovieModel {
     data['movieId'] = this.movieId;
     data['title'] = this.title;
     if (this.categories != null) {
-      data['categories'] = this.categories!.map((v) => v.toJson()).toList();
+      data['movieTypes'] = this.categories!.map((v) => v.toJson()).toList();
     }
-    data['ageRestrict'] = this.ageRestrict;
+    data['restrictedAge'] = this.ageRestrict;
     data['duration'] = this.duration;
     data['releaseDate'] = this.releaseDate;
-    data['coverImgURL'] = this.coverImgURL;
-    data['posterImgURL'] = this.posterImgURL;
+    data['coverImgURL'] = this.coverImgUrl;
+    data['posterImgURL'] = this.posterImgUrl;
+    data['trailerUrl'] = this.trailerUrl;
+    data['description'] = this.description;
     return data;
   }
 

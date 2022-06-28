@@ -4,6 +4,11 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:term7moviemobile/controllers/auth_controller.dart';
 import 'package:term7moviemobile/controllers/home_controller.dart';
+import 'package:term7moviemobile/controllers/location_controller.dart';
+import 'package:term7moviemobile/controllers/main_controller.dart';
+import 'package:term7moviemobile/controllers/movies_controller.dart';
+import 'package:term7moviemobile/controllers/onboarding_controller.dart';
+import 'package:term7moviemobile/controllers/profile_controller.dart';
 import 'package:term7moviemobile/routes/routes.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 import 'firebase_options.dart';
@@ -14,7 +19,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Get.put(AuthController());
-  Get.put(HomeController());
+  Get.put(MainController());
+  Get.put(OnBoardingController());
+  Get.put(LocationController());
+
   runApp(MyApp());
 }
 

@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,10 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:term7moviemobile/services/api.dart';
 import 'package:term7moviemobile/services/auth_services.dart';
-import 'package:term7moviemobile/services/room_services.dart';
-import 'package:term7moviemobile/utils/constants.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 
 class AuthController extends GetxController {
