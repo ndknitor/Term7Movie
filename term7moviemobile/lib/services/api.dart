@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:term7moviemobile/services/auth_services.dart';
-// import 'package:get/get.dart' hide Response;
+import 'package:get/get.dart' hide Response;
 import 'package:term7moviemobile/utils/constants.dart';
 
 import '../routes/routes.dart';
@@ -26,7 +26,6 @@ class Api {
       }
     }, onError: (DioError error, handler) async {
       if (error.response?.statusCode == 401) {
-        //prevRequest.sent = true;
         if (await _storage.containsKey(key: 'refreshToken')) {
           if (await refreshToken()) {
             return handler.resolve(await _retry(error.requestOptions));
@@ -56,7 +55,7 @@ class Api {
     final response = await AuthServices.getNewAccessToken(refreshToken);
 
     if (response.statusCode == 200) {
-      accessToken = jsonDecode(response.data?.accessToken);
+      accessToken = response.data['accessToken'];
       print(accessToken);
       await _storage.write(key: 'accessToken', value: accessToken);
       return true;
@@ -64,6 +63,7 @@ class Api {
       // refresh token is wrong
       accessToken = null;
       _storage.deleteAll();
+      Get.toNamed("login");
       return false;
     }
   }

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:term7moviemobile/models/movie_model.dart';
 
 class CarouselSliderDataFound extends StatefulWidget {
@@ -20,72 +21,78 @@ class _CarouselSliderDataFoundState extends State<CarouselSliderDataFound> {
   @override
   void initState() {
     imageSlider = widget.carouselList
-        .map((e) => Container(
-      child: Container(
-        margin: EdgeInsets.all(5.0),
-        child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(14.0)),
-            child: Stack(
-              children: <Widget>[
-                CachedNetworkImage(
-                  imageUrl: e.coverImgURL ?? '',
-                  errorWidget: (context, url, error) =>
-                      Icon(Icons.error),
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Center(
-                        child: CircularProgressIndicator(
-                          value: downloadProgress.progress,
-                        ),
-                      ),
-                  fit: BoxFit.cover,
-                  width: 1000,
-                  height: 1000,
-                ),
-                Positioned(
-                  bottom: 0.0,
-                  left: 0.0,
-                  right: 0.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color.fromARGB(200, 0, 0, 0),
-                          Color.fromARGB(0, 0, 0, 0)
-                        ],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          e.title ?? '',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
+        .map((e) => GestureDetector(
+        onTap: () {
+          print(e.movieId);
+          Get.toNamed("/detail/${e.movieId}");
+        },
+          child: Container(
+                child: Container(
+                  margin: EdgeInsets.all(5.0),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(14.0)),
+                      child: Stack(
+                        children: <Widget>[
+                          CachedNetworkImage(
+                            imageUrl: e.coverImgUrl ?? '',
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => Center(
+                              child: CircularProgressIndicator(
+                                value: downloadProgress.progress,
+                              ),
+                            ),
+                            fit: BoxFit.cover,
+                            width: 1000,
+                            height: 1000,
                           ),
-                        ),
-                        // Text(
-                        //   'Price: 80000',
-                        //   style: TextStyle(
-                        //     color: Colors.white,
-                        //     fontSize: 20.0,
-                        //     fontWeight: FontWeight.bold,
-                        //   ),
-                        // ),
-                      ],
-                    ),
-                  ),
+                          Positioned(
+                            bottom: 0.0,
+                            left: 0.0,
+                            right: 0.0,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color.fromARGB(200, 0, 0, 0),
+                                    Color.fromARGB(0, 0, 0, 0)
+                                  ],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                ),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 20.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    e.title ?? '',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  // Text(
+                                  //   'Price: 80000',
+                                  //   style: TextStyle(
+                                  //     color: Colors.white,
+                                  //     fontSize: 20.0,
+                                  //     fontWeight: FontWeight.bold,
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
                 ),
-              ],
-            )),
-      ),
-    ))
+              ),
+        ))
         .toList();
     super.initState();
   }
@@ -100,7 +107,7 @@ class _CarouselSliderDataFoundState extends State<CarouselSliderDataFound> {
               options: CarouselOptions(
                   autoPlay: true,
                   enlargeCenterPage: true,
-                  aspectRatio: 16/9,
+                  aspectRatio: 16 / 9,
                   // viewportFraction: 1,
                   onPageChanged: (index, reason) {
                     setState(() {
@@ -114,7 +121,7 @@ class _CarouselSliderDataFoundState extends State<CarouselSliderDataFound> {
               return Container(
                 width: 8,
                 height: 8,
-                margin: EdgeInsets.symmetric(vertical: 10,horizontal: 2),
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _current == index

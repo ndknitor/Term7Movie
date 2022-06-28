@@ -1,224 +1,377 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:term7moviemobile/controllers/movie_detail_controller.dart';
+import 'package:term7moviemobile/utils/constants.dart';
+import 'package:term7moviemobile/utils/convert_color.dart';
+import 'package:term7moviemobile/utils/theme.dart';
+import 'package:term7moviemobile/widgets/arrow_back.dart';
+import 'package:term7moviemobile/widgets/movie_detail/company_list.dart';
+import 'package:term7moviemobile/widgets/date_picker.dart';
+import 'package:term7moviemobile/widgets/movie_detail/background_widget.dart';
+import 'package:term7moviemobile/widgets/movie_detail/cast_bar.dart';
+import 'package:term7moviemobile/widgets/movie_detail/trailer_bar.dart';
 
-class DetailScreen extends StatefulWidget {
-  const DetailScreen({Key? key}) : super(key: key);
+class MovieDetailScreen extends StatefulWidget {
+  const MovieDetailScreen({Key? key}) : super(key: key);
 
   @override
-  State<DetailScreen> createState() => _DetailScreenState();
+  State<MovieDetailScreen> createState() => _MovieDetailScreenState();
 }
 
-class _DetailScreenState extends State<DetailScreen> {
+class _MovieDetailScreenState extends State<MovieDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  MovieDetailController controller = Get.put(MovieDetailController());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchMovieDetail();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-        Container(
-        // 40% of our total height
-        height: size.height * 0.5,
-          child: Stack(
-            children: <Widget>[
-              Container(
-                height: size.height * 0.55 - 50,
-                decoration: BoxDecoration(
-                  //borderRadius: BorderRadius.all(Radius.circular(15)),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage('https://cdnimg.vietnamplus.vn/t1200/Uploaded/Mtpyelagtpy/2019_04_29/avengersendgame2904.jpg'),
-                  ),
-                ),
-              ),
-              // Rating Box
-              // Positioned(
-              //   bottom: 0,
-              //   right: 0,
-              //   child: Container(
-              //     // it will cover 90% of our total width
-              //     width: size.width * 0.9,
-              //     height: 100,
-              //     decoration: BoxDecoration(
-              //       color: Colors.white,
-              //       borderRadius: BorderRadius.only(
-              //         bottomLeft: Radius.circular(50),
-              //         topLeft: Radius.circular(50),
-              //       ),
-              //       boxShadow: [
-              //         BoxShadow(
-              //           offset: Offset(0, 5),
-              //           blurRadius: 50,
-              //           color: Color(0xFF12153D).withOpacity(0.2),
-              //         ),
-              //       ],
-              //     ),
-              //     child: Padding(
-              //       padding: EdgeInsets.symmetric(horizontal: 16),
-              //       child: Row(
-              //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //         children: <Widget>[
-              //           Column(
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             children: <Widget>[
-              //               // SvgPicture.asset("assets/icons/star_fill.svg"),
-              //               SizedBox(height: 16 / 4),
-              //               // RichText(
-              //               //   text: TextSpan(
-              //               //     style: TextStyle(color: Colors.black),
-              //               //     children: [
-              //               //       TextSpan(
-              //               //         text: "string",
-              //               //         style: TextStyle(
-              //               //             fontSize: 16, fontWeight: FontWeight.w600),
-              //               //       ),
-              //               //       TextSpan(text: "10\n"),
-              //               //       TextSpan(
-              //               //         text: "150,212",
-              //               //         style: TextStyle(color: Colors.white),
-              //               //       ),
-              //               //     ],
-              //               //   ),
-              //               // ),
-              //             ],
-              //           ),
-              //           Column(
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //             children: <Widget>[
-              //               Container(
-              //                 padding: EdgeInsets.all(6),
-              //                 decoration: BoxDecoration(
-              //                   color: Color(0xFF51CF66),
-              //                   borderRadius: BorderRadius.circular(2),
-              //                 ),
-              //                 child: Text(
-              //                   "5.9",
-              //                   style: TextStyle(
-              //                     fontSize: 16,
-              //                     color: Colors.white,
-              //                     fontWeight: FontWeight.w500,
-              //                   ),
-              //                 ),
-              //               ),
-              //               SizedBox(height: 16 / 4),
-              //               Text(
-              //                 "Meta score",
-              //                 style: TextStyle(
-              //                     fontSize: 16, fontWeight: FontWeight.w500),
-              //               ),
-              //               Text(
-              //                 "62 critic reviews",
-              //                 style: TextStyle(color: Colors.white),
-              //               )
-              //             ],
-              //           )
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // Back Button
-              // SafeArea(child: BackButton()),
-            ],
-          ),
-        ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 16 / 2,
-                horizontal: 16,
-              ),
-              child: Text(
-                'Avengers: End Game',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+    final Size size = MediaQuery.of(context).size;
+    return Scaffold(body: LayoutBuilder(
+      builder: (ctx, constraints) {
+        return Obx(
+          () => LoadingOverlay(
+            isLoading: controller.isLoading.value,
+            color: MyTheme.backgroundColor,
+            progressIndicator: const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(MyTheme.primaryColor),
             ),
-            SizedBox(height: 16 / 2),
-            // TitleDurationAndFabBtn(movie: movie),
-            // Genres(movie: movie),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 16 / 2,
-                horizontal: 16,
-              ),
-              child: Text(
-                "Description",
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Avengers: Hồi kết là phim điện ảnh siêu anh hùng Mỹ ra mắt năm 2019, do Marvel Studios sản xuất và Walt Disney Studios Motion Pictures phân phối độc quyền tạithị trường Bắc Mỹ',
-                style: TextStyle(
-                  color: Color(0xFF737599),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 16 / 2,
-                horizontal: 16,
-              ),
-              child: Text(
-                "Actors",
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Robert Downey Jr. Chris Evans Mark Ruffalo Chris Hemsworth',
-                style: TextStyle(
-                  color: Color(0xFF737599),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 16 / 2,
-                horizontal: 16,
-              ),
-              child: Text(
-                "Director",
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Anthony Russo, Joseph V. "Joe" Russo',
-                style: TextStyle(
-                  color: Color(0xFF737599),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: Text('Book Ticket'),
-                  )
-                ),
-                Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      child: Text('View Trailer'),
+            opacity: 1,
+            child: SingleChildScrollView(
+              child: controller.movie == null
+                  ? Container(
+                      width: size.width,
+                      height: size.height,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Can't find the movie",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 18),
+                          ),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                                primary: MyTheme.primaryColor),
+                            icon: Icon(Icons.arrow_back_rounded, size: 18),
+                            label: Text('Go Back'),
+                            onPressed: () {
+                              Get.back();
+                            },
+                          )
+                        ],
+                      ),
                     )
-                ),
-              ],
+                  : Stack(
+                      children: [
+                        BackgroundWidget(
+                          size: size,
+                          coverImgUrl: controller.movie?.coverImgUrl ??
+                              Constants.defaultImage,
+                        ),
+                        Container(
+                          height: size.height / 3,
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  colors: [
+                                MyTheme.primaryColor.withOpacity(0.3),
+                                MyTheme.primaryColor.withOpacity(0.1)
+                              ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter)),
+                        ),
+                        const ArrowBack(color: Colors.white,),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 16, top: size.height / 4),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: size.width / 2.5,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        controller.movie?.posterImgUrl ??
+                                            'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                      child: Column(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(
+                                            left: 8,
+                                            bottom: 8,
+                                            top: size.height / 10),
+                                        width: size.width,
+                                        child: Text(
+                                          controller.movie?.title ?? '',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 20,
+                                              height: 1.2,
+                                              decoration: TextDecoration.none,
+                                              color: MyTheme.textColor),
+                                        ),
+                                      ),
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        // physics: NeverScrollableScrollPhysics(),
+                                        child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 8, bottom: 8),
+                                          width: size.width,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: controller
+                                                .movie!.categories!
+                                                .map((e) =>
+                                                    Builder(builder: (context) {
+                                                      return Container(
+                                                        margin: EdgeInsets.only(
+                                                            right: 8),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                          color: HexColor(
+                                                                  e.color!)
+                                                              .withOpacity(0.2),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                                vertical: 2,
+                                                                horizontal: 6),
+                                                        child: Text(
+                                                          e.name!,
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 10,
+                                                            color: HexColor(
+                                                                e.color!),
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .none,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }))
+                                                .toList(),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8, bottom: 8),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(right: 8),
+                                              width: 30,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                  color: controller.movie?.ageRestrict ==
+                                                      0 ? MyTheme.successColor : MyTheme.errorColor),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 2, horizontal: 6),
+                                              child: Text(
+                                                controller.movie?.ageRestrict ==
+                                                        0
+                                                    ? 'P'
+                                                    : 'C' + controller.movie!.ageRestrict.toString(),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 10,
+                                                  color: Colors.white,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.access_time,
+                                                    color: MyTheme.primaryColor,
+                                                    size: 18),
+                                                SizedBox(
+                                                  width: 2,
+                                                ),
+                                                Text(
+                                                  controller.movie!.duration
+                                                          .toString() +
+                                                      ' min',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 10,
+                                                    color: MyTheme.textColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.date_range,
+                                                    color: MyTheme.primaryColor,
+                                                    size: 18),
+                                                SizedBox(
+                                                  width: 2,
+                                                ),
+                                                Text(
+                                                  controller.movie!.releaseDate
+                                                      .toString()
+                                                      .split('T')
+                                                      .first,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 10,
+                                                    color: MyTheme.textColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8, bottom: 8),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.language,
+                                                color: MyTheme.primaryColor,
+                                                size: 22),
+                                            SizedBox(
+                                              width: 4,
+                                            ),
+                                            Text(
+                                              'Languages:',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w300,
+                                                fontSize: 12,
+                                                color: MyTheme.textColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ))
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: size.height + 200,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    alignment: Alignment.center,
+                                    width: size.width,
+                                    child: TabBar(
+                                      tabs: const [
+                                        Tab(text: 'About Movie'),
+                                        Tab(text: 'Showtime'),
+                                      ],
+                                      controller: _tabController,
+                                      indicatorSize: TabBarIndicatorSize.label,
+                                      labelColor: MyTheme.primaryColor,
+                                      unselectedLabelColor: MyTheme.grayColor,
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                      unselectedLabelStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                      indicatorColor: MyTheme.primaryColor,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TabBarView(
+                                      controller: _tabController,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            buildTitle('Description'),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 24),
+                                              child: Text(
+                                                controller.movie?.description ??
+                                                    'There is no description',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14,
+                                                    color: Colors.black54,
+                                                    decoration:
+                                                        TextDecoration.none),
+                                              ),
+                                            ),
+                                            buildTitle('Actors'),
+                                            CastBar(size: size),
+                                            buildTitle('Director'),
+                                            CastBar(size: size),
+                                            buildTitle('Trailer'),
+                                            // const TrailerBar()
+                                          ],
+                                        ),
+                                        Column(
+                                            children: [
+                                              MyDatePicker(),
+                                              CompanyList(),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
             ),
-          ],
-        ),
+          ),
+        );
+      },
+    ));
+  }
+
+  Padding buildTitle(String content) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Text(
+        content,
+        style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 22,
+            decoration: TextDecoration.none,
+            color: MyTheme.textColor),
       ),
     );
   }
