@@ -9,17 +9,22 @@ namespace Term7MovieRepository.Cache.Implement
     public class CacheProvider : ICacheProvider
     {
         private readonly IDistributedCache _distributedCache;
-        private readonly DistributedCacheEntryOptions options;
+        public DistributedCacheEntryOptions CacheOption { set; get; }
 
         public CacheProvider(IDistributedCache distributedCache)
         {
             _distributedCache = distributedCache;
 
-            options = new DistributedCacheEntryOptions();
+            CacheOption = new DistributedCacheEntryOptions();
 
-            options.SetAbsoluteExpiration(DateTime.UtcNow.AddMinutes(int.MaxValue));
+            CacheOption.SetAbsoluteExpiration(DateTime.UtcNow.AddMinutes(int.MaxValue));
 
         }
+
+        public CacheProvider(IDistributedCache distributedCache, DistributedCacheEntryOptions options) : this(distributedCache)
+        {
+            this.CacheOption = options;
+        }   
 
         public async Task<T> GetValueAsync<T>(string key)
         {
@@ -28,12 +33,19 @@ namespace Term7MovieRepository.Cache.Implement
             return value != null ? value.ToObject<T>() : default;
         }
 
-        public async Task SetValueAsync (string key, object value)
+        public T GetValue<T>(string key)
         {
-            await _distributedCache.SetStringAsync(key, value.ToJson(), options);
+            string value = _distributedCache.GetString(key);
+
+            return value != null ? value.ToObject<T>() : default;
         }
 
-        public void SetValue(string key, object value) => _distributedCache.SetString(key, value.ToJson(), options);
+        public async Task SetValueAsync (string key, object value)
+        {
+            await _distributedCache.SetStringAsync(key, value.ToJson(), CacheOption);
+        }
+
+        public void SetValue(string key, object value) => _distributedCache.SetString(key, value.ToJson(), CacheOption);
         
         public async Task RemoveAsync(string key)
         {

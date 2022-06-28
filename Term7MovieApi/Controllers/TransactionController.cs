@@ -21,7 +21,7 @@ namespace Term7MovieApi.Controllers
             _transactionService = transactionService;
         }
 
-        [Authorize(Roles = Constants.ROLE_CUSTOMER)]
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)] // policy check if ticket is available
         [HttpPost]
         public async Task<IActionResult> CreateTransactionAsync(TransactionCreateRequest request)
         {

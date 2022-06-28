@@ -48,13 +48,19 @@ namespace Term7MovieApi.BackgroundServices
 
         public void DoWork(object state)
         {
-            _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
+            try
+            {
+                _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
 
-            IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
+                IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
 
-            _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
-            _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);
-            _cacheProvider.SetValue(Constants.REDIS_KEY_MOVIE, movies);
+                _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
+                _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);
+                _cacheProvider.SetValue(Constants.REDIS_KEY_MOVIE, movies);
+            } catch
+            {
+                _logger.LogDebug("Catch Redis Exception");
+            }
         }
     }
 }
