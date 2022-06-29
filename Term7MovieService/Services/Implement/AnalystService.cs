@@ -12,6 +12,7 @@ namespace Term7MovieService.Services.Implement
         private readonly IUnitOfWork _unitOfWork;
         private readonly IShowtimeRepository showRepository;
         private readonly ITicketRepository ticketRepository;
+        private readonly ICompanyRepository companyRepository;
         private readonly ITransactionHistoryRepository tranHisRepository;
 
         public AnalystService(IUnitOfWork unitOfWork)
@@ -20,10 +21,15 @@ namespace Term7MovieService.Services.Implement
             showRepository = _unitOfWork.ShowtimeRepository;
             ticketRepository = _unitOfWork.TicketRepository;
             tranHisRepository = _unitOfWork.TransactionHistoryRepository;
+            companyRepository = _unitOfWork.CompanyRepository;
         }
 
-        public async Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid)
+        public async Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid, long? managerid)
         {
+            if (managerid == null)
+                throw new Exception("403");
+            if (await companyRepository.GetManagerIdFromCompanyId(companyid) != managerid)
+                throw new Exception("403");
             var result = await GettingAnalystForOneWeek(companyid);
             bool S1mple = IsItSundayYet(DateTime.UtcNow);
             return new DashboardResponse
