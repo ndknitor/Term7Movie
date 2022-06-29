@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Extensions;
 using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
@@ -12,22 +13,22 @@ namespace Term7MovieApi.Controllers
     public class AnalystController : ControllerBase
     {
         private readonly IAnalystService _anaService;
-        private readonly ILogger<AnalystController> _logger;
+        //private readonly ILogger<AnalystController> _logger;
 
-        public AnalystController(IAnalystService anaService, ILogger<AnalystController> logger)
+        public AnalystController(IAnalystService anaService/*, ILogger<AnalystController> logger*/)
         {
             _anaService = anaService;
-            _logger = logger;
+            //_logger = logger;
         }
 
         [HttpGet]
-        //[Authorize(Roles = Constants.ROLE_MANAGER)]
+        [Authorize(Roles = Constants.ROLE_MANAGER)]
         public async Task<IActionResult> QuickDashboard(int companyid)
         {
+            long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
             //gonna check manager later
-            Stopwatch slow = Stopwatch.StartNew();
-            var result = await _anaService.GetQuickAnalystForDashboard(companyid);
-            _logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
+            var result = await _anaService.GetQuickAnalystForDashboard(companyid, managerId);
+            //_logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
             return Ok(result);
         }
     }

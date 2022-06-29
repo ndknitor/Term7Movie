@@ -11,6 +11,7 @@ using Term7MovieCore.Data.Dto.Errors;
 using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
 using Newtonsoft.Json;
+using Term7MovieCore.Data.Exceptions;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -248,9 +249,8 @@ namespace Term7MovieRepository.Repositories.Implement
 
         public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies()
         {
-            if (!await _context.Database.CanConnectAsync())
-                //throw new Exception();
-                return null;
+            if (!await _context.Database.CanConnectAsync())    
+                throw new DbOperationException("DBCONNECTION");
             List<SmallMovieHomePageDTO> movies = new List<SmallMovieHomePageDTO>();
             var query = _context.Movies
                 .Where(a => a.ReleaseDate > DateTime.Now
@@ -273,7 +273,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetEightLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
-                return null;
+                throw new DbOperationException("DBCONNECTION");
             //return null;
             List<Movie> movies = new List<Movie>();
             var query = _context.Movies
@@ -329,7 +329,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetRemainInformationForHomePage(int[] MovieIds)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception("DBCONNECTION");
+                throw new DbOperationException("DBCONNECTION");
             List <Movie> result = new List<Movie>();
             for(int i = 0; i < MovieIds.Length; i++)
             {
@@ -433,7 +433,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<bool> UpdateMovie(MovieUpdateRequest request)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new Exception("DBCONNECTION");
+                throw new DbOperationException("DBCONNECTION");
             if (await _context.Movies.FindAsync(request.MovieId) == null)
                 throw new Exception("MOVIENOTFOUND");
             bool DoesItGood = true;

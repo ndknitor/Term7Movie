@@ -82,6 +82,7 @@ namespace Term7MovieService.Services.Implement
 
             if (movie == null) throw new DbNotFoundException();
 
+            //movie.BeautifyActors = JsonConvert.DeserializeObject<string[]>("test500error");
             movie.BeautifyActors = movie.Actors.ToObject<string[]>();
             movie.LanguageList = movie.Actors.ToObject<string[]>();
 
@@ -97,7 +98,7 @@ namespace Term7MovieService.Services.Implement
             //Handle Error
             IEnumerable<SmallMovieHomePageDTO> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
             if (!rawData.Any()) 
-                return new IncomingMovieResponse { Message = "DATABASE IS EMPTY" };
+                return new IncomingMovieResponse { Message = "Empty database" };
 
             //Start making process
             return new IncomingMovieResponse
@@ -109,13 +110,9 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<MovieNotListResponse> GetEightLatestMovieForHomepage()
         {
-            //Handle Error
-            IMovieRepository movierepo = _unitOfWork.MovieRepository;
-            if (movierepo == null)
-                return new MovieNotListResponse { Message = "REPOSITORY NULL" };
             IEnumerable<Movie> rawData = await movieRepository.GetEightLatestMovies();
             if (!rawData.Any())
-                return new MovieNotListResponse { Message = "DATABASE IS EMPTY" };
+                return new MovieNotListResponse { Message = "Empty database" };
 
             //rawData = rawData.ToList().OrderByDescending(a => a.ReleaseDate).Take(8);
             

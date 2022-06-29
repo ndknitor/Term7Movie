@@ -4,6 +4,6 @@ namespace Term7MovieService.Services.Interface
 {
     public interface IAnalystService
     {
-        Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid);
+        Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid, long? managerid);
     }
 }
