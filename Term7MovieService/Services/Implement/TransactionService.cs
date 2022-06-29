@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using AutoMapper;
+using Microsoft.Extensions.Options;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Enum;
@@ -18,54 +19,65 @@ namespace Term7MovieService.Services.Implement
         private readonly ITransactionRepository transactionRepo;
         private readonly ITicketRepository ticketRepo;
         private readonly IPaymentService _paymentService;
-        public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService)
+        private readonly IMapper mapper;
+
+        private object lockObject;
+
+        public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             transactionRepo = _unitOfWork.TransactionRepository;
             ticketRepo = _unitOfWork.TicketRepository;
             _paymentService = paymentService;
+            this.mapper = mapper;
         }
 
-        public async Task<TransactionCreateResponse> CreateTransactionAsync(TransactionCreateRequest request, UserDTO user)
+        public TransactionCreateResponse CreateTransaction(TransactionCreateRequest request, UserDTO user)
         {
-            IEnumerable<Ticket> tickets = await ticketRepo.GetTicketByIdListAsync(request.IdList);
-
-            decimal total = tickets.Sum(t => t.SellingPrice);
-
-
-            // create transaction - pending
-            Transaction transaction = new Transaction
+            lock(lockObject)
             {
-                Id = Guid.NewGuid(),
-                CustomerId = user.Id,
-                PurchasedDate = DateTime.UtcNow,
-                StatusId = (int)TransactionStatusEnum.Pending,
-                Total = total,
-            };
+                IEnumerable<TicketDto> tickets = ticketRepo.GetTicketByIdList(request.IdList);
 
-            await transactionRepo.CreateTransaction(transaction);
+                decimal total = tickets.Sum(t => t.SellingPrice);
 
-            if (_unitOfWork.HasChange())
-            {
-                await _unitOfWork.CompleteAsync();
 
-                // lock ticket
-                await ticketRepo.LockTicketAsync(request.IdList);
-
-                // create momo payment request
-                transaction.Tickets = tickets.ToList();
-
-                var result = await _paymentService.CreateMomoPaymentRequestAynsc(transaction, user);
-
-                if (result == null) throw new DbOperationException("Cannot create momo payment request");
-
-                return new TransactionCreateResponse { 
-                    Result = result,
-                    Message = Constants.MESSAGE_SUCCESS 
+                // create transaction - pending
+                Transaction transaction = new Transaction
+                {
+                    Id = Guid.NewGuid(),
+                    CustomerId = user.Id,
+                    PurchasedDate = DateTime.UtcNow,
+                    StatusId = (int)TransactionStatusEnum.Pending,
+                    ValidUntil = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE - 1),
+                    Total = total,
                 };
-            }
 
-            throw new DbOperationException();
+                transactionRepo.CreateTransaction(transaction);
+
+                TransactionDto transactionDto = mapper.Map<TransactionDto>(transaction);
+
+                if (_unitOfWork.Complete())
+                {
+
+                    // lock ticket
+                    ticketRepo.LockTicket(request.IdList);
+
+                    // create momo payment request
+                    transactionDto.Tickets = tickets;
+
+                    var result = _paymentService.CreateMomoPaymentRequest(transactionDto, user);
+
+                    if (result == null) throw new DbOperationException("Cannot create momo payment request");
+
+                    return new TransactionCreateResponse
+                    {
+                        Result = result,
+                        Message = Constants.MESSAGE_SUCCESS
+                    };
+                }
+
+                throw new DbOperationException();
+            }
             
 
             // successs => change transaction success => status add to history o controller khasc

@@ -16,9 +16,9 @@ namespace Term7MovieRepository.Repositories.Implement
             Transaction transaction = null;
             return transaction;
         }
-        public async Task CreateTransaction(Transaction transaction)
+        public void CreateTransaction(Transaction transaction)
         {
-            await _context.Transactions.AddAsync(transaction);
+            _context.Transactions.Add(transaction);
         }
         public async Task UpdateTransaction(Guid id, int statusId, int momoStatus)
         {

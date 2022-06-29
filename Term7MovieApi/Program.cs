@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Caching.Redis;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Term7MovieCore.Entities;
@@ -45,6 +43,8 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 // inject services from Term7MovieService.Services
 builder.Services.InjectProjectServices();
 
+builder.Services.ConfigureRedisCacheService(config);
+
 // create instance for config in appsettings.json
 builder.Services.ConfigureOptions(config);
 builder.Services.ConfigureBackgroundService();
@@ -74,11 +74,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.ConfigureAuthorization();
 
-builder.Services.AddDistributedRedisCache(option =>
-{
-    option.Configuration = builder.Configuration.GetConnectionString("Redis");
-
-});
 builder.Services.AddCors(option =>
 {
     option.AddPolicy("Default", policy =>
@@ -88,7 +83,6 @@ builder.Services.AddCors(option =>
 });
 
 builder.Services.AddSwaggerGen();
-builder.Services.AddDistributedMemoryCache();
 
 if (builder.Environment.IsProduction())
 {

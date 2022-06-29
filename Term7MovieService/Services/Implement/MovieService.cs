@@ -56,7 +56,7 @@ namespace Term7MovieService.Services.Implement
             foreach(var m in movies.Results)
             {
                 m.BeautifyActors = m.Actors.ToObject<string[]>();
-                m.LanguageList = m.Actors.ToObject<string[]>();
+                m.LanguageList = m.Languages.ToObject<string[]>();
             }
 
             return new MovieListResponse
@@ -84,7 +84,7 @@ namespace Term7MovieService.Services.Implement
 
             //movie.BeautifyActors = JsonConvert.DeserializeObject<string[]>("test500error");
             movie.BeautifyActors = movie.Actors.ToObject<string[]>();
-            movie.LanguageList = movie.Actors.ToObject<string[]>();
+            movie.LanguageList = movie.Languages.ToObject<string[]>();
 
             return new ParentResultResponse
             {

@@ -21,5 +21,6 @@ namespace Term7MovieCore.Data.Dto
         public DateTime? LockedTime { set; get; }
         public Guid? ShowtimeTicketTypeId { set; get; }
         public ShowtimeTicketTypeDto ShowtimeTicketType { set; get; }
+        public TicketTypeDto TicketType { set; get; }
     }
 }
