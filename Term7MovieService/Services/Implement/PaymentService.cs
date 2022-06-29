@@ -35,7 +35,7 @@ namespace Term7MovieService.Services.Implement
             paymentRequestRepo = _unitOfWork.PaymentRequestRepository;
         }
 
-        public async Task<MomoPaymentCreateResponse> CreateMomoPaymentRequestAynsc(Transaction transaction, UserDTO user)
+        public MomoPaymentCreateResponse CreateMomoPaymentRequest(TransactionDto transaction, UserDTO user)
         {
             MomoPaymentCreateResponse response = null;
             
@@ -62,15 +62,20 @@ namespace Term7MovieService.Services.Implement
 
                 StringContent content = new StringContent(request.ToJson(), Encoding.UTF8, MediaTypeNames.Application.Json);
 
-                var res = await client.PostAsync(momoOption.PayUrl, content);
+                var postRequest = new HttpRequestMessage(HttpMethod.Post, momoOption.PayUrl);
+
+                var res = client.Send(postRequest);
 
                 if (res.IsSuccessStatusCode)
                 {
-                    await _unitOfWork.PaymentRequestRepository.InsertPaymentRequestAsync(request);
-                    await _unitOfWork.CompleteAsync();
+                    _unitOfWork.PaymentRequestRepository.InsertPaymentRequest(request);
 
-                    string message = await res.Content.ReadAsStringAsync();
-                    response = message.ToObject<MomoPaymentCreateResponse>();
+                    using(var reader = new StreamReader(res.Content.ReadAsStream()))
+                    {
+                        var message = reader.ReadToEnd();
+
+                        response = message.ToObject<MomoPaymentCreateResponse>();
+                    }
                 }
             }
 
@@ -107,7 +112,7 @@ namespace Term7MovieService.Services.Implement
             }
         }
 
-        private IEnumerable<MomoItemModel> MapItemFromTicket(Transaction transaction)
+        private IEnumerable<MomoItemModel> MapItemFromTicket(TransactionDto transaction)
         {
             return _mapper.Map<IEnumerable<MomoItemModel>>(transaction.Tickets);
         }

@@ -52,7 +52,7 @@ namespace Term7MovieApi.Profiles
                     option => option.MapFrom(src => src.FullName)
                 );
 
-            CreateMap<Ticket, MomoItemModel>()
+            CreateMap<TicketDto, MomoItemModel>()
                 .BeforeMap((src, des) =>
                 {
                     des.Quantity = 1;
@@ -66,6 +66,8 @@ namespace Term7MovieApi.Profiles
                     des => des.Name,
                     option => option.MapFrom(src =>  Constants.MOMO_ITEM_NAME + " - " + src.Seat.SeatType.Name)
                 );
+
+            CreateMap<Transaction, TransactionDto>();
 
             CreateMap<MomoIPNRequest, MomoPaymentCreateRequest>();
         }          

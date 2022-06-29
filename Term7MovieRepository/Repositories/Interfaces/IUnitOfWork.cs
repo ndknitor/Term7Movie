@@ -28,6 +28,7 @@
         bool HasChange();
 
         Task<bool> CompleteAsync();
+        bool Complete();
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Options;
@@ -20,9 +21,9 @@ namespace Term7MovieApi.BackgroundServices
 
         private const int DELAY_FIRST_START_IN_MINUTE = 1;
 
-        public DistributedCacheSupportService(IDistributedCache distributedCache, ILogger<DistributedCacheSupportService> logger, IOptions<ConnectionOption> option)
+        public DistributedCacheSupportService(IConnectionMultiplexer connectionMultiplexer, ILogger<DistributedCacheSupportService> logger, IOptions<ConnectionOption> option)
         {
-            _cacheProvider = new CacheProvider(distributedCache);
+            _cacheProvider = new CacheProvider(connectionMultiplexer);
             _logger = logger;
             movieRepo = new MovieRepository(null, option.Value);
         }
