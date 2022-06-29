@@ -25,20 +25,11 @@ namespace Term7MovieApi.Controllers
         [Authorize(Roles = Constants.ROLE_MANAGER)]
         public async Task<IActionResult> QuickDashboard(int companyid)
         {
-            try
-            {
-                long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
-                //gonna check manager later
-                var result = await _anaService.GetQuickAnalystForDashboard(companyid, managerId);
-                //_logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
-                return Ok(result);
-            }
-            catch(Exception ex)
-            {
-                if (ex.Message == "403")
-                    return Forbid();
-                throw new Exception(ex.Message); //will exceptionfilter catch this one?
-            }
+            long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            //gonna check manager later
+            var result = await _anaService.GetQuickAnalystForDashboard(companyid, managerId);
+            //_logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
+            return Ok(result);
         }
     }
 }

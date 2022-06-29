@@ -1,6 +1,7 @@
 ﻿
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto.Analyst;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Response.Analyst;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
@@ -27,9 +28,9 @@ namespace Term7MovieService.Services.Implement
         public async Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid, long? managerid)
         {
             if (managerid == null)
-                throw new Exception("403");
+                throw new DbForbiddenException();
             if (await companyRepository.GetManagerIdFromCompanyId(companyid) != managerid)
-                throw new Exception("403");
+                throw new DbForbiddenException();
             var result = await GettingAnalystForOneWeek(companyid);
             bool S1mple = IsItSundayYet(DateTime.UtcNow);
             return new DashboardResponse
