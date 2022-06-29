@@ -8,6 +8,6 @@ namespace Term7MovieCore.Data.Request
 {
     public class TheaterFilterRequest : ParentFilterRequest
     {
-
+        public bool IsIncludeRoom { set; get;} = true;
     }
 }

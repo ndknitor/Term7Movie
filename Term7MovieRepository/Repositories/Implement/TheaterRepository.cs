@@ -49,6 +49,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     GetAdditionalTheaterFilter(request, FILTER_THEATER_NAME);
 
                 string roomQuery =
+                    (!request.IsIncludeRoom) ? "" :
                     @" ; SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status 
                          FROM Rooms 
                          WHERE Status = 1 ";
@@ -61,12 +62,15 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 int total = await multiQ.ReadFirstOrDefaultAsync<int>();
 
-                IEnumerable<RoomDto> rooms = await multiQ.ReadAsync<RoomDto>();
-
-                foreach(TheaterDto t in results)
+                if (request.IsIncludeRoom)
                 {
-                    t.Rooms = rooms.Where(r => r.TheaterId == t.Id);
-                    t.TotalRoom = t.Rooms.Count();
+                    IEnumerable<RoomDto> rooms = await multiQ.ReadAsync<RoomDto>();
+
+                    foreach (TheaterDto t in results)
+                    {
+                        t.Rooms = rooms.Where(r => r.TheaterId == t.Id);
+                        t.TotalRoom = t.Rooms.Count();
+                    }
                 }
 
                 list = new PagingList<TheaterDto>(pageSize: request.PageSize, page: request.Page, results, total);
