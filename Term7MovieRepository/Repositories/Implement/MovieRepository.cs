@@ -36,7 +36,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string query =
                     " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages " +
                     " FROM Movies " +
-                    " WHERE ReleaseDate >= ( GETUTCDATE() - 60)  " +
+                    " WHERE ReleaseDate >= ( GETUTCDATE() - 60) AND Title LIKE '%" + request.SearchKey + "%'" +
                     " ORDER BY Id " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";

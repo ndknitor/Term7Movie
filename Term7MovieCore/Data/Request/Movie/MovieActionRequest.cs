@@ -21,6 +21,7 @@ namespace Term7MovieCore.Data.Request.Movie
         [Range(-180, 180)]
         public double Longitude { get; set; }
         [Range(-90, 90)]
+        //validate gòi mà
         public double Latitude { get; set; }
     }
 }

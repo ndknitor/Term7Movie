@@ -33,15 +33,13 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        //lmao
-        [HttpGet]//tôi mất 25p chỉ để hiểu rằng t sẽ làm thế này (:
+        [HttpGet]
         public async Task<IActionResult> GetMoviesForSpecificAction([FromQuery] MovieActionRequest request)
         {
-
             switch(request.Action)
             {
                 case "page":
-                    return await GetAllMovie(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize});
+                    return await GetAllMovie(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize, SearchKey = request.SearchKey});
                 case "home":
                     return await GetMoviesForMobileHome(new MovieHomePageRequest { Latitude = request.Latitude, Longtitude = request.Longitude });
                 case "incoming":

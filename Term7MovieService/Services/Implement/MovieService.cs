@@ -48,7 +48,8 @@ namespace Term7MovieService.Services.Implement
                 movies = await movieRepository.GetAllMovie(request);
             } else
             {
-                var pagingList = list.Skip(request.PageSize * (request.Page - 1)).Take(request.PageSize);
+                var pagingList = list.Where(xxx => xxx.Title.Contains(request.SearchKey))
+                    .Skip(request.PageSize * (request.Page - 1)).Take(request.PageSize);
 
                 movies = new PagingList<MovieModelDto>(request.PageSize, request.Page, pagingList, list.Count());
             }
