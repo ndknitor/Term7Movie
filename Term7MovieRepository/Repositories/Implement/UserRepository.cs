@@ -300,7 +300,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                     break;
                 case FILTER_BY_ROLE:
-                    if (request.IsManagerOnly)
+                    if (request.IsManagerOnly || (!request.IsManagerOnly && request.IsCustomerOnly))
                     {
                         query = " AND ur.RoleId = @RoleId ";
                     }
