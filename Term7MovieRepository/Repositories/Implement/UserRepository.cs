@@ -20,6 +20,7 @@ namespace Term7MovieRepository.Repositories.Implement
         private ConnectionOption _connectionOption;
 
         private const string FILTER_BY_EMAIL = "Email";
+        private const string FILTER_BY_ROLE = "ROLE";
         public UserRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
@@ -38,9 +39,10 @@ namespace Term7MovieRepository.Repositories.Implement
                 string count = @" SELECT COUNT(*)  
                                   FROM Users u LEFT JOIN Companies c ON u.CompanyId = c.Id
                                        JOIN UserRoles ur ON u.Id = ur.UserId
-                                  WHERE ur.RoleId != @RoleId " +
+                                  WHERE ur.RoleId != @RoleAdmin " +
 
                                   GetAdditionUserFilter(request, FILTER_BY_EMAIL) +
+                                  GetAdditionUserFilter(request, FILTER_BY_ROLE) +
 
                                @" ; ";
 
@@ -49,16 +51,28 @@ namespace Term7MovieRepository.Repositories.Implement
                                      JOIN UserRoles ur ON u.Id = ur.UserId
                                      JOIN Roles r ON r.Id = ur.RoleId
                                      JOIN UserStatus us ON u.StatusId = us.Id
-                                WHERE ur.RoleId != @RoleId " +
+                                WHERE ur.RoleId != @RoleAdmin " +
 
                                 GetAdditionUserFilter(request, FILTER_BY_EMAIL) +
+                                GetAdditionUserFilter(request, FILTER_BY_ROLE) +
 
                              @" ORDER BY u.Id 
                                 OFFSET @offset ROWS
                                 FETCH NEXT @fetch ROWS ONLY ";
 
+                int roleId = 0;
 
-                object param = new { offset, fetch, RoleId = (int)RoleEnum.Admin, Email = request.Email };
+                if (request.IsManagerOnly)
+                {
+                    roleId = (int)RoleEnum.Manager;
+                }
+
+                if (!request.IsManagerOnly && request.IsCustomerOnly)
+                {
+                    roleId = (int)RoleEnum.Customer;
+                }
+
+                object param = new { offset, fetch, RoleId = roleId, RoleAdmin = (int) RoleEnum.Admin, request.Email };
 
                 var multiQ = await con.QueryMultipleAsync(count + sql, param);
 
@@ -284,6 +298,12 @@ namespace Term7MovieRepository.Repositories.Implement
                         query = " AND Email LIKE CONCAT('%', @Email, '%') "; // param { Email = "%" + email + "%" de dung LIKE sql}
                     }
 
+                    break;
+                case FILTER_BY_ROLE:
+                    if (request.IsManagerOnly)
+                    {
+                        query = " AND ur.RoleId = @RoleId ";
+                    }
                     break;
             }
 
