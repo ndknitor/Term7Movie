@@ -37,7 +37,7 @@ namespace Term7MovieService.Services.Implement
             tiktokRepository = _unitOfWork.TicketRepository;
         }
 
-        public async Task<MovieListResponse> GetAllMovie(ParentFilterRequest request)
+        public async Task<MovieListResponse> GetAllMovie(MovieFilterRequest request)
         {
             PagingList<MovieModelDto> movies;
 
@@ -48,6 +48,20 @@ namespace Term7MovieService.Services.Implement
                 movies = await movieRepository.GetAllMovie(request);
             } else
             {
+                if (!string.IsNullOrEmpty(request.SearchKey))
+                {
+                    request.SearchKey = request.SearchKey.ToLower();
+                    list = list.Where(m => m.Title.ToLower().Contains(request.SearchKey));
+                }
+
+                if (request.IsAvailableOnly)
+                {
+                    list = list.Where(m => m.IsAvailable);
+                } else
+                {
+                    if (request.IsDisabledOnly) list = list.Where(m => !m.IsAvailable);
+                }
+                
                 var pagingList = list.Skip(request.PageSize * (request.Page - 1)).Take(request.PageSize);
 
                 movies = new PagingList<MovieModelDto>(request.PageSize, request.Page, pagingList, list.Count());
@@ -448,22 +462,17 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<ParentResponse> DeleteMovie(int movieid)
         {
-            ParentResponse response = new ParentResponse();
-            try
+            await movieRepository.DeleteMovie(movieid);
+
+            if (await _unitOfWork.CompleteAsync())
             {
-                //hiện tại bên repo đang false => ko có connect
-                //throw exception tạm thời để track bug vì đang trong giai đoạn development :v
-                if (await movieRepository.DeleteMovie(movieid))
-                    response.Message = Constants.MESSAGE_SUCCESS;
-                else response.Message = "Failed to deleted this movie";
+                return new ParentResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS
+                };
             }
-            catch(Exception ex)
-            {
-                if(ex.Message == "MOVIENOTFOUND")
-                    return new ParentResponse { Message = "No Movie was found for id: " + movieid };
-                throw new Exception(ex.Message);
-            }
-            return response;
+
+            throw new DbNotFoundException();
         }
 
         /* --------------------- END CUD MOVIE ------------- */

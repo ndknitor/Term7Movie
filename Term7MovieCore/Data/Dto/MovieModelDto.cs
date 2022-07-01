@@ -20,6 +20,7 @@
         public string Languages { set; get; }
 
         public string[] LanguageList { set; get; }
+        public bool IsAvailable { set; get; }
         public IEnumerable<CategoryDTO> Categories { set; get; }
     }
 }

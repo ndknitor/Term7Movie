@@ -21,7 +21,7 @@ namespace Term7MovieService.Services.Implement
         private readonly IPaymentService _paymentService;
         private readonly IMapper mapper;
 
-        private object lockObject;
+        private object lockObject = new object();
 
         public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService, IMapper mapper)
         {

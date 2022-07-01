@@ -21,12 +21,16 @@ namespace Term7MovieRepository.Repositories.Implement
         private AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
 
+        private const string FILTER_BY_TITLE = "Title";
+        private const string FILTER_BY_AVAILABLE = "Available";
+        private const string FILTER_BY_DISABLED = "Disabled";
+
         public MovieRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
             _connectionOption = connectionOption;
         }
-        public async Task<PagingList<MovieModelDto>> GetAllMovie(ParentFilterRequest request)
+        public async Task<PagingList<MovieModelDto>> GetAllMovie(MovieFilterRequest request)
         {
             PagingList<MovieModelDto> pagingList;
             int fetch = request.PageSize;
@@ -34,14 +38,26 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string query =
-                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages " +
-                    " FROM Movies " +
-                    " WHERE ReleaseDate >= ( GETUTCDATE() - 60)  " +
-                    " ORDER BY Id " +
-                    " OFFSET @offset ROWS " +
-                    " FETCH NEXT @fetch ROWS ONLY ; ";
+                    @" SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages, IsAvailable 
+                       FROM Movies 
+                       WHERE 1=1  " +
 
-                string count = " SELECT COUNT(1) FROM Movies WHERE ReleaseDate >= ( GETUTCDATE() - 60) ; ";
+                    GetAdditionalMovieFilter(request, FILTER_BY_TITLE) +
+                    GetAdditionalMovieFilter(request, FILTER_BY_AVAILABLE) +
+                    GetAdditionalMovieFilter(request, FILTER_BY_DISABLED) +
+
+                    @" ORDER BY Id 
+                       OFFSET @offset ROWS 
+                       FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string count =
+                    @" SELECT COUNT(1) 
+                       FROM Movies 
+                       WHERE 1=1 " +
+                    GetAdditionalMovieFilter(request, FILTER_BY_TITLE) +
+                    GetAdditionalMovieFilter(request, FILTER_BY_AVAILABLE) +
+                    GetAdditionalMovieFilter(request, FILTER_BY_DISABLED) +
+                    " ; ";
 
                 string category = 
                     " SELECT mc.MovieId, c.Id, c.Name, c.Color " +
@@ -79,9 +95,8 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string query =
-                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages " +
+                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages, IsAvailable " +
                     " FROM Movies " +
-                    " WHERE ReleaseDate >= ( GETUTCDATE() - 60) " +
                     " ORDER BY ReleaseDate DESC ; ";
 
                 string category =
@@ -113,7 +128,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string query =
-                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages " +
+                    " SELECT Id, Title, ReleaseDate, Duration, RestrictedAge, PosterImageUrl, CoverImageUrl, TrailerUrl, Description, ViewCount, TotalRating, Actors, Director, Languages, IsAvailable " +
                     " FROM Movies " +
                     " WHERE Id = @id ";
 
@@ -141,6 +156,34 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return movie;
+        }
+
+        private string GetAdditionalMovieFilter(MovieFilterRequest request, string filter)
+        {
+            string sql = "";
+
+            switch(filter)
+            {
+                case FILTER_BY_TITLE:
+                    if (!string.IsNullOrEmpty(request.SearchKey))
+                    {
+                        sql = " AND Title LIKE CONCAT('%', @SearchKey, '%') ";
+                    }
+                    break;
+                case FILTER_BY_AVAILABLE:
+                    if (request.IsAvailableOnly)
+                    {
+                        sql = " AND IsAvailable = 1 ";
+                    }
+                    break;
+                case FILTER_BY_DISABLED:
+                    if (!request.IsAvailableOnly && request.IsDisabledOnly)
+                    {
+                        sql = " AND IsAvailable = 0 ";
+                    }
+                    break;
+            }
+            return sql;
         }
 
         public IEnumerable<Movie> MovieEntityToList()
@@ -200,31 +243,13 @@ namespace Term7MovieRepository.Repositories.Implement
         }
 
 
-        public async Task<bool> DeleteMovie(int movieid)
+        public async Task DeleteMovie(int movieId)
         {
-            if (!await _context.Database.CanConnectAsync())
-                //throw new Exception();
-                return false;
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                Movie movie = await _context.Movies.FindAsync(movieid);
-                if (movie == null)
-                    throw new Exception("MOVIENOTFOUND");
-                var categories = _context.MovieCategories.Where(a => a.MovieId == movieid);
-                _context.MovieCategories.RemoveRange(categories);
-                await _context.SaveChangesAsync(); 
-                _context.Movies.Remove
-                    (movie);
-                await _context.SaveChangesAsync();
-                transaction.Commit();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-                //return false;
-            }
+            Movie movie = await _context.Movies.FindAsync(movieId);
+
+            if (movie == null) throw new DbNotFoundException();
+
+            movie.IsAvailable = false;
         }
         public int Count()
         {

@@ -27,7 +27,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet]
-        private async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
+        private async Task<IActionResult> GetAllMovie([FromQuery] MovieFilterRequest request)
         {
             var response = await _movieService.GetAllMovie(request);
             return Ok(response);
@@ -41,9 +41,9 @@ namespace Term7MovieApi.Controllers
             switch(request.Action)
             {
                 case "page":
-                    return await GetAllMovie(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize});
+                    return await GetAllMovie(new MovieFilterRequest{ Page = request.PageIndex, PageSize = request.PageSize, SearchKey = request.SearchKey, IsAvailableOnly = request.IsAvailableOnly, IsDisabledOnly = request.IsDisabledOnly});
                 case "home":
-                    return await GetMoviesForMobileHome(new MovieHomePageRequest { Latitude = request.Latitude, Longtitude = request.Longitude });
+                    return await GetMoviesForMobileHome(new MovieHomePageRequest { Latitude = request.Latitude ?? 0, Longtitude = request.Longitude ?? 0 });
                 case "incoming":
                     return await GetIncomingMovies();
                 case "latest":
@@ -56,7 +56,7 @@ namespace Term7MovieApi.Controllers
                         TitleSearch = request.SearchKey
                     });
                 case "detail":
-                    return await GetMoviesDetailFromID(request.MovieId);
+                    return await GetMoviesDetailFromID(request.MovieId ?? 0);
                 case "titles":
                         return await GetMovieTitles();
                 default:
@@ -90,10 +90,10 @@ namespace Term7MovieApi.Controllers
 
         [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpDelete]
-        public async Task<IActionResult> DeleteMovie(int movieid)
+        public async Task<IActionResult> DeleteMovie(int movieId)
         {
-                var result = await _movieService.DeleteMovie(movieid);
-                return Ok(result);
+            var result = await _movieService.DeleteMovie(movieId);
+            return Ok(result);
         }
 
         /* ---------------- START PRIVATE METHODS ----------------- */

@@ -10,8 +10,6 @@ using Term7MovieCore.Data.Request.Movie;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/v2/movies")]
-    [ApiController]
     public class MovieV2Controller : ControllerBase
     {
         private readonly ILogger<MovieV2Controller> _logger;
@@ -26,7 +24,7 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet]
-        private async Task<IActionResult> GetAllMovie([FromQuery] ParentFilterRequest request)
+        private async Task<IActionResult> GetAllMovie([FromQuery] MovieFilterRequest request)
         {
             var response = await _movieService.GetAllMovie(request);
             return Ok(response);
@@ -42,7 +40,7 @@ namespace Term7MovieApi.Controllers
                 return await GetEightLatestMovies();
             if (request.Action == "page")
             {
-                ParentFilterRequest pfr = new ParentFilterRequest()
+                MovieFilterRequest pfr = new MovieFilterRequest()
                 {
                     Page = request.PageIndex,
                     PageSize = request.PageSize,
@@ -52,7 +50,7 @@ namespace Term7MovieApi.Controllers
             }
 
             if (request.Action == "detail")
-                return await GetMovieDetailById(request.MovieId);
+                return await GetMovieDetailById(request.MovieId ?? 0);
             return BadRequest(new ParentResponse { Message = "Quăng nó 404 đê" });
         }
 
