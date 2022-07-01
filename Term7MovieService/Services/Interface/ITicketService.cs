@@ -12,7 +12,7 @@ namespace Term7MovieService.Services.Interface
 
         //Task<TicketResponse> GetTicketForATransaction(Guid transactionid);
 
-        Task<TicketResponse> GetDetailOfATicket(long id);
+        Task<ParentResultResponse> GetTicketDetail(long id, long showtimeId, string role);
 
         Task<ParentResponse> CreateTicketAsync(TicketListCreateRequest request);
     }

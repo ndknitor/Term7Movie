@@ -46,7 +46,6 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
-                              shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice,
                               tt.Id, tt.Name, tt.CompanyId   
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
@@ -78,12 +77,11 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + count, param);
 
-                IEnumerable<TicketDto> tickets = multiQ.Read<TicketDto, SeatDto, SeatTypeDto, ShowtimeTicketTypeDto, TicketTypeDto, TicketDto>(
-                    (t, s, st, shtt, tt) =>
+                IEnumerable<TicketDto> tickets = multiQ.Read<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(
+                    (t, s, st, tt) =>
                     {
-                        shtt.TicketType = tt;
+                        t.TicketType = tt;
                         s.SeatType = st;
-                        t.ShowtimeTicketType = shtt;
                         t.Seat = s;
                         return t;
                     }, splitOn: "Id"
@@ -114,12 +112,43 @@ namespace Term7MovieRepository.Repositories.Implement
             list = await query.ToListAsync();
             return list;
         }
-        public async Task<Ticket> GetTicketById(long id)
+        public async Task<TicketDto> GetTicketById(long id, bool isNotShowed)
         {
-            if(!await _context.Database.CanConnectAsync())
-                return null;
-            Ticket ticket = await _context.Tickets.FindAsync(id);
-            return ticket;
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT t.Id, t.ShowtimeId, t.ShowStartTime, 
+                              t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
+                              t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
+                              t.SeatId, s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, 
+                              tt.Id, tt.Name, tt.CompanyId,   
+                              sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle'
+                       FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
+                            JOIN SeatTypes st ON s.SeatTypeId = st.Id
+                            JOIN TicketStatuses ts ON t.StatusId = ts.Id 
+                            JOIN ShowtimeTicketTypes shtt ON shtt.Id = t.ShowtimeTicketTypeId 
+                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id
+                            JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
+                            JOIN Movies m ON m.Id = sh.MovieId
+                            JOIN Theaters th ON sh.TheaterId = th.Id 
+                       WHERE t.Id = @id " +
+
+                       GetAdditionalTicketFilter( new TicketFilterRequest { IsNotShowedYet = isNotShowed }, FILTER_BY_IS_SHOWED);
+                object param = new { id };
+
+                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto, TicketDto>( sql,
+                    (t, s, st, tt, sh) =>
+                    {
+                        t.TicketType = tt;
+                        s.SeatType = st;
+                        t.Seat = s;
+                        t.Showtime = sh;
+                        return t;
+                    }, param, splitOn: "Id"
+                );
+
+                return tickets.FirstOrDefault();
+            }
         }
         public async Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList)
         {
@@ -171,7 +200,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                         IEnumerable<TicketDto> tickets = GetTicketByShowtimeId(showtime.Id);
 
-                        await _cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_TICKET, tickets);
+                        await _cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_SHOWTIME_TICKET, tickets);
 
                         await transaction.CommitAsync();
                         return count;
@@ -196,7 +225,6 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
-                              shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice,
                               tt.Id, tt.Name, tt.CompanyId   
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
@@ -208,12 +236,11 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 object param = new { showtimeId };
 
-                IEnumerable<TicketDto> tickets = con.Query<TicketDto, SeatDto, SeatTypeDto, ShowtimeTicketTypeDto, TicketTypeDto, TicketDto>(sql,
-                    (t, s, st, shtt, tt) =>
+                IEnumerable<TicketDto> tickets = con.Query<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(sql,
+                    (t, s, st, tt) =>
                     {
-                        shtt.TicketType = tt;
+                        t.TicketType = tt;
                         s.SeatType = st;
-                        t.ShowtimeTicketType = shtt;
                         t.Seat = s;
                         return t;
                     }, param, splitOn: "Id"

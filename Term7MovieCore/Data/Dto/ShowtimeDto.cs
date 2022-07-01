@@ -4,6 +4,7 @@
     {
         public long Id { get; set; }
         public int MovieId { set; get; }
+        public string MovieTitle { set; get; }   
         public MovieModelDto Movie { get; set; }
         public int RoomId { set; get; }
         public RoomDto Room { set; get; }

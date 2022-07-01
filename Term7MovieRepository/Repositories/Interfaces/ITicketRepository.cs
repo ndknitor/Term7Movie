@@ -11,7 +11,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<PagingList<TicketDto>> GetAllTicketAsync(TicketFilterRequest request);
         Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid);
         Task<IEnumerable<Ticket>> GetAllTicketByTransactionId(Guid id);
-        Task<Ticket> GetTicketById(long id);
+        Task<TicketDto> GetTicketById(long id, bool isNotShowed);
         Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList);
         Task<int> CreateTicketAsync(TicketListCreateRequest request);
         Task DeleteExpiredTicket();
