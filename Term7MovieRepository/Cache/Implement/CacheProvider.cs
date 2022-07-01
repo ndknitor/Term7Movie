@@ -1,4 +1,5 @@
 ﻿using StackExchange.Redis;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Extensions;
 using Term7MovieRepository.Cache.Interface;
@@ -68,13 +69,16 @@ namespace Term7MovieRepository.Cache.Implement
             switch (valueSet.First())
             {
                 case TicketDto:
-                    TimeSpan expire = (valueSet.First() as TicketDto).ShowStartTime - DateTime.UtcNow;
+                    TicketDto firstTicket = valueSet.First() as TicketDto;
+                    string showtimeRedisKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + firstTicket.ShowTimeId;
+
+                    TimeSpan expire = firstTicket.ShowStartTime - DateTime.UtcNow;
                     foreach (var ticket in (TicketDto[]) valueSet)
                     {
-                        entries[i] = new HashEntry(ticket.Id.ToString(), ticket.Id.ToString());
-                        await redis.StringSetAsync(ticket.Id.ToString(), ticket.ToJson(), expire);
+                        entries[i] = new HashEntry(firstTicket.ShowTimeId, showtimeRedisKey);
                         i++;
                     }
+                    await redis.StringSetAsync(showtimeRedisKey, valueSet.ToJson(), expire);
                     break;
             }
             await redis.HashSetAsync(key, entries);
@@ -83,6 +87,30 @@ namespace Term7MovieRepository.Cache.Implement
         public async Task PutHashMapAsync(string key, HashEntry[] entries)
         {
             await redis.HashSetAsync(key, entries);
+        }
+
+        public async Task<bool> IsHashExistAsync(string hashKey, string key)
+        {
+            return await redis.HashExistsAsync(hashKey, key);
+        }
+
+        public bool IsHashExist(string hashKey, string key)
+        {
+            return redis.HashExists(hashKey, key);
+        }
+
+        public T GetHashFieldValue<T>(string hashKey, string key)
+        {
+            object o = redis.HashGet(hashKey, key);
+
+            return o == null ? default : (T)o;
+        }
+
+        public async Task<T> GetHashFieldValueAsync<T>(string hashKey, string key)
+        {
+            object o = await redis.HashGetAsync(hashKey, key);
+
+            return o == null ? default : (T)o;
         }
     }
 }

@@ -11,6 +11,7 @@ using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Entities;
+using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
 
@@ -19,17 +20,19 @@ namespace Term7MovieService.Services.Implement
     public class TicketService : ITicketService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITicketRepository tiktokRepository;
+        private readonly ITicketRepository ticketRepository;
+        private readonly ICacheProvider cacheProvider;
 
-        public TicketService(IUnitOfWork unitOfWork)
+        public TicketService(IUnitOfWork unitOfWork, ICacheProvider cacheProvider)
         {
             _unitOfWork = unitOfWork;
-            tiktokRepository = _unitOfWork.TicketRepository;
+            ticketRepository = _unitOfWork.TicketRepository;
+            this.cacheProvider = cacheProvider;
         }
 
         public async Task<ParentResultResponse> GetTicketAsync(TicketFilterRequest request)
         {
-            PagingList<TicketDto> list = await tiktokRepository.GetAllTicketAsync(request);
+            PagingList<TicketDto> list = await ticketRepository.GetAllTicketAsync(request);
 
             return new ParentResultResponse
             {
@@ -59,7 +62,7 @@ namespace Term7MovieService.Services.Implement
 
         private async Task<TicketResponse> GetTicketForAShowTime(int showtimeid)
         {
-            var rawdata = await tiktokRepository.GetAllTicketByShowtime(showtimeid);
+            var rawdata = await ticketRepository.GetAllTicketByShowtime(showtimeid);
             if (rawdata == null)
                 return new TicketResponse { Message = "Can't access data storage." };
             if (!rawdata.Any())
@@ -89,7 +92,7 @@ namespace Term7MovieService.Services.Implement
 
         private async Task<TicketResponse> GetTicketForATransaction(Guid transactionid)
         {
-            var rawdata = await tiktokRepository.GetAllTicketByTransactionId(transactionid);
+            var rawdata = await ticketRepository.GetAllTicketByTransactionId(transactionid);
             if (rawdata == null)
                 return new TicketResponse { Message = "Can't access data storage." };
             if (!rawdata.Any())
@@ -117,35 +120,47 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<TicketResponse> GetDetailOfATicket(long id)
+        public async Task<ParentResultResponse> GetTicketDetail(long id, long showtimeId, string role)
         {
-            var rawdata = await tiktokRepository.GetTicketById(id);
-            if (rawdata == null)
-                return new TicketResponse { Message = "Can't access database or ticket no longer exists" };
-            return new TicketResponse
+            TicketDto ticket;
+            switch(role)
             {
-                Tickets = new List<TicketDTO>
-                {
-                    new TicketDTO
+                case Constants.ROLE_CUSTOMER:
+                    string showtimeKey = await cacheProvider.GetHashFieldValueAsync<string>(Constants.REDIS_KEY_SHOWTIME_TICKET, Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + showtimeId);
+
+                    if (showtimeKey != null)
                     {
-                        TicketId = rawdata.Id,
-                        SeatId = rawdata.SeatId,
-                        TransactionId = rawdata.TransactionId,
-                        ShowTimeId = rawdata.ShowTimeId,
-                        ShowStartTime = rawdata.ShowStartTime,
-                        //OriginalPrice = rawdata.OriginalPrice,
-                        ReceivePrice = rawdata.ReceivePrice,
-                        SellingPrice = rawdata.SellingPrice,
-                        StatusId = rawdata.StatusId,
-                        LockedTime = rawdata.LockedTime
+                        IEnumerable<TicketDto> tickets = await cacheProvider.GetValueAsync<IEnumerable<TicketDto>>(showtimeKey);
+                        if (tickets == null || !tickets.Any()) throw new DbNotFoundException();
+
+                        ticket = tickets.FirstOrDefault(t => t.Id == id);
+                    } 
+                    else
+                    {
+                        ticket = await ticketRepository.GetTicketById(id, isNotShowed: true);
                     }
-                }
-            }; //how to C#
+                    break;
+                case Constants.ROLE_ADMIN:
+                case Constants.ROLE_MANAGER:
+                    ticket = await ticketRepository.GetTicketById(id, isNotShowed: false);
+                    break;
+                default: 
+                    ticket = null; 
+                    break;
+            }
+
+            if (ticket == null) throw new DbNotFoundException();
+
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = ticket
+            };
         }
 
         public async Task<ParentResponse> CreateTicketAsync(TicketListCreateRequest request)
         {
-            var ticketRepo = tiktokRepository;
+            var ticketRepo = ticketRepository;
 
             int count = await ticketRepo.CreateTicketAsync(request);
 

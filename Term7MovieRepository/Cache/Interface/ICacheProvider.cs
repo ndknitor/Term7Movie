@@ -13,5 +13,11 @@ namespace Term7MovieRepository.Cache.Interface
         void Remove(string key);
         Task PutHashMapAsync(string key, IEnumerable<object> valueSet);
         Task PutHashMapAsync(string key, HashEntry[] entries);
+        bool IsExist(string key);
+        Task<bool> IsExistAsync(string key);
+        Task<bool> IsHashExistAsync(string hashKey, string key);
+        bool IsHashExist(string hashKey, string key);
+        T GetHashFieldValue<T>(string hashKey, string key);
+        Task<T> GetHashFieldValueAsync<T>(string hashKey, string key);
     }
 }
