@@ -117,7 +117,7 @@ app.MapControllers();
 app.Use(async (context, next) =>
 {
     string ip = context.Request.Headers["CF-CONNECTING-IP"].FirstOrDefault();
-    app.Logger.LogInformation($"{DateTime.UtcNow} | Request-from-ip:{ip};ConnectionId:{context.Connection.Id};Path:{context.Request.Path};Method:{context.Request.Method};Content-Type:{context.Request.ContentType};Content-Length:{context.Request.ContentLength}");
+    app.Logger.LogInformation($"{DateTime.UtcNow} | Request-from-ip:{ip};ConnectionId:{context.Connection.Id};Path:{context.Request.Path};Method:{context.Request.Method};Query:{context.Request.QueryString};Content-Type:{context.Request.ContentType};Content-Length:{context.Request.ContentLength}");
 #if DEBUG
     string headers = String.Empty;
     foreach (var key in context.Request.Headers.Keys)
