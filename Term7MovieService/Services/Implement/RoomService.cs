@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
@@ -38,20 +39,14 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<TheaterRoomsResponse> GetRoomsByTheaterId(int theaterId)
+        public async Task<ParentResultResponse> GetRoomsByTheaterId(RoomFilterRequest request)
         {
-            IEnumerable<RoomDto> rooms = await roomRepo.GetAllRoomByTheaterId(theaterId);
+            PagingList<RoomDto> rooms = await roomRepo.GetAllRoomByTheaterId(request);
 
-            if ((rooms as List<RoomDto>).Count == 0)
-            {
-                return null;
-            }
-
-            return new TheaterRoomsResponse()
+            return new ParentResultResponse()
             {
                 Message = Constants.MESSAGE_SUCCESS,
-                TheaterId = theaterId,
-                Rooms = rooms
+                Result = rooms
             };
         }
 

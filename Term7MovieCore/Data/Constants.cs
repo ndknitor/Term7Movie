@@ -68,6 +68,7 @@ namespace Term7MovieCore.Data
         public const string CONSTRAINT_REQUEST_MESSAGE_END_TIME_NOT_VALID = "End time not valid";
         public const string CONSTRAINT_REQUEST_SHOWTIME_MUST_BE_IN_40MIN = "Start time must be in next 40 minutes";
         public const string CONSTRAINT_TICKET_LIST_NOT_VALID = "Ticket list not valid";
+        public const string CONSTRAINT_LIST_CAN_NOT_EMPTY = "List cannot empty";
 
         public const int DefaultPageSize = 10;
         public const int DefaultPage = 1;
@@ -98,5 +99,11 @@ namespace Term7MovieCore.Data
         public const string MOMO_ITEM_NAME = "Ticket";
 
         public const string REDIS_KEY_MOVIE = "MOVIES";
+
+        public const string REDIS_KEY_TICKET = "TICKETS";
+
+        public const string REDIS_KEY_LOCKED_TICKET = "LOCKED_TICKETS";
+
+        public const string REDIS_KEY_SHOWTIME_TICKET = "SHOWTIME_TICKETS";
     }
 }

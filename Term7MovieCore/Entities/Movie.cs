@@ -28,6 +28,7 @@ namespace Term7MovieCore.Entities
         public string Actors { set; get; }
         [Column(TypeName = "varchar(max)")]
         public string Languages { set; get; }
+        public bool IsAvailable { set; get; }
         public ICollection<MovieCategory> MovieCategories { set; get; }
         public ICollection<Showtime> MovieShowtimes { set; get; }
         public ICollection<MovieRating> MovieRatings { set; get; }

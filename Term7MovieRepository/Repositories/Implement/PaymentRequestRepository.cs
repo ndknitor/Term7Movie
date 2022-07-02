@@ -34,9 +34,10 @@ namespace Term7MovieRepository.Repositories.Implement
             return req;
         }
 
-        public async Task InsertPaymentRequestAsync(MomoPaymentCreateRequest req)
+        public void InsertPaymentRequest(MomoPaymentCreateRequest req)
         {
-            await _context.PaymentRequests.AddAsync(req);
+           _context.PaymentRequests.Add(req);
+           _context.SaveChanges();
         }
     }
 }

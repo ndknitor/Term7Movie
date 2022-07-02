@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using StackExchange.Redis;
+using StackExchange.Redis.Extensions.Core.Configuration;
+using StackExchange.Redis.Extensions.Newtonsoft;
 using Term7MovieApi.BackgroundServices;
 using Term7MovieApi.Handlers;
 using Term7MovieApi.Requirements;
@@ -49,13 +52,13 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<ICompanyService, CompanyService>();
 
-            services.AddScoped<ICacheProvider, CacheProvider>();
-
             services.AddScoped<IImageHostService, ImageHostService>();
 
             services.AddScoped<ITicketTypeService, TicketTypeService>();
 
             services.AddScoped<IShowtimeTicketTypeService, ShowtimeTicketTypeService>();
+
+            services.AddScoped<IAnalystService, AnalystService>();
 
             return services;
         }
@@ -111,5 +114,18 @@ namespace Term7MovieApi.Extensions
             services.AddHostedService<DistributedCacheSupportService>();
             return services;
         }
+
+
+        public static IServiceCollection ConfigureRedisCacheService(this IServiceCollection services, IConfiguration config)
+        {
+            string redisConnectString = config.GetConnectionString("Redis");
+
+            services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(new RedisConfiguration { ConnectionString = redisConnectString });
+            services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(redisConnectString));
+            services.AddScoped<ICacheProvider, CacheProvider>();
+
+            return services;
+        }
+
     }
 }

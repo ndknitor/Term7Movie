@@ -15,6 +15,8 @@ namespace Term7MovieRepository.Repositories.Implement
     {
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
+
+        private const string FILTER_THEATER_NAME = "Name";
         public TheaterRepository(AppDbContext context, ConnectionOption connectionOption)
         {
             _context = context;
@@ -29,25 +31,88 @@ namespace Term7MovieRepository.Repositories.Implement
                 int offset = request.PageSize * (request.Page - 1);
                 int fetch = request.PageSize;
 
-                string query =
+                string sql =
                     " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status " +
                     " FROM Theaters " +
-                    " WHERE Status = 1 ";
+                    " WHERE Status = 1 " +
+
+                    GetAdditionalTheaterFilter(request, FILTER_THEATER_NAME) + 
+
+                    " ORDER BY Id " + // offset phai co order by...
+                    " OFFSET @offset ROWS " +
+                    " FETCH NEXT @fetch ROWS ONLY ";
+
                 string count =
                     " ; SELECT Count(1) " +
                     " FROM Theaters " +
-                    " WHERE Status = 1 ";
+                    " WHERE Status = 1 " +
+                    GetAdditionalTheaterFilter(request, FILTER_THEATER_NAME);
+
+                string roomQuery =
+                    (!request.IsIncludeRoom) ? "" :
+                    @" ; SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status 
+                         FROM Rooms 
+                         WHERE Status = 1 ";
+
+                object param = new { offset, fetch, request.SearchKey };
+
+                var multiQ = await con.QueryMultipleAsync(sql + count + roomQuery, param);
+
+                IEnumerable<TheaterDto> results = await multiQ.ReadAsync<TheaterDto>();
+
+                int total = await multiQ.ReadFirstOrDefaultAsync<int>();
+
+                if (request.IsIncludeRoom)
+                {
+                    IEnumerable<RoomDto> rooms = await multiQ.ReadAsync<RoomDto>();
+
+                    foreach (TheaterDto t in results)
+                    {
+                        t.Rooms = rooms.Where(r => r.TheaterId == t.Id);
+                        t.TotalRoom = t.Rooms.Count();
+                    }
+                }
+
+                list = new PagingList<TheaterDto>(pageSize: request.PageSize, page: request.Page, results, total);
+            }
+
+            return list;
+        }
+
+        public async Task<PagingList<TheaterDto>> GetAllTheaterByManagerIdAsync(TheaterFilterRequest request, long managerId)
+        {
+            PagingList<TheaterDto> list = new();
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                int offset = request.PageSize * (request.Page - 1);
+                int fetch = request.PageSize;
+
+                string query =
+                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status " +
+                    " FROM Theaters " +
+                    " WHERE Status = 1 AND ManagerId = @managerId " +
+
+                    GetAdditionalTheaterFilter(request, FILTER_THEATER_NAME) +
+
+                    " ORDER BY Id " + // offset phai co order by...
+                    " OFFSET @offset ROWS " +
+                    " FETCH NEXT @fetch ROWS ONLY ";
+
+                string count =
+                    " ; SELECT Count(1) " +
+                    " FROM Theaters " +
+                    " WHERE Status = 1 AND ManagerId = @managerId " +
+                    GetAdditionalTheaterFilter(request, FILTER_THEATER_NAME);
 
                 string roomQuery =
                     @" ; SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status 
                          FROM Rooms 
                          WHERE Status = 1 ";
 
-                string sql = ConcatQueryWithFilter(query, count, request);
+                object param = new { offset, fetch, managerId, request.SearchKey };
 
-                object param = new { offset, fetch, CompanyId = request.CompanyId ?? 0 };
-
-                var multiQ = await con.QueryMultipleAsync(sql + roomQuery, param);
+                var multiQ = await con.QueryMultipleAsync(query + count + roomQuery, param);
 
                 IEnumerable<TheaterDto> results = await multiQ.ReadAsync<TheaterDto>();
 
@@ -55,7 +120,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 IEnumerable<RoomDto> rooms = await multiQ.ReadAsync<RoomDto>();
 
-                foreach(TheaterDto t in results)
+                foreach (TheaterDto t in results)
                 {
                     t.Rooms = rooms.Where(r => r.TheaterId == t.Id);
                     t.TotalRoom = t.Rooms.Count();
@@ -161,20 +226,18 @@ namespace Term7MovieRepository.Repositories.Implement
             return result;
         }
 
-        private string ConcatQueryWithFilter(string query, string count, TheaterFilterRequest request)
+        private string GetAdditionalTheaterFilter(TheaterFilterRequest request, string filter)
         {
-            if (request.CompanyId != null)
+            string sql = "";
+
+            switch(filter)
             {
-                query += " AND CompanyId = @CompanyId ";
-                count += " AND CompanyId = @CompanyId ";
+                case FILTER_THEATER_NAME:
+                    if (!string.IsNullOrEmpty(request.SearchKey)) sql = " AND Name LIKE CONCAT('%', @SearchKey, '%') ";
+                    break;
             }
 
-            query += 
-                " ORDER BY Id " + // offset phai co order by...
-                " OFFSET @offset ROWS " +
-                " FETCH NEXT @fetch ROWS ONLY ";
-
-            return query + count;
+            return sql;
         }
     }
 }

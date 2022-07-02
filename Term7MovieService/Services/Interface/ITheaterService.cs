@@ -9,7 +9,7 @@ namespace Term7MovieService.Services.Interface
 {
     public interface ITheaterService
     {
-        Task<TheaterListResponse> GetTheatersAsync(TheaterFilterRequest request);
+        Task<TheaterListResponse> GetTheatersAsync(TheaterFilterRequest request, long userId, string role);
         Task<TheaterResponse> GetTheaterByIdAsync(int id);
         Task<ParentResponse> CreateTheaterAsync(TheaterCreateRequest request, long managerId);
         Task<ParentResponse> UpdateTheaterAsync(TheaterUpdateRequest request);

@@ -4,7 +4,9 @@ namespace Term7MovieCore.Data.Response.Analyst
 {
     public class DashboardResponse : ParentResponse
     {
-        public DashboardDTO DashBoardInfo { get; set; }
+        public ShowtimeQuanityDTO ShowtimeDashboard { get; set; }
+        public TicketSoldDTO TicketSoldDashboard { get; set; }
+        public IncomeDTO IncomeDashboard { get; set; }
         public bool IsItStatistical { get; set; }
     }
 }

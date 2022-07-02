@@ -11,7 +11,7 @@ namespace Term7MovieService.Services.Interface
 {
     public interface ITransactionService
     {
-        Task<TransactionCreateResponse> CreateTransactionAsync(TransactionCreateRequest request, UserDTO user);
+        TransactionCreateResponse CreateTransaction(TransactionCreateRequest request, UserDTO user);
         Task ProcessPaymentAsync(MomoIPNRequest ipn);
     }
 }

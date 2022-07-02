@@ -7,7 +7,7 @@ namespace Term7MovieService.Services.Interface
 {
     public interface IPaymentService
     {
-        Task<MomoPaymentCreateResponse> CreateMomoPaymentRequestAynsc(Transaction transaction, UserDTO user);
+        MomoPaymentCreateResponse CreateMomoPaymentRequest(TransactionDto transaction, UserDTO user);
         Task ProcessMomoIPNRequestAsync(MomoIPNRequest ipn);
     }
 }

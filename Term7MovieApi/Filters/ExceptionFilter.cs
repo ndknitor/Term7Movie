@@ -31,6 +31,14 @@ namespace Term7MovieApi.Filters
                     break;
                 case DbOperationException:
 
+                    if(message == "DBCONNECTION")
+                    {
+                        response.Message = "Cannot connect to data warehouse";
+                        context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        context.Result = new JsonResult(response);
+                        break;
+                    }
+
                     _logger.LogDebug(message);
 
                     response.Message = Constants.MESSAGE_BAD_REQUEST;

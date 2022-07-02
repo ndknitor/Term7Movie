@@ -19,7 +19,7 @@ namespace Term7MovieCore.Data.Dto.Analyst
         public decimal TotalIncomeQuantity { get; set; }
         public decimal OldIncomeQuantity { get; set; } //tháng trước
         public decimal NewIncomeQuantity { get; set; } //current
-        public float PercentIncomeChange { get; set; }
+        public decimal PercentIncomeChange { get; set; }
         public bool IsIncomeUpOrDown { get; set; } // trưởng hợp ngang nhau thì cho là có lên
     }
 
@@ -30,6 +30,15 @@ namespace Term7MovieCore.Data.Dto.Analyst
         public int NewTicketSoldQuantity { get; set; } //current
         public float PercentTicketSoldChange { get; set; }
         public bool IsTicketSoldUpOrDown { get; set; }
+    }
+
+    public class ShowtimeQuanityDTO
+    {
+        public int TotalShowtimeQuantity { get; set; }
+        public int OldShowtimeQuantity { get; set; } //tháng trước
+        public int NewShowtimeQuantity { get; set; } //current
+        public float PercentShowtimeChange { get; set; }
+        public bool IsShowtimeUpOrDown { get; set; }
     }
 
     public class TicketSoldDTO

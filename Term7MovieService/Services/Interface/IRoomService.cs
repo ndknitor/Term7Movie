@@ -8,7 +8,7 @@ namespace Term7MovieService.Services.Interface
     public interface IRoomService
     {
         Task<RoomResponse> GetRoomDetail(int roomId);
-        Task<TheaterRoomsResponse> GetRoomsByTheaterId(int theaterId);
+        Task<ParentResultResponse> GetRoomsByTheaterId(RoomFilterRequest request);
         Task<ParentResponse> CreateRoom(RoomCreateRequest request);
         Task<ParentResponse> UpdateRoom(RoomUpdateRequest request);
         Task<ParentResponse> DeleteRoom(int id);

@@ -190,6 +190,9 @@ namespace Term7MovieApi.Migrations
                     b.Property<int?>("ExternalId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Languages")
                         .HasColumnType("varchar(max)");
 
@@ -508,9 +511,6 @@ namespace Term7MovieApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("OriginalPrice")
-                        .HasColumnType("money");
-
                     b.Property<decimal>("ReceivePrice")
                         .HasColumnType("money");
 
@@ -610,9 +610,6 @@ namespace Term7MovieApi.Migrations
                     b.Property<DateTime?>("LockedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("OriginalPrice")
-                        .HasColumnType("money");
-
                     b.Property<decimal>("ReceivePrice")
                         .HasColumnType("money");
 
@@ -709,6 +706,9 @@ namespace Term7MovieApi.Migrations
 
                     b.Property<decimal>("Total")
                         .HasColumnType("money");
+
+                    b.Property<DateTime>("ValidUntil")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

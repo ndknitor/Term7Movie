@@ -37,7 +37,7 @@ namespace Term7MovieService.Services.Implement
             tiktokRepository = _unitOfWork.TicketRepository;
         }
 
-        public async Task<MovieListResponse> GetAllMovie(ParentFilterRequest request)
+        public async Task<MovieListResponse> GetAllMovie(MovieFilterRequest request)
         {
             PagingList<MovieModelDto> movies;
 
@@ -48,6 +48,20 @@ namespace Term7MovieService.Services.Implement
                 movies = await movieRepository.GetAllMovie(request);
             } else
             {
+                if (!string.IsNullOrEmpty(request.SearchKey))
+                {
+                    request.SearchKey = request.SearchKey.ToLower();
+                    list = list.Where(m => m.Title.ToLower().Contains(request.SearchKey));
+                }
+
+                if (request.IsAvailableOnly)
+                {
+                    list = list.Where(m => m.IsAvailable);
+                } else
+                {
+                    if (request.IsDisabledOnly) list = list.Where(m => !m.IsAvailable);
+                }
+                
                 var pagingList = list.Skip(request.PageSize * (request.Page - 1)).Take(request.PageSize);
 
                 movies = new PagingList<MovieModelDto>(request.PageSize, request.Page, pagingList, list.Count());
@@ -56,7 +70,7 @@ namespace Term7MovieService.Services.Implement
             foreach(var m in movies.Results)
             {
                 m.BeautifyActors = m.Actors.ToObject<string[]>();
-                m.LanguageList = m.Actors.ToObject<string[]>();
+                m.LanguageList = m.Languages.ToObject<string[]>();
             }
 
             return new MovieListResponse
@@ -82,8 +96,9 @@ namespace Term7MovieService.Services.Implement
 
             if (movie == null) throw new DbNotFoundException();
 
+            //movie.BeautifyActors = JsonConvert.DeserializeObject<string[]>("test500error");
             movie.BeautifyActors = movie.Actors.ToObject<string[]>();
-            movie.LanguageList = movie.Actors.ToObject<string[]>();
+            movie.LanguageList = movie.Languages.ToObject<string[]>();
 
             return new ParentResultResponse
             {
@@ -92,43 +107,26 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage()
+        public async Task<IncomingMovieResponse> GetThreeLosslessLatestMovieForHomepage()
         {
             //Handle Error
-            IMovieRepository movierepo = _unitOfWork.MovieRepository;
-            if (movierepo == null) 
-                return new IncomingMovieResponse { Message = "REPOSITORY NULL" };
-            IEnumerable<Movie> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
+            IEnumerable<SmallMovieHomePageDTO> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
             if (!rawData.Any()) 
-                return new IncomingMovieResponse { Message = "DATABASE IS EMPTY" };
+                return new IncomingMovieResponse { Message = "Empty database" };
 
             //Start making process
-            IncomingMovieResponse IMR = new IncomingMovieResponse();
-            List<SmallMovieHomePageDTO> list = new List<SmallMovieHomePageDTO>();
-            foreach(var item in rawData)
+            return new IncomingMovieResponse
             {
-                SmallMovieHomePageDTO smp = new SmallMovieHomePageDTO();
-                smp.MovieId = item.Id;
-                //cover.CoverImgURL = item.CoverImageUrl;
-                smp.PosterImgURL = item.PosterImageUrl;
-                list.Add(smp);
-            }
-            if (list.Count == 0) IMR.Message = "No data for incoming movies :(";
-            else if (list.Count < 3) IMR.Message = "Missing incoming movie from database";
-            else IMR.Message = Constants.MESSAGE_SUCCESS;
-            IMR.LosslessMovieList = list;
-            return IMR;
+                LosslessMovieList = rawData,
+                Message = Constants.MESSAGE_SUCCESS,
+            };
         }
 
         public async Task<MovieNotListResponse> GetEightLatestMovieForHomepage()
         {
-            //Handle Error
-            IMovieRepository movierepo = _unitOfWork.MovieRepository;
-            if (movierepo == null)
-                return new MovieNotListResponse { Message = "REPOSITORY NULL" };
             IEnumerable<Movie> rawData = await movieRepository.GetEightLatestMovies();
             if (!rawData.Any())
-                return new MovieNotListResponse { Message = "DATABASE IS EMPTY" };
+                return new MovieNotListResponse { Message = "Empty database" };
 
             //rawData = rawData.ToList().OrderByDescending(a => a.ReleaseDate).Take(8);
             
@@ -464,22 +462,17 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<ParentResponse> DeleteMovie(int movieid)
         {
-            ParentResponse response = new ParentResponse();
-            try
+            await movieRepository.DeleteMovie(movieid);
+
+            if (await _unitOfWork.CompleteAsync())
             {
-                //hiện tại bên repo đang false => ko có connect
-                //throw exception tạm thời để track bug vì đang trong giai đoạn development :v
-                if (await movieRepository.DeleteMovie(movieid))
-                    response.Message = Constants.MESSAGE_SUCCESS;
-                else response.Message = "Failed to deleted this movie";
+                return new ParentResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS
+                };
             }
-            catch(Exception ex)
-            {
-                if(ex.Message == "MOVIENOTFOUND")
-                    return new ParentResponse { Message = "No Movie was found for id: " + movieid };
-                throw new Exception(ex.Message);
-            }
-            return response;
+
+            throw new DbNotFoundException();
         }
 
         /* --------------------- END CUD MOVIE ------------- */
@@ -651,9 +644,10 @@ namespace Term7MovieService.Services.Implement
                     {
                         result.Add(new MovieHomePageDTO
                         {
-                            MovieId = item.Id,
-                            CoverImgURL = item.CoverImageUrl,
+                            MovieId = item.MovieId,
+                            CoverImgURL = item.CoverImgURL,
                             Title = item.Title,
+                            
                         });
                     }
                     response.MovieHomePages = result;

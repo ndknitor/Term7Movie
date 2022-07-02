@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Options;
@@ -20,9 +21,9 @@ namespace Term7MovieApi.BackgroundServices
 
         private const int DELAY_FIRST_START_IN_MINUTE = 1;
 
-        public DistributedCacheSupportService(IDistributedCache distributedCache, ILogger<DistributedCacheSupportService> logger, IOptions<ConnectionOption> option)
+        public DistributedCacheSupportService(IConnectionMultiplexer connectionMultiplexer, ILogger<DistributedCacheSupportService> logger, IOptions<ConnectionOption> option)
         {
-            _cacheProvider = new CacheProvider(distributedCache);
+            _cacheProvider = new CacheProvider(connectionMultiplexer);
             _logger = logger;
             movieRepo = new MovieRepository(null, option.Value);
         }
@@ -48,13 +49,19 @@ namespace Term7MovieApi.BackgroundServices
 
         public void DoWork(object state)
         {
-            _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
+            try
+            {
+                _logger.LogInformation(DateTime.UtcNow + " - Redis start setting values");
 
-            IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
+                IEnumerable<MovieModelDto> movies = movieRepo.GetAllMovie();
 
-            _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
-            _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);
-            _cacheProvider.SetValue(Constants.REDIS_KEY_MOVIE, movies);
+                _logger.LogInformation(DateTime.UtcNow + " - Redis set values");
+                _cacheProvider.Remove(Constants.REDIS_KEY_MOVIE);
+                _cacheProvider.SetValue(Constants.REDIS_KEY_MOVIE, movies);
+            } catch
+            {
+                _logger.LogDebug("Catch Redis Exception");
+            }
         }
     }
 }

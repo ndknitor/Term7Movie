@@ -10,16 +10,16 @@ namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface IMovieRepository
     {
-        Task<PagingList<MovieModelDto>> GetAllMovie(ParentFilterRequest request);
+        Task<PagingList<MovieModelDto>> GetAllMovie(MovieFilterRequest request);
         Task<MovieModelDto> GetMovieByIdAsync(int id);
         IEnumerable<MovieModelDto> GetAllMovie();
         IEnumerable<Movie> MovieEntityToList();
         Task<Movie> GetMovieById(int id);
         Task<bool> CreateMovie(IEnumerable<Movie> movie);
         Task<bool> UpdateMovie(Movie movie);
-        Task<bool> DeleteMovie(int movieid);
+        Task DeleteMovie(int movieId);
         int Count();
-        Task<IEnumerable<Movie>> GetLessThanThreeLosslessLatestMovies();
+        Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies();
         Task<IEnumerable<Movie>> GetEightLatestMovies();
         Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds);
         Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity, string searchKey);

@@ -9,6 +9,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
     public interface ITheaterRepository
     {
         Task<PagingList<TheaterDto>> GetAllTheaterAsync(TheaterFilterRequest request);
+
+        Task<PagingList<TheaterDto>> GetAllTheaterByManagerIdAsync(TheaterFilterRequest request, long managerId);
         Task<TheaterDto> GetTheaterByIdAsync(int id);
         Task CreateTheaterAsync(Theater theater);
         Task UpdateTheaterAsync(Theater theater);

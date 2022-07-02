@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Extensions;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieService.Services.Interface;
@@ -14,7 +16,6 @@ namespace Term7MovieApi.Controllers
     {
         private readonly ILogger<MovieController> _logger;
         private readonly ITicketService _ticketService;
-        //private readonly IUnitOfWork _unitOfWork;
 
         public TicketController(ILogger<MovieController> logger, ITicketService ticketService)
         {
@@ -22,41 +23,29 @@ namespace Term7MovieApi.Controllers
             _ticketService = ticketService;
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{ticketId:long}")]
         [Authorize]
-        public async Task<IActionResult> GetTicketById(long id)
+        public async Task<IActionResult> GetTicketById([FromQuery][Required] long showtimeId, long ticketId)
         {
-            try
-            {
-                var response = await _ticketService.GetDetailOfATicket(id);
-                return Ok(response);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Send this to Nam Tran: " });
-            }
+            string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+
+            var response = await _ticketService.GetTicketDetail(ticketId, showtimeId, role);
+
+            return Ok(response);
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetTicketFromSomething(TicketRequest request)
+        public async Task<IActionResult> GetTicketAsync([FromQuery] TicketFilterRequest request)
         {
-            try
-            {
-                var response = await _ticketService.GetTicketForSomething(request);
-                return Ok(response);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Send this to Nam Tran: " });
-            }
+            var response = await _ticketService.GetTicketAsync(request);
+
+            return Ok(response);
         }
 
         [HttpPost]
         [Authorize(Roles = Constants.ROLE_MANAGER, Policy = Constants.POLICY_MANAGER_CREATE_TICKET)]
-        public async Task<IActionResult> CreateTicket(TicketListCreateRequest request)
+        public async Task<IActionResult> CreateTicket([FromBody] TicketListCreateRequest request)
         {
             var response = await _ticketService.CreateTicketAsync(request);
 

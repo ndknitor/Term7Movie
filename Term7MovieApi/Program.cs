@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Caching.Redis;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Term7MovieCore.Entities;
@@ -25,7 +23,11 @@ builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionF
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection"), b => b.MigrationsAssembly("Term7MovieApi")));
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection"), b =>
+{
+    b.MigrationsAssembly("Term7MovieApi"); 
+    b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null); //hit harder so the database can return my stupid query xD
+}));
 
 builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedPhoneNumber = false)
                     .AddRoles<Role>()
@@ -40,6 +42,8 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
 // inject services from Term7MovieService.Services
 builder.Services.InjectProjectServices();
+
+builder.Services.ConfigureRedisCacheService(config);
 
 // create instance for config in appsettings.json
 builder.Services.ConfigureOptions(config);
@@ -70,11 +74,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.ConfigureAuthorization();
 
-builder.Services.AddDistributedRedisCache(option =>
-{
-    option.Configuration = builder.Configuration.GetConnectionString("Redis");
-
-});
 builder.Services.AddCors(option =>
 {
     option.AddPolicy("Default", policy =>
@@ -84,7 +83,6 @@ builder.Services.AddCors(option =>
 });
 
 builder.Services.AddSwaggerGen();
-builder.Services.AddDistributedMemoryCache();
 
 if (builder.Environment.IsProduction())
 {

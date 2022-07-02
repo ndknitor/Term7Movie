@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Room;
 using Term7MovieCore.Data.Options;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
@@ -18,18 +20,35 @@ namespace Term7MovieRepository.Repositories.Implement
             _context = context;
             _connectionOption = connectionOption;
         }
-        public async Task<IEnumerable<RoomDto>> GetAllRoomByTheaterId(int theaterId)
+        public async Task<PagingList<RoomDto>> GetAllRoomByTheaterId(RoomFilterRequest request)
         {
-            IEnumerable<RoomDto> list = new List<RoomDto>();
+            PagingList<RoomDto> list;
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
+                int fetch = request.PageSize;
+                int offset = request.PageSize*(request.Page - 1);
                 string sql = 
-                    " SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status " +
-                    " FROM Rooms " +
-                    " WHERE TheaterId = @theaterId ";
-                var param = new { theaterId };
-                list = (await con.QueryAsync<RoomDto>(sql, param)).ToList();
+                   @" SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status
+                       FROM Rooms
+                       WHERE TheaterId = @TheaterId 
+                       ORDER BY Id 
+                       OFFSET @offset ROWS 
+                       FETCH NEXT @fetch ROWS ONLY ; ";
+
+                string count = @" SELECT COUNT(*) 
+                                  FROM Rooms 
+                                  WHERE TheaterId = @TheaterId ; ";
+
+                var param = new { offset, fetch, request.TheaterId };
+
+                var multiQ = await con.QueryMultipleAsync(sql + count, param);
+
+                IEnumerable<RoomDto> rooms = await multiQ.ReadAsync<RoomDto>();
+
+                int total = await multiQ.ReadFirstOrDefaultAsync<int>();
+
+                list = new PagingList<RoomDto>(request.PageSize, request.Page, rooms, total);
             }
 
             return list;
@@ -45,7 +64,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " WHERE Id = @id AND Status = 1 ; ";
 
                 string seatSql =
-                    " SELECT s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, st.BonusPrice " +
+                    " SELECT s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name " +
                     " FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
                     " WHERE s.RoomId = @id ";
 

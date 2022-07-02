@@ -1,5 +1,6 @@
 ﻿using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Utility;
@@ -20,9 +21,12 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<bool> CanManagerCreateShowtime(ShowtimeCreateRequest request, long managerId);
 
-        Task<bool> CanManagerCreateTicket(long managerId, long showtimeId, DateTime startTime, IEnumerable<long> seatId);
+        Task<bool> CanManagerCreateTicket(long managerId, IEnumerable<Guid> showtimeTicketTypeId, IEnumerable<long> seatId);
         Task<IEnumerable<TheaterShowTimeLocationDTO>> GetRecentlyShowTimeForMovieHomepage();
 
         Task<IEnumerable<TheaterShowTimeDTO>> GetRecentlyShowTimeWithMinutesRemain(Coordinate UserLocation);
+
+        Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(int companyid, 
+            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
     }
 }

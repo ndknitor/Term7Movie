@@ -2,10 +2,13 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
+using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 
 namespace Term7MovieRepository.Repositories.Implement
@@ -15,11 +18,80 @@ namespace Term7MovieRepository.Repositories.Implement
         private readonly AppDbContext _context;
         private readonly ConnectionOption _connectionOption;
         private readonly ProfitFormulaOption _profitFormulaOption;
-        public TicketRepository(AppDbContext context, ConnectionOption connectionOption, ProfitFormulaOption profitFormulaOption)
+        private readonly ICacheProvider _cacheProvider;
+
+        private const string FILTER_BY_ID = "Id";
+        private const string FILTER_BY_SHOWTIME = "ShowtimeId";
+        private const string FILTER_BY_IS_SHOWED = "IsShowed";
+        private const string FILTER_BY_IS_PURCHASED = "IsPurchased";
+
+        public TicketRepository(AppDbContext context, ConnectionOption connectionOption, 
+                                ProfitFormulaOption profitFormulaOption, ICacheProvider cacheProvider)
         {
             _context = context;
             _connectionOption = connectionOption;
             _profitFormulaOption = profitFormulaOption;
+            _cacheProvider = cacheProvider;
+        }
+
+        public async Task<PagingList<TicketDto>> GetAllTicketAsync(TicketFilterRequest request)
+        {
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                int offset = request.PageSize * (request.Page - 1);
+                int fetch = request.PageSize;
+                string sql =
+                    @" SELECT t.Id, t.ShowtimeId, t.ShowStartTime, 
+                              t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
+                              t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
+                              t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
+                              tt.Id, tt.Name, tt.CompanyId   
+                       FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
+                            JOIN SeatTypes st ON s.SeatTypeId = st.Id
+                            JOIN TicketStatuses ts ON t.StatusId = ts.Id 
+                            JOIN ShowtimeTicketTypes shtt ON shtt.Id = t.ShowtimeTicketTypeId 
+                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id
+                       WHERE 1 = 1 " + 
+
+                            GetAdditionalTicketFilter(request, FILTER_BY_SHOWTIME) +
+                            GetAdditionalTicketFilter(request, FILTER_BY_ID) +
+                            GetAdditionalTicketFilter(request, FILTER_BY_IS_SHOWED) +
+                            GetAdditionalTicketFilter(request, FILTER_BY_IS_PURCHASED) +
+
+                    @" ORDER BY t.Id DESC 
+                       OFFSET @offset ROWS
+                       FETCH NEXT @fetch ROWS ONLY ;";
+
+                string count =
+                    @" SELECT COUNT(*) 
+                       FROM Tickets t 
+                       WHERE 1 = 1 " +
+                       GetAdditionalTicketFilter(request, FILTER_BY_SHOWTIME) +
+                       GetAdditionalTicketFilter(request, FILTER_BY_ID) +
+                       GetAdditionalTicketFilter(request, FILTER_BY_IS_SHOWED) +
+                       GetAdditionalTicketFilter(request, FILTER_BY_IS_PURCHASED);
+
+
+                object param = new { offset, fetch, request.ShowtimeId, request.TicketId, request.IsNotShowedYet, request.IsPurchased };
+
+                var multiQ = await con.QueryMultipleAsync(sql + count, param);
+
+                IEnumerable<TicketDto> tickets = multiQ.Read<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(
+                    (t, s, st, tt) =>
+                    {
+                        t.TicketType = tt;
+                        s.SeatType = st;
+                        t.Seat = s;
+                        return t;
+                    }, splitOn: "Id"
+                );
+
+                long total = await multiQ.ReadFirstOrDefaultAsync<long>();
+
+                return new PagingList<TicketDto>(request.PageSize, request.Page, tickets, total);
+
+            }
         }
 
         public async Task<IEnumerable<Ticket>> GetAllTicketByShowtime(int showtimeid)
@@ -40,12 +112,43 @@ namespace Term7MovieRepository.Repositories.Implement
             list = await query.ToListAsync();
             return list;
         }
-        public async Task<Ticket> GetTicketById(long id)
+        public async Task<TicketDto> GetTicketById(long id, bool isNotShowed)
         {
-            if(!await _context.Database.CanConnectAsync())
-                return null;
-            Ticket ticket = await _context.Tickets.FindAsync(id);
-            return ticket;
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT t.Id, t.ShowtimeId, t.ShowStartTime, 
+                              t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
+                              t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
+                              t.SeatId, s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, 
+                              tt.Id, tt.Name, tt.CompanyId,   
+                              sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle'
+                       FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
+                            JOIN SeatTypes st ON s.SeatTypeId = st.Id
+                            JOIN TicketStatuses ts ON t.StatusId = ts.Id 
+                            JOIN ShowtimeTicketTypes shtt ON shtt.Id = t.ShowtimeTicketTypeId 
+                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id
+                            JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
+                            JOIN Movies m ON m.Id = sh.MovieId
+                            JOIN Theaters th ON sh.TheaterId = th.Id 
+                       WHERE t.Id = @id " +
+
+                       GetAdditionalTicketFilter( new TicketFilterRequest { IsNotShowedYet = isNotShowed }, FILTER_BY_IS_SHOWED);
+                object param = new { id };
+
+                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto, TicketDto>( sql,
+                    (t, s, st, tt, sh) =>
+                    {
+                        t.TicketType = tt;
+                        s.SeatType = st;
+                        t.Seat = s;
+                        t.Showtime = sh;
+                        return t;
+                    }, param, splitOn: "Id"
+                );
+
+                return tickets.FirstOrDefault();
+            }
         }
         public async Task<bool> BuyTicket(Guid transactionId, IEnumerable<long> idList)
         {
@@ -74,18 +177,18 @@ namespace Term7MovieRepository.Repositories.Implement
                     foreach(TicketCreateRequest ticket in request.Tickets)
                     {
                         string sql =
-                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, OriginalPrice, ReceivePrice, SellingPrice, StatusId) 
-                           SELECT @SeatId, @ShowTimeId, @ShowStartTime, @OriginalPrice, @ReceivePrice, @ReceivePrice + (@OriginalPrice - @ReceivePrice) * @SellingPriceRatio, 1 
-                           FROM Seats s JOIN SeatTypes st ON s.SeatTypeId = st.Id
-                           WHERE s.Id = @SeatId ";
+                        @" INSERT INTO Tickets (SeatId, ShowTimeId, ShowStartTime, ReceivePrice, SellingPrice, StatusId, ShowtimeTicketTypeId ) 
+                           SELECT @SeatId, sh.Id, sh.StartTime , shtt.ReceivePrice, ROUND(shtt.ReceivePrice*(1 + @SellingPriceRatio), 0), 1, @ShowtimeTicketTypeId
+                           FROM ShowtimeTicketTypes shtt 
+                                JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
+                                JOIN Seats s ON s.RoomId = sh.RoomId
+                           WHERE s.Id = @SeatId 
+                                AND shtt.Id = @ShowtimeTicketTypeId ";
 
                         object param = new 
                         { 
                             ticket.SeatId,
-                            ticket.ShowTimeId,
-                            ticket.ShowStartTime,
-                            ticket.OriginalPrice,
-                            ticket.ReceivePrice,
+                            ticket.ShowtimeTicketTypeId,
                             _profitFormulaOption.SellingPriceRatio };
 
                         count += await con.ExecuteAsync(sql, param, transaction: transaction);
@@ -93,6 +196,12 @@ namespace Term7MovieRepository.Repositories.Implement
 
                     if (count == request.Tickets.Count())
                     {
+                        ShowtimeDto showtime = GetShowtimeByShowtimeTicketType(request.Tickets.First().ShowtimeTicketTypeId);
+
+                        IEnumerable<TicketDto> tickets = GetTicketByShowtimeId(showtime.Id);
+
+                        await _cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_SHOWTIME_TICKET, tickets);
+
                         await transaction.CommitAsync();
                         return count;
                     }
@@ -106,6 +215,58 @@ namespace Term7MovieRepository.Repositories.Implement
                 return 0;
             }
         }
+
+        private IEnumerable<TicketDto> GetTicketByShowtimeId(long showtimeId)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT t.Id, t.ShowtimeId, t.ShowStartTime, 
+                              t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
+                              t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
+                              t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
+                              tt.Id, tt.Name, tt.CompanyId   
+                       FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
+                            JOIN SeatTypes st ON s.SeatTypeId = st.Id
+                            JOIN TicketStatuses ts ON t.StatusId = ts.Id 
+                            JOIN ShowtimeTicketTypes shtt ON shtt.Id = t.ShowtimeTicketTypeId 
+                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id
+                       WHERE t.ShowtimeId = @showtimeId ";
+
+
+                object param = new { showtimeId };
+
+                IEnumerable<TicketDto> tickets = con.Query<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(sql,
+                    (t, s, st, tt) =>
+                    {
+                        t.TicketType = tt;
+                        s.SeatType = st;
+                        t.Seat = s;
+                        return t;
+                    }, param, splitOn: "Id"
+                );
+
+                return tickets;
+            }
+        }
+
+        private ShowtimeDto GetShowtimeByShowtimeTicketType(Guid showtimeTicketTypeId)
+        {
+            ShowtimeDto showtimeDto = null;
+
+            using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" SELECT sh.Id, sh.StartTime
+                                FROM Showtimes sh JOIN ShowtimeTicketTypes shtt ON sh.Id = shtt.ShowtimeId 
+                                WHERE shtt.Id = @showtimeTicketTypeId ";
+                object param = new { showtimeTicketTypeId};
+                showtimeDto = con.QueryFirstOrDefault<ShowtimeDto>(sql, param);
+            }
+
+
+            return showtimeDto;
+        }
+
         public async Task DeleteExpiredTicket()
         {
             await Task.CompletedTask;
@@ -131,24 +292,27 @@ namespace Term7MovieRepository.Repositories.Implement
             return valid;
         }
 
-        public async Task<IEnumerable<Ticket>> GetTicketByIdListAsync(IEnumerable<long> idList)
+        public IEnumerable<TicketDto> GetTicketByIdList(IEnumerable<long> idList)
         {
-            IEnumerable<Ticket> list = new List<Ticket>();
+            IEnumerable<TicketDto> list = null;
 
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    " SELECT t.Id, t.SellingPrice, s.Id, s.Name, s.RoomId, st.Id, st.Name, st.BonusPrice " +
-                    " FROM Tickets t JOIN Seats s ON t.SeatId = s.Id " +
-                    "   JOIN SeatTypes st ON s.SeatTypeId = st.Id " +
-                    " WHERE t.Id IN @idList ";
+                    @" SELECT t.Id, t.SellingPrice, tt.Id, tt.Name 
+                       FROM Tickets t JOIN ShowtimeTicketTypes shtt ON t.ShowtimeTicketTypeId = shtt.Id
+                            JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
+                       WHERE t.Id IN @idList 
+                            AND t.ShowStartTime > GETUTCDATE() 
+                            AND ( t.LockedTime IS NULL OR t.LockedTime < GETUTCDATE()) 
+                            AND t.TransactionId IS NULL ";
+
                 object param = new { idList };
 
-                list = await con.QueryAsync<Ticket, Seat, SeatType, Ticket>(sql, 
-                    (t, s, st) => 
+                list = con.Query<TicketDto, TicketTypeDto, TicketDto>(sql, 
+                    (t, tt) =>
                     {
-                        s.SeatType = st;
-                        t.Seat = s;
+                        t.TicketType = tt;
                         return t;
                     }, param, splitOn: "Id");
             }
@@ -156,7 +320,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return list;
         }
 
-        public async Task LockTicketAsync(IEnumerable<long> idList)
+        public void LockTicket(IEnumerable<long> idList)
         {
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
@@ -166,7 +330,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " WHERE Id IN @idList ";
                 object param = new { idList, time = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE) };
 
-                await con.ExecuteAsync(sql, param);
+                con.Execute(sql, param);
             }
         }
 
@@ -185,7 +349,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return Tuple.Create(min, max);
         }
 
-        /*public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
+        public async Task<TicketQuanityDTO> GetQuickTicketQuanityInTwoWeek(int companyid,
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -196,30 +360,19 @@ namespace Term7MovieRepository.Repositories.Implement
                                 .Where(a => a.CompanyId == companyid)
                                 .SelectMany(a => a.Showtimes)
                                 .Select(a => a.Id).ToListAsync();
-            if (!showtimeids.Any())
-                return null; //công ty này chưa có cái rạp nào cả...
             //lấy ra số ticket có trong toàn bộ showtimeids có được từ query trên và count lại toàn bộ để ra quantity
             //đây chỉ là tuần hiện tại
             var firstquery = await _context.Showtimes
-                                .Include(a => a.Tickets)
-                                .Where(a => a.Tickets.Any(
-                                    a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1))
+                                .Where(a => showtimeids.Contains(a.Id)
                                     && a.StartTime <= DateTime.UtcNow.Date && a.StartTime >= ThisMondayWeek)
-                                .SelectMany(a => a.Tickets)
                                 .CountAsync();
             //lấy tuần trước
             var secondquery = await _context.Showtimes
-                                .Include(a => a.Tickets)
-                                .Where(a => a.Tickets.Any(
-                                    a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1))
+                                .Where(a => showtimeids.Contains(a.Id)
                                     && a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
-                                .SelectMany(a => a.Tickets)
                                 .CountAsync();
             var thirdquery = await _context.Showtimes
-                                .Include(a => a.Tickets)
-                                .Where(a => a.Tickets.Any
-                                (a => showtimeids.Contains(a.ShowTimeId != null ? a.ShowTimeId.Value : -1)))
-                                .SelectMany(a => a.Tickets)
+                                .Where(a => showtimeids.Contains(a.Id))
                                 .CountAsync();
             if (firstquery == 0 && secondquery == 0 && thirdquery == 0)
             {
@@ -247,7 +400,34 @@ namespace Term7MovieRepository.Repositories.Implement
                 dto.PercentTicketSoldChange = 0.69F;
             }
             return dto;
-        }*/
+        }
+        private string GetAdditionalTicketFilter(TicketFilterRequest request, string filter)
+        {
+            string sql = "";
+            switch(filter)
+            {
+                case FILTER_BY_SHOWTIME:
 
+                    if (request.ShowtimeId != null) sql = " AND t.ShowtimeId = @ShowtimeId ";
+
+                    break;
+                case FILTER_BY_ID:
+
+                    if (request.TicketId != null) sql = " AND t.Id = @TicketId ";
+
+                    break;
+                case FILTER_BY_IS_PURCHASED:
+
+                    if (request.IsPurchased) sql = " AND t.TransactionId IS NOT NULL ";
+
+                    break;
+                case FILTER_BY_IS_SHOWED:
+
+                    if (request.IsNotShowedYet) sql = " AND t.ShowStartTime > GETUTCDATE() ";
+
+                    break;
+            }
+            return sql;
+        }
     }
 }

@@ -7,11 +7,11 @@ namespace Term7MovieService.Services.Interface
 {
     public interface IMovieService
     {
-        Task<MovieListResponse> GetAllMovie(ParentFilterRequest request);
+        Task<MovieListResponse> GetAllMovie(MovieFilterRequest request);
 
         Task<ParentResultResponse> GetMovieById(int id);
         
-        Task<IncomingMovieResponse> GetEightLosslessLatestMovieForHomepage();
+        Task<IncomingMovieResponse> GetThreeLosslessLatestMovieForHomepage();
 
         Task<MovieNotListResponse> GetEightLatestMovieForHomepage();
 
@@ -26,7 +26,7 @@ namespace Term7MovieService.Services.Interface
 
         Task<ParentResponse> UpdateMovie(MovieUpdateRequest request);
 
-        Task<ParentResponse> DeleteMovie(int movieid);
+        Task<ParentResponse> DeleteMovie(int movieId);
 
         Task<MovieTitleResponse> GetMovieTitle();
 

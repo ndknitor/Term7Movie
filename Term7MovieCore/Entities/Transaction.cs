@@ -11,6 +11,7 @@ namespace Term7MovieCore.Entities
         public User Customer { set; get; }
         [Required]
         public DateTime PurchasedDate { set; get; }
+        public DateTime ValidUntil { set; get; }
         [Column(TypeName = "money"), Required]
         public decimal Total { set; get; }
         [Column(TypeName = "varchar(200)")]

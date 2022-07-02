@@ -1,12 +1,14 @@
-﻿using Term7MovieCore.Data.Dto;
+﻿using Term7MovieCore.Data.Collections;
+using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Room;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
     public interface IRoomRepository
     {
-        Task<IEnumerable<RoomDto>> GetAllRoomByTheaterId(int theaterId);
+        Task<PagingList<RoomDto>> GetAllRoomByTheaterId(RoomFilterRequest request);
         Task<RoomDto> GetRoomById(int id);
         Task CreateRoom(Room room);
         Task UpdateRoom(Room room);

@@ -21,9 +21,9 @@ namespace Term7MovieApi.Controllers
             _transactionService = transactionService;
         }
 
-        [Authorize(Roles = Constants.ROLE_CUSTOMER)]
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)] // policy check if ticket is available
         [HttpPost]
-        public async Task<IActionResult> CreateTransactionAsync(TransactionCreateRequest request)
+        public IActionResult CreateTransactionAsync(TransactionCreateRequest request)
         {
             IEnumerable<Claim> claims = User.Claims;
             UserDTO user = new UserDTO
@@ -33,7 +33,7 @@ namespace Term7MovieApi.Controllers
                 Email = claims.FindFirstValue(Constants.JWT_CLAIM_EMAIL)
             };
 
-            var response = await _transactionService.CreateTransactionAsync(request, user);
+            var response = _transactionService.CreateTransaction(request, user);
 
             return Ok(response);
         }

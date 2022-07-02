@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Dto.Theater;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
@@ -18,6 +19,9 @@ namespace Term7MovieRepository.Repositories.Implement
         private readonly ConnectionOption _connectionOption;
 
         private const string FILTER_NOT_SHOWED_YET = "NOT_SHOWED";
+        private const string FILTER_BY_MOVIE = "BY_MOVIE";
+        private const string FILTER_BY_THEATER = "BY_THEATER";
+        private const string FILTER_BY_DATE = "BY_DATE";
 
         public ShowtimeRepository(AppDbContext context, ConnectionOption connectionOption)
         {
@@ -33,51 +37,72 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string query =
-                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl " +
-                    " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
-                    " WHERE TheaterId = @TheaterId " +
+                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime " + 
+                    (request.IsIncludeMovie ? ", m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl ": "")  +
+                    " FROM Showtimes sh " +
+                    (request.IsIncludeMovie ? " JOIN Movies m ON sh.MovieId = m.Id " : "") +
+                    " WHERE 1 = 1 " +
 
                     GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) +
+                    GetAdditionQueryString(request, FILTER_BY_MOVIE) +
+                    GetAdditionQueryString(request, FILTER_BY_THEATER) +
+                    GetAdditionQueryString(request, FILTER_BY_DATE) +
 
-                    " ORDER BY StartTime " +
+                    " ORDER BY sh.Id " +
                     " OFFSET @offset ROWS " +
                     " FETCH NEXT @fetch ROWS ONLY ; ";
 
                 string count =
                     " SELECT COUNT(1) " +
-                    " FROM Showtimes " +
-                    " WHERE TheaterId = @TheaterId " +
+                    " FROM Showtimes sh " +
+                    " WHERE 1 = 1 " +
 
                     GetAdditionQueryString(request, FILTER_NOT_SHOWED_YET) +
+                    GetAdditionQueryString(request, FILTER_BY_MOVIE) +
+                    GetAdditionQueryString(request, FILTER_BY_THEATER) +
+                    GetAdditionQueryString(request, FILTER_BY_DATE) +
                     " ; ";
                     
 
-                string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                string showtimeTiketType = 
+                    !request.IsIncludeTicketType ? "" : 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
 
-                object param = new { request.TheaterId,  offset, fetch };
+                object param = new { request.TheaterId, request.Date?.Date, request.MovieId, offset, fetch };
 
                 var multiQ = await con.QueryMultipleAsync(query + count + showtimeTiketType, param);
 
-                IEnumerable<ShowtimeDto> results = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>((sh, m) =>
+                IEnumerable<ShowtimeDto> results;
+
+                if (request.IsIncludeMovie)
                 {
-                    sh.Movie = m;
-                    return sh;
-                }, splitOn : "Id");
+                    results = multiQ.Read<ShowtimeDto, MovieModelDto, ShowtimeDto>((sh, m) =>
+                    {
+                        sh.Movie = m;
+                        return sh;
+                    }, splitOn: "Id");
+                } 
+                else
+                {
+                    results = await multiQ.ReadAsync<ShowtimeDto>();
+                }
 
                 int total = await multiQ.ReadFirstOrDefaultAsync<int>();
 
-                IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt , tt) =>
+                if (request.IsIncludeTicketType)
                 {
-                    shtt.TicketType = tt;
-                    return shtt;
-                });
+                    IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
+                    {
+                        shtt.TicketType = tt;
+                        return shtt;
+                    });
 
-                foreach(ShowtimeDto showtime in results)
-                {
-                    showtime.ShowtimeTicketTypes = showtimeTicketTypes.Where(shtt => shtt.ShowtimeId == showtime.Id);
+                    foreach (ShowtimeDto showtime in results)
+                    {
+                        showtime.ShowtimeTicketTypes = showtimeTicketTypes.Where(shtt => shtt.ShowtimeId == showtime.Id);
+                    }
                 }
 
                 list = new PagingList<ShowtimeDto>(request.PageSize, request.Page, results, total);
@@ -115,7 +140,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " ; ";
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
                 object param = new { managerId, offset, fetch };
@@ -158,7 +183,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " WHERE sh.Id = @id ; ";
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.OriginalPrice, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
                       WHERE shtt.ShowtimeId = @id ";
 
@@ -203,8 +228,8 @@ namespace Term7MovieRepository.Repositories.Implement
                     scopeIdentity = await con.QueryFirstOrDefaultAsync<long>(sql + getIdentity, request, transaction:transaction);
 
                     string insertShowtimeTicketType =
-                        @" INSERT INTO ShowtimeTicketTypes (Id, ShowtimeId, TicketTypeId, OriginalPrice, ReceivePrice) 
-                           VALUES (NEWID(), @scopeIdentity, @TicketTypeId, @OriginalPrice, @ReceivePrice) ";
+                        @" INSERT INTO ShowtimeTicketTypes (Id, ShowtimeId, TicketTypeId, ReceivePrice) 
+                           VALUES (NEWID(), @scopeIdentity, @TicketTypeId, @ReceivePrice) ";
 
                     object param;
 
@@ -214,7 +239,7 @@ namespace Term7MovieRepository.Repositories.Implement
                         param = new
                         {
                             showtimeTicketType.TicketTypeId,
-                            showtimeTicketType.OriginalPrice,
+                            //showtimeTicketType.OriginalPrice,
                             showtimeTicketType.ReceivePrice,
                             scopeIdentity
                         };
@@ -336,7 +361,16 @@ namespace Term7MovieRepository.Repositories.Implement
             switch(filter)
             {
                 case FILTER_NOT_SHOWED_YET:
-                    if (request.IsNotShowedYet) query = " AND StartTime > GETUTCDATE() ";
+                    if (request.IsNotShowedYet) query = " AND sh.StartTime > GETUTCDATE() ";
+                    break;
+                case FILTER_BY_THEATER:
+                    if (request.TheaterId != null) query = " AND sh.TheaterId = @TheaterId ";
+                    break;
+                case FILTER_BY_MOVIE:
+                    if (request.MovieId != null) query = " AND sh.MovieId = @MovieId ";
+                    break;
+                case FILTER_BY_DATE:
+                    if (request.Date != null) query = " AND CAST(sh.StartTime AS DATE) = @Date ";
                     break;
             }
 
@@ -458,23 +492,24 @@ namespace Term7MovieRepository.Repositories.Implement
             return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
         }
 
-        public async Task<bool> CanManagerCreateTicket(long managerId, long showtimeId, DateTime startTime, IEnumerable<long> seatId)
+        public async Task<bool> CanManagerCreateTicket(long managerId, IEnumerable<Guid> showtimeTicketTypeId, IEnumerable<long> seatId)
         {
             bool valid = false;
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" SELECT COUNT(*)
+                    @" SELECT COUNT(*) OVER()
                        FROM Showtimes sh JOIN Theaters th ON sh.TheaterId = th.Id
-                            JOIN Rooms r ON r.TheaterId = sh.TheaterId
-                            JOIN Seats s ON s.RoomId = r.Id 
+                            JOIN Seats s ON s.RoomId = sh.RoomId
+                            JOIN ShowtimeTicketTypes shtt ON shtt.ShowtimeId = sh.Id
                        WHERE th.ManagerId = @managerId 
-                            AND sh.Id = @showtimeId 
+                            AND shtt.Id IN @showtimeTicketTypeId 
                             AND s.Id IN @seatId
-                            AND sh.StartTime = @startTime ";
+                            AND sh.StartTime > GETUTCDATE()
+                       GROUP BY s.Id ";   // count(*) over(): count after group by
 
-                object param = new { managerId, showtimeId, startTime, seatId };
+                object param = new { managerId, showtimeTicketTypeId, seatId };
 
                 int count = await con.QueryFirstOrDefaultAsync<int>(sql, param);
 
@@ -482,6 +517,50 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return valid;
+        }
+
+        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(int companyid,
+            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            int TotalShowtime = await _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.CompanyId == companyid)
+                                            .CountAsync();
+            int ShowtimePreviousWeek = await _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.CompanyId == companyid &&
+                                            xxx.StartTime <= SundayPreviousWeek && xxx.StartTime >= MondayPreviousWeek)
+                                            .CountAsync();
+            int ShowtimeThisWeek = await _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.CompanyId == companyid &&
+                                            xxx.StartTime <= DateTime.UtcNow && xxx.StartTime >= ThisMondayWeek)
+                                            .CountAsync();
+            if(TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
+            {
+                TotalShowtime = 1;
+                ShowtimePreviousWeek = 1;
+                ShowtimeThisWeek = 1;
+            }
+            ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
+            dto.TotalShowtimeQuantity = TotalShowtime;
+            dto.OldShowtimeQuantity = ShowtimePreviousWeek;
+            dto.NewShowtimeQuantity = ShowtimeThisWeek;
+            if(ShowtimeThisWeek > ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimePreviousWeek * (float)100F / (float)ShowtimeThisWeek);
+                dto.IsShowtimeUpOrDown = true;
+            }
+            else if(ShowtimeThisWeek < ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimeThisWeek * (float)100F / (float)ShowtimePreviousWeek);
+                dto.IsShowtimeUpOrDown = false;
+            }
+            else if(ShowtimeThisWeek == ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = 0.69F;
+                dto.IsShowtimeUpOrDown = true; //be positive, why not (:
+            }
+            return dto;
         }
     }
 }
