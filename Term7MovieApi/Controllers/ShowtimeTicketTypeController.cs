@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Term7MovieCore.Data;
+using Term7MovieCore.Data.Request;
 using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
@@ -22,6 +24,15 @@ namespace Term7MovieApi.Controllers
         public async Task<IActionResult> GetShowtimeTicketTypeByShowtimeIdAsync([Required][FromQuery] long showtimeId)
         {
             var response = await _showtimeTicketTypeService.GetShowtimeTicketTypeByShowtimeIdAsync(showtimeId);
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = Constants.ROLE_MANAGER)]
+        public async Task<IActionResult> CreateShowtimeTicketTypeAsync([FromBody] ShowtimeTicketTypeCreateRequest request)
+        {
+            var response = await _showtimeTicketTypeService.CreateShowtimeTicketTypeAsync(request);
 
             return Ok(response);
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Exceptions;
@@ -71,10 +72,18 @@ namespace Term7MovieApi.Filters
                     context.Result = new JsonResult(response);
 
                     break;
+                case SqlException:
 
+                    _logger.LogError($"{message}\n {context.Exception.StackTrace}\n");
+
+                    response.Message = ErrorMessageConstants.ERROR_MESSAGE_DUPLICATE;
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    context.Result = new JsonResult(response);
+
+                    break;
 
                 default:
-                    _logger.LogError(context.Exception.StackTrace);
+                    _logger.LogError($"{context.Exception.Source}\n {message}\n {context.Exception.StackTrace}\n" );
 
                     response.Message = message;
                     context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
