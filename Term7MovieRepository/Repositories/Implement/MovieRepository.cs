@@ -46,7 +46,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     GetAdditionalMovieFilter(request, FILTER_BY_AVAILABLE) +
                     GetAdditionalMovieFilter(request, FILTER_BY_DISABLED) +
 
-                    @" ORDER BY Id 
+                    @" ORDER BY ReleaseDate DESC 
                        OFFSET @offset ROWS 
                        FETCH NEXT @fetch ROWS ONLY ; ";
 

@@ -124,6 +124,14 @@ namespace Term7MovieCore.Entities
                 .WithMany(tt => tt.ShowtimeTicketTypes)
                 .HasForeignKey(stt => stt.TicketTypeId);
 
+            builder.Entity<ShowtimeTicketType>()
+                .HasIndex(shtt => new { shtt.ShowtimeId, shtt.TicketTypeId })
+                .IsUnique(true);
+
+            builder.Entity<TicketType>()
+                .HasIndex(tt => new { tt.Name, tt.CompanyId })
+                .IsUnique(true);
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();

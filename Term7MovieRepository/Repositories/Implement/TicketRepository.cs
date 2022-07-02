@@ -196,13 +196,14 @@ namespace Term7MovieRepository.Repositories.Implement
 
                     if (count == request.Tickets.Count())
                     {
+                        await transaction.CommitAsync();
+
                         ShowtimeDto showtime = GetShowtimeByShowtimeTicketType(request.Tickets.First().ShowtimeTicketTypeId);
 
-                        IEnumerable<TicketDto> tickets = GetTicketByShowtimeId(showtime.Id);
+                        IEnumerable<TicketDto> tickets = await GetTicketByShowtimeId(showtime.Id);
 
                         await _cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_SHOWTIME_TICKET, tickets);
 
-                        await transaction.CommitAsync();
                         return count;
                     }
                 } 
@@ -216,10 +217,11 @@ namespace Term7MovieRepository.Repositories.Implement
             }
         }
 
-        private IEnumerable<TicketDto> GetTicketByShowtimeId(long showtimeId)
+        private async Task<IEnumerable<TicketDto>> GetTicketByShowtimeId(long showtimeId)
         {
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
+                await con.OpenAsync();
                 string sql =
                     @" SELECT t.Id, t.ShowtimeId, t.ShowStartTime, 
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
@@ -236,7 +238,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 object param = new { showtimeId };
 
-                IEnumerable<TicketDto> tickets = con.Query<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(sql,
+                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(sql,
                     (t, s, st, tt) =>
                     {
                         t.TicketType = tt;

@@ -150,7 +150,10 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql = @" INSERT INTO Companies (Name, LogoUrl, IsActive) 
-                                VALUES (@Name, @LogoUrl, 1) ";
+                                VALUES (@Name, @LogoUrl, 1) ;
+                               
+                                INSERT INTO TicketTypes (Name, CompanyId) 
+                                VALUES ('Flash Sale', SCOPE_IDENTITY()) ; ";
 
                 count = await con.ExecuteAsync(sql, request);
 

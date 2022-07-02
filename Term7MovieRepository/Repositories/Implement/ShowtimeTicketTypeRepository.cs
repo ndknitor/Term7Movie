@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Options;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
 using Term7MovieRepository.Repositories.Interfaces;
 
@@ -42,6 +43,26 @@ namespace Term7MovieRepository.Repositories.Implement
                 }, param, splitOn: "Id");
             }
             return list;
+        }
+
+        public async Task<int> InsertShowtimeTicketType(ShowtimeTicketTypeCreateRequest request)
+        {
+            int count = 0;
+
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" INSERT INTO ShowtimeTicketTypes (Id, ShowtimeId, TicketTypeId, ReceivePrice) 
+                       SELECT NEWID(), @ShowtimeId, @TicketTypeId, @ReceivePrice
+                       FROM Showtimes sh
+                       WHERE StartTime > GETUTCDATE() 
+                             AND sh.Id = @ShowtimeId
+                    ";
+
+                count = await con.ExecuteAsync(sql, request);
+            }
+
+            return count;
         }
     }
 }

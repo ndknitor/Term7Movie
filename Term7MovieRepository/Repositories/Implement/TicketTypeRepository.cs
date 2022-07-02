@@ -76,7 +76,14 @@ namespace Term7MovieRepository.Repositories.Implement
                     request.Name,
                     managerId
                 };
-                count = await con.ExecuteAsync(sql, param);
+                try
+                {
+                    count = await con.ExecuteAsync(sql, param);
+                }
+                catch
+                {
+                    throw new BadRequestException("Duplicate ticket type");
+                }
             }
 
             return count;

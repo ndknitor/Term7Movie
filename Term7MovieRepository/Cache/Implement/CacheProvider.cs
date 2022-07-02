@@ -73,7 +73,7 @@ namespace Term7MovieRepository.Cache.Implement
                     string showtimeRedisKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + firstTicket.ShowTimeId;
 
                     TimeSpan expire = firstTicket.ShowStartTime - DateTime.UtcNow;
-                    foreach (var ticket in (TicketDto[]) valueSet)
+                    foreach (var ticket in (IEnumerable<TicketDto>) valueSet)
                     {
                         entries[i] = new HashEntry(firstTicket.ShowTimeId, showtimeRedisKey);
                         i++;
