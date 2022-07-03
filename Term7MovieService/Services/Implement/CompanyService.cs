@@ -1,4 +1,4 @@
-﻿using Term7MovieCore.Data;
+using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Exceptions;

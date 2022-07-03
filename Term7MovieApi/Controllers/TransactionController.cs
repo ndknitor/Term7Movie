@@ -6,11 +6,13 @@ using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Extensions;
 using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Response;
+using Term7MovieCore.Extensions;
 using Term7MovieService.Services.Interface;
 
 namespace Term7MovieApi.Controllers
 {
-    [Route("api/v1/transaction")]
+    [Route("api/v1/transactions")]
     [ApiController]
     public class TransactionController : ControllerBase
     {
@@ -21,9 +23,31 @@ namespace Term7MovieApi.Controllers
             _transactionService = transactionService;
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllTransactionAsync([FromQuery] TransactionFilterRequest request)
+        {
+            long userId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+
+            var response = await _transactionService.GetAllTransactionAsync(request, userId, role);
+
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpGet("{transactionId:Guid}")]
+        public async Task<IActionResult> GetAllTransactionAsync(Guid transactionId)
+        {
+
+            var response = await _transactionService.GetTransactionByIdAsync(transactionId);
+
+            return Ok(response);
+        }
+
         [Authorize(Roles = Constants.ROLE_CUSTOMER)] // policy check if ticket is available
         [HttpPost]
-        public IActionResult CreateTransactionAsync(TransactionCreateRequest request)
+        public IActionResult CreateTransactionAsync([FromBody] TransactionCreateRequest request)
         {
             IEnumerable<Claim> claims = User.Claims;
             UserDTO user = new UserDTO
@@ -49,6 +73,16 @@ namespace Term7MovieApi.Controllers
         {
             await _transactionService.ProcessPaymentAsync(request);
             return NoContent();
+        }
+
+        [HttpGet("status-code")]
+        public IActionResult GetStatusCodes()
+        {
+            return Ok(new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = "[{\"Id\":1,\"Name\":\"Failed\"},{\"Id\":2,\"Name\":\"Successful\"},{\"Id\":3,\"Name\":\"Pending\"},{\"Id\":4,\"Name\":\"Cancelled\"}]".ToObject<IEnumerable<TransactionStatusDto>>()
+            });
         }
     }
 }

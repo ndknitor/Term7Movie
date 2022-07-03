@@ -24,7 +24,6 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetTheatersAsync([FromQuery] TheaterFilterRequest request)
         {
             string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
@@ -36,7 +35,6 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet("{theaterId:int}")]
-        [Authorize]
         public async Task<IActionResult> GetTheatersAsync(int theaterId)
         {
             var response = await _theaterService.GetTheaterByIdAsync(theaterId);

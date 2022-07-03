@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
