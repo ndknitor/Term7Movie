@@ -200,7 +200,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 showtime = list.FirstOrDefault();
 
-                IEnumerable<ShowtimeTicketTypeDto> showtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
+                showtime.ShowtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
                 {
                     shtt.TicketType = tt;
                     return shtt;
