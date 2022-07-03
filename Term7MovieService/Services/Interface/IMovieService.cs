@@ -1,4 +1,4 @@
-﻿using Term7MovieCore.Data.Request;
+using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Data.Response.Movie;

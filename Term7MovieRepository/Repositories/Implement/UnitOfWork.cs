@@ -34,7 +34,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public ITicketRepository TicketRepository { get => new TicketRepository(_context, _connectionOption, _profitFormulaOption, _cacheProvider); }
         public ITicketStatusRepository TicketStatusRepository { get => new TicketStatusRepository(_context); }
         public ITransactionHistoryRepository TransactionHistoryRepository { get => new TransactionHistoryRepository(_context, _connectionOption); }
-        public ITransactionRepository TransactionRepository { get => new TransactionRepository(_context); }
+        public ITransactionRepository TransactionRepository { get => new TransactionRepository(_context, _connectionOption); }
         public ITransactionStatusRepository TransactionStatusRepository { get => new TransactionStatusRepository(_context); }
         public IUserRepository UserRepository { get => new UserRepository(_context, _connectionOption); }
         public IPromotionCodeRepository PromotionCodeRepository { get => new PromotionCodeRepository(_context); }

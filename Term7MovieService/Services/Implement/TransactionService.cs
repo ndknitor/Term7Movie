@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Options;
 using Term7MovieCore.Data;
+using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Enum;
 using Term7MovieCore.Data.Exceptions;
@@ -83,6 +84,27 @@ namespace Term7MovieService.Services.Implement
             // successs => change transaction success => status add to history o controller khasc
 
             // add transaction id to ticket
+        }
+        public async Task<ParentResultResponse> GetAllTransactionAsync(TransactionFilterRequest request, long userId, string roleId)
+        {
+            var result = await transactionRepo.GetAllTransactionAsync(request, userId, roleId);
+
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = result
+            };
+        }
+
+        public async Task<ParentResultResponse> GetTransactionByIdAsync(Guid transactionId)
+        {
+            var result = await transactionRepo.GetTransactionByIdAsync(transactionId);
+
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = result
+            };
         }
 
         public async Task ProcessPaymentAsync(MomoIPNRequest ipn) => await _paymentService.ProcessMomoIPNRequestAsync(ipn);

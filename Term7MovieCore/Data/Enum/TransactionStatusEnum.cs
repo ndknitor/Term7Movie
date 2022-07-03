@@ -2,9 +2,9 @@
 {
     public enum TransactionStatusEnum
     {
-        Failed = 0,
-        Successful = 1,
-        Pending = 2,
-        Cancelled = 3
+        Failed = 1,
+        Successful = 2,
+        Pending = 3,
+        Cancelled = 4
     }
 }
