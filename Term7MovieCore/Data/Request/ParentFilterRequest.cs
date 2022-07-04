@@ -7,7 +7,7 @@
         public int PageSize 
         { 
             set => pageSize = value;
-            get => pageSize = pageSize > 0 && pageSize <= 50 ? pageSize : Constants.DefaultPageSize; 
+            get => pageSize = pageSize > 0 ? pageSize : Constants.DefaultPageSize; 
         }
         public int Page
         { 
