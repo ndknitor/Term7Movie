@@ -132,6 +132,10 @@ namespace Term7MovieCore.Entities
                 .HasIndex(tt => new { tt.Name, tt.CompanyId })
                 .IsUnique(true);
 
+            builder.Entity<Ticket>()
+                .HasIndex(t => new { t.SeatId, t.ShowTimeId })
+                .IsUnique(true);
+
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var name = entityType.GetTableName();
