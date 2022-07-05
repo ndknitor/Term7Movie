@@ -421,6 +421,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
                 movie.Director = request.Director;
                 movie.Languages = JsonConvert.SerializeObject(request.Languages.Distinct());
+                movie.IsAvailable = true;
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
                 await _context.Movies.AddAsync(movie);
@@ -476,7 +477,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.Description = request.Description;
                 movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
                 movie.Director = request.Director;
-                movie.Languages = request.Language;
+                movie.Languages = JsonConvert.SerializeObject(request.Language.Distinct());
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
                 _context.Update(movie);
