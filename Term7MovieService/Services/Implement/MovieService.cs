@@ -348,7 +348,8 @@ namespace Term7MovieService.Services.Implement
             dto.TotalRating = rawData.TotalRating;
             dto.Actors = string.IsNullOrEmpty(rawData.Actors) ? null :
                 JsonConvert.DeserializeObject<string[]>(rawData.Actors);
-            dto.Language = rawData.Languages;
+            dto.Languages = string.IsNullOrEmpty(rawData.Languages) ? null :
+                JsonConvert.DeserializeObject<string[]>(rawData.Languages);
             dto.Director = rawData.Director;
             //dto.DirectorId = rawData.DirectorId;
             mdr.MovieDetail = dto;
