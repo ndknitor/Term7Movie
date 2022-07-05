@@ -1,6 +1,6 @@
 ﻿namespace Term7MovieCore.Data.Dto.Movie
 {
-    public class MovieDetailDTO// :MovieModelDto //hehe why not, well chỉ vì muốn format date thôi :v
+    public class MovieDetailDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -15,7 +15,7 @@
         public float TotalRating { set; get; }
         public string Director { get; set; }
         public string[] Actors { get; set; }
-        public string Language { get; set; }
+        public string[] Languages { get; set; }
         public IEnumerable<MovieType> movieTypes { get; set; }
     }
 }

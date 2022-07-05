@@ -420,7 +420,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.Description = request.Description;
                 movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
                 movie.Director = request.Director;
-                movie.Languages = request.Language;
+                movie.Languages = JsonConvert.SerializeObject(request.Languages.Distinct());
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
                 await _context.Movies.AddAsync(movie);
