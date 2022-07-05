@@ -26,7 +26,7 @@ builder.Services.AddControllers(options => options.Filters.Add(typeof(ExceptionF
 builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(config.GetConnectionString("FCinemaConnection"), b =>
 {
     b.MigrationsAssembly("Term7MovieApi"); 
-    b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null); //hit harder so the database can return my stupid query xD
+    //b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null); //hit harder so the database can return my stupid query xD
 }));
 
 builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedPhoneNumber = false)
