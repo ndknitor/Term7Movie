@@ -56,7 +56,7 @@ namespace Term7MovieApi.Filters
                     break;
                 case DbUpdateException:
 
-                    _logger.LogError(message);
+                    _logger.LogDebug(message);
 
                     response.Message = Constants.MESSAGE_BAD_REQUEST;
                     context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -65,7 +65,7 @@ namespace Term7MovieApi.Filters
 
                 case BadRequestException:
 
-                    _logger.LogError(message);
+                    _logger.LogDebug(message);
 
                     response.Message = message;
                     context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -74,7 +74,7 @@ namespace Term7MovieApi.Filters
                     break;
                 case SqlException:
 
-                    _logger.LogError($"{message}\n {context.Exception.StackTrace}\n");
+                    _logger.LogDebug($"{message}\n {context.Exception.StackTrace}\n");
 
                     response.Message = ErrorMessageConstants.ERROR_MESSAGE_DUPLICATE;
                     context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
