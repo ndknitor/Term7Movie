@@ -52,8 +52,10 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
+                              , u.Id, u.FullName, u.Email
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
+                            JOIN Users u ON trn.CustomerId = u.Id
                        WHERE 1=1 " +
 
                        GetAdditionTransactionFilter(request, userId, role, FILTER_BY_ROLE) +
@@ -77,7 +79,13 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + count, param);
 
-                IEnumerable<TransactionDto> transactions = await multiQ.ReadAsync<TransactionDto>();
+                IEnumerable<TransactionDto> transactions = multiQ.Read<TransactionDto, UserDTO, TransactionDto>(
+                    (trn, u) =>
+                    {
+                        trn.Customer = u;
+                        return trn;
+                    }, splitOn: "Id");
+
                 long total = await multiQ.ReadFirstOrDefaultAsync<long>();
 
                 list = new PagingList<TransactionDto>(request.PageSize, request.Page, transactions, total);
