@@ -245,14 +245,13 @@ namespace Term7MovieRepository.Repositories.Implement
 
         public async Task DeleteMovie(int movieId)
         {
-            Movie movie = await _context.Movies.FindAsync(movieId);
-
+            Movie movie = await _context.Movies
+                                        .Include(a => a.MovieShowtimes)
+                                        .SingleOrDefaultAsync(x => x.Id == movieId);
+            //checking
             if (movie == null) throw new DbNotFoundException();
 
-            //check business logic
-            var query = _context.Showtimes.Where(x => x.MovieId == movieId
-                                            && x.StartTime > DateTime.UtcNow);
-            if (await query.AnyAsync())
+            if(movie.MovieShowtimes.Where(x => x.StartTime > DateTime.UtcNow).Any())
                 throw new DbBusinessLogicException("Cannot disable this movie because it's already been sold.");
 
             movie.IsAvailable = false;
