@@ -37,7 +37,7 @@ namespace Term7MovieApi.Controllers
             if (request.Action == "incoming")
                 return await GetIncomingMovies();
             if (request.Action == "latest")
-                return await GetEightLatestMovies();
+                //return await GetEightLatestMovies();
             if (request.Action == "page")
             {
                 MovieFilterRequest pfr = new MovieFilterRequest()
@@ -109,25 +109,25 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        private async Task<IActionResult> GetEightLatestMovies()
-        {
-            //sr vì chưa handle lỗi tốt lắm. hmu hmu
-            try
-            {
-                Stopwatch zaWarudo = new Stopwatch();
-                zaWarudo.Start();
-                var result = await _movieService.GetEightLatestMovieForHomepage();
-                zaWarudo.Stop();
-                _logger.LogInformation("The power of Dio has stopped the world for: " + zaWarudo.ElapsedMilliseconds);
-                if (result == null)
-                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
-            }
-        }
+        //private async Task<IActionResult> GetEightLatestMovies()
+        //{
+        //    //sr vì chưa handle lỗi tốt lắm. hmu hmu
+        //    try
+        //    {
+        //        Stopwatch zaWarudo = new Stopwatch();
+        //        zaWarudo.Start();
+        //        var result = await _movieService.GetEightLatestMovieForHomepage();
+        //        zaWarudo.Stop();
+        //        _logger.LogInformation("The power of Dio has stopped the world for: " + zaWarudo.ElapsedMilliseconds);
+        //        if (result == null)
+        //            return BadRequest(new ParentResponse { Message = "NULL DATA" });
+        //        return Ok(result);
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
+        //    }
+        //}
 
         private async Task<IActionResult> GetMoviesPaging(int pageIndex)
         {

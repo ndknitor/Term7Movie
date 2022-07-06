@@ -122,25 +122,27 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<MovieLatestResponse> GetEightLatestMovieForHomepage()
+        public async Task<MovieLatestResponse> GetLatestMovieForNowShowingPage(ParentFilterRequest request)
         {
             IEnumerable<MovieModelDto> cachedlist = await _cacheProvider.GetValueAsync<IEnumerable<MovieModelDto>>(Constants.REDIS_KEY_MOVIE);
             if(cachedlist == null)
             {
-                IEnumerable<Movie> rawData = await movieRepository.GetLatestMovies();
+                var rawData = await movieRepository.GetLatestMovies(request);
+
+                var MovieLatestList = rawData.Item1;
 
                 //Start making process
-                int[] movieIds = new int[rawData.Count()];
-                for (int j = 0; j < rawData.Count(); j++)
+                int[] movieIds = new int[MovieLatestList.Count()];
+                for (int j = 0; j < MovieLatestList.Count(); j++)
                 {
-                    movieIds[j] = rawData.ElementAt(j).Id;
+                    movieIds[j] = MovieLatestList.ElementAt(j).Id;
                 }
                 Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
                 //The code below effect RAM only
                 bool DoesItNull = false;
                 MovieLatestResponse mhpr = new MovieLatestResponse();
                 List<MovieDTO> list = new List<MovieDTO>();
-                foreach (var item in rawData)
+                foreach (var item in MovieLatestList)
                 {
                     MovieDTO movie = new MovieDTO();
                     movie.MovieId = item.Id;
@@ -159,22 +161,31 @@ namespace Term7MovieService.Services.Implement
                 if (!DoesItNull)
                     mhpr.Message = Constants.MESSAGE_SUCCESS;
                 else mhpr.Message = "Some movie categories is null";
-                mhpr.movieList = list;
+                mhpr.movieList = new PagingList<MovieDTO>
+                {
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    Results = list,
+                    Total = rawData.Item2
+                };
                 return mhpr;
             }
             else
             {
                 //we don't even touch showtime
-                var LatestMovies = cachedlist.Where(x => x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
-                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1))
+                var LatestMoviesList = cachedlist.Where(x => x.IsAvailable
+                                        && x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
+                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
+                                        && x.Title.ToLower().Contains(request.SearchKey.ToLower()))
+                                        .Skip(request.PageSize * (request.Page -1))
+                                        .Take(request.PageSize)
                                         .Select(x => new MovieDTO
                                         {
                                             MovieId = x.Id,
                                             CoverImgURL = x.CoverImageUrl,
                                             PosterImgURL = x.PosterImageUrl,
                                             Title = x.Title,
-                                            ReleaseDate = x.ReleaseDate.HasValue ? x.ReleaseDate.Value.ToString("MMM dd, yyyy")
-                                                                        : "Can't get release date",
+                                            ReleaseDate = x.ReleaseDate.Value.ToString("MMM dd, yyyy"),
                                             Duration = x.Duration,
                                             AgeRestrict = x.RestrictedAge,
                                             Categories = x.Categories.Select(xx => new MovieType
@@ -184,10 +195,23 @@ namespace Term7MovieService.Services.Implement
                                                 CateName = xx.Name
                                             }),
                                         });
+                //current paging is follow searchkey
+                long totalrecord = cachedlist.Where(x => x.IsAvailable
+                                        && x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
+                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
+                                        && x.Title.Contains(request.SearchKey))
+                                        .LongCount();
+                PagingList<MovieDTO> result = new PagingList<MovieDTO>()
+                {
+                    Results = LatestMoviesList,
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    Total = totalrecord
+                };
                 return new MovieLatestResponse
                 {
                     Message = Constants.MESSAGE_SUCCESS,
-                    movieList = LatestMovies
+                    movieList = result
                 };
             }
         }

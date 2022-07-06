@@ -300,21 +300,22 @@ namespace Term7MovieRepository.Repositories.Implement
             return movies;
         }
 
-        public async Task<IEnumerable<Movie>> GetLatestMovies()
+        public async Task<Tuple<IEnumerable<Movie>, long>> GetLatestMovies(ParentFilterRequest request)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
             //return null;
-            List<Movie> movies = new List<Movie>();
+            IEnumerable<Movie> movies = new List<Movie>();
             var query = _context.Movies
                 //lấy phim tính từ 1 tháng trước đến bây giờ
                 //order by sẽ được tối ưu hơn khi chỉ lấy phim trong vòng 1 tháng (nếu performance chưa lên thì sẽ chơi trò khác :D)
                 .Where(a => a.IsAvailable
-                            && a.ReleaseDate < DateTime.Now.AddDays(15)
-                            && a.ReleaseDate > DateTime.Now.AddMonths(-1)
-                            && !string.IsNullOrEmpty(a.CoverImageUrl)
-                            && !string.IsNullOrEmpty(a.PosterImageUrl))
+                            && a.ReleaseDate < DateTime.UtcNow.AddDays(15)
+                            && a.ReleaseDate > DateTime.UtcNow.AddMonths(-1)
+                            && a.Title.ToLower().Contains(request.SearchKey.ToLower()))
                 .OrderByDescending(a => a.ReleaseDate)
+                .Skip(request.PageSize * (request.Page - 1))
+                .Take(request.PageSize)
                 .Select(a => new Movie
                 {
                     Id = a.Id,
@@ -326,7 +327,12 @@ namespace Term7MovieRepository.Repositories.Implement
                     RestrictedAge = a.RestrictedAge
                 });
             movies = query.ToList();
-            return movies;
+            long totalrecord = await _context.Movies.Where(a => a.IsAvailable
+                                                          && a.ReleaseDate < DateTime.UtcNow.AddDays(15)
+                                                          && a.ReleaseDate > DateTime.UtcNow.AddMonths(-1)
+                                                          && a.Title.ToLower().Contains(request.SearchKey.ToLower()))
+                                        .LongCountAsync();
+            return Tuple.Create(movies, totalrecord);
 
         }
 
@@ -337,18 +343,28 @@ namespace Term7MovieRepository.Repositories.Implement
             Dictionary<int, IEnumerable<MovieType>> result = new Dictionary<int, IEnumerable<MovieType>>();
             foreach(int movieId in MovieIds)
             {
-                var list = _context.MovieCategories
-                                                .Include(a => a.Category)
-                                                .Where(a => a.MovieId == movieId).ToList();
-                List<MovieType> categories = new List<MovieType>();
-                foreach(var category in list)
-                {
-                    MovieType mt = new MovieType();
-                    mt.CateId = category.CategoryId;
-                    mt.CateName = category.Category.Name;
-                    categories.Add(mt);
-                }
-                result.Add(movieId, categories);
+                //var list = _context.MovieCategories
+                //                                .Include(a => a.Category)
+                //                                .Where(a => a.MovieId == movieId).ToList();
+                //List<MovieType> categories = new List<MovieType>();
+                //foreach(var category in list)
+                //{
+                //    MovieType mt = new MovieType();
+                //    mt.CateId = category.CategoryId;
+                //    mt.CateName = category.Category.Name;
+                //    categories.Add(mt);
+                //}
+                //result.Add(movieId, categories);
+                var query = _context.MovieCategories
+                                        .Include(a => a.Category)
+                                        .Where(a => a.MovieId == movieId)
+                                        .Select(xx => new MovieType
+                                        {
+                                            CateColor = xx.Category.Color,
+                                            CateId = xx.CategoryId,
+                                            CateName = xx.Category.Name
+                                        });
+                result.Add(movieId, query);
             }
 
 
