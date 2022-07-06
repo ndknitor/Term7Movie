@@ -122,46 +122,98 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<MovieNotListResponse> GetEightLatestMovieForHomepage()
+        public async Task<MovieLatestResponse> GetLatestMovieForNowShowingPage(ParentFilterRequest request)
         {
-            IEnumerable<Movie> rawData = await movieRepository.GetEightLatestMovies();
-            if (!rawData.Any())
-                return new MovieNotListResponse { Message = "Empty database" };
+            IEnumerable<MovieModelDto> cachedlist = await _cacheProvider.GetValueAsync<IEnumerable<MovieModelDto>>(Constants.REDIS_KEY_MOVIE);
+            if(cachedlist == null)
+            {
+                var rawData = await movieRepository.GetLatestMovies(request);
 
-            //rawData = rawData.ToList().OrderByDescending(a => a.ReleaseDate).Take(8);
-            
-            //Start making process
-            int[] movieIds = new int[rawData.Count()];
-            for(int j = 0; j < rawData.Count(); j++)
-            {
-                movieIds[j] = rawData.ElementAt(j).Id;
+                var MovieLatestList = rawData.Item1;
+
+                //Start making process
+                int[] movieIds = new int[MovieLatestList.Count()];
+                for (int j = 0; j < MovieLatestList.Count(); j++)
+                {
+                    movieIds[j] = MovieLatestList.ElementAt(j).Id;
+                }
+                Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
+                //The code below effect RAM only
+                bool DoesItNull = false;
+                MovieLatestResponse mhpr = new MovieLatestResponse();
+                List<MovieDTO> list = new List<MovieDTO>();
+                foreach (var item in MovieLatestList)
+                {
+                    MovieDTO movie = new MovieDTO();
+                    movie.MovieId = item.Id;
+                    movie.CoverImgURL = item.CoverImageUrl;
+                    movie.PosterImgURL = item.PosterImageUrl;
+                    movie.Title = item.Title;
+                    movie.AgeRestrict = item.RestrictedAge;
+                    movie.Duration = item.Duration;
+                    DateTime dt = item.ReleaseDate;
+                    movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
+                    //movie.Types = categories.GetValueOrDefault(item.Id);
+                    if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
+                    movie.Categories = categories.GetValueOrDefault(item.Id);
+                    list.Add(movie);
+                }
+                if (!DoesItNull)
+                    mhpr.Message = Constants.MESSAGE_SUCCESS;
+                else mhpr.Message = "Some movie categories is null";
+                mhpr.movieList = new PagingList<MovieDTO>
+                {
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    Results = list,
+                    Total = rawData.Item2
+                };
+                return mhpr;
             }
-            Dictionary<int, IEnumerable<MovieType>> categories = await movieRepository.GetCategoriesFromMovieList(movieIds);
-            //The code below effect RAM only
-            bool DoesItNull = false;
-            MovieNotListResponse mhpr = new MovieNotListResponse();
-            List<MovieDTO> list = new List<MovieDTO>();
-            foreach (var item in rawData)
+            else
             {
-                MovieDTO movie = new MovieDTO();
-                movie.MovieId = item.Id;
-                movie.CoverImgURL = item.CoverImageUrl;
-                movie.PosterImgURL = item.PosterImageUrl;
-                movie.Title = item.Title;
-                movie.AgeRestrict = item.RestrictedAge;
-                movie.Duration = item.Duration;
-                DateTime dt = item.ReleaseDate;
-                movie.ReleaseDate = dt.ToString("MMM") + " " + dt.ToString("dd") + ", " + dt.ToString("yyyy");
-                //movie.Types = categories.GetValueOrDefault(item.Id);
-                if (movie.Categories == null || movie.Categories.Count() == 0) DoesItNull = true;
-                movie.Categories = categories.GetValueOrDefault(item.Id);
-                list.Add(movie);
+                //we don't even touch showtime
+                var LatestMoviesList = cachedlist.Where(x => x.IsAvailable
+                                        && x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
+                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
+                                        && x.Title.ToLower().Contains(request.SearchKey.ToLower()))
+                                        .Skip(request.PageSize * (request.Page -1))
+                                        .Take(request.PageSize)
+                                        .Select(x => new MovieDTO
+                                        {
+                                            MovieId = x.Id,
+                                            CoverImgURL = x.CoverImageUrl,
+                                            PosterImgURL = x.PosterImageUrl,
+                                            Title = x.Title,
+                                            ReleaseDate = x.ReleaseDate.Value.ToString("MMM dd, yyyy"),
+                                            Duration = x.Duration,
+                                            AgeRestrict = x.RestrictedAge,
+                                            Categories = x.Categories.Select(xx => new MovieType
+                                            {
+                                                CateColor = xx.Color,
+                                                CateId = xx.Id,
+                                                CateName = xx.Name
+                                            }),
+                                        });
+                //current paging is follow searchkey
+                long totalrecord = cachedlist.Where(x => x.IsAvailable
+                                        && x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
+                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
+                                        && x.Title.Contains(request.SearchKey))
+                                        .LongCount();
+                PagingList<MovieDTO> result = new PagingList<MovieDTO>()
+                {
+                    Results = LatestMoviesList,
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    Total = totalrecord
+                };
+                return new MovieLatestResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS,
+                    movieList = result
+                };
             }
-            if (!DoesItNull)
-                mhpr.Message = Constants.MESSAGE_SUCCESS;
-            else mhpr.Message = "Some movie categories is null";
-            mhpr.movieList = list;
-            return mhpr;
         }
 
         public async Task<MoviePagingResponse> GetMovieListFollowPage(MovieListPageRequest request)
@@ -481,23 +533,44 @@ namespace Term7MovieService.Services.Implement
         /* -------------------- START GET TITLE MOVIE ------------------ */
         public async Task<MovieTitleResponse> GetMovieTitle()
         {
-            var rawData = await movieRepository.GetMoviesTitle();
-            if (rawData == null) return new MovieTitleResponse { Message = "Cant access database" };
-            List<MovieTitleDTO> list = new List<MovieTitleDTO>();
-            foreach(var item in rawData)
+            var movielist = await _cacheProvider.GetValueAsync<IEnumerable<MovieModelDto>>(Constants.REDIS_KEY_MOVIE);
+            if(movielist == null)
             {
-                MovieTitleDTO dto = new MovieTitleDTO()
+                var rawData = await movieRepository.GetMoviesTitle();
+                if (rawData == null) return new MovieTitleResponse { Message = "Cant access database" };
+                List<MovieTitleDTO> list = new List<MovieTitleDTO>();
+                foreach (var item in rawData)
                 {
-                    MovieId = item.Id,
-                    Title = item.Title,
+                    MovieTitleDTO dto = new MovieTitleDTO()
+                    {
+                        MovieId = item.Id,
+                        Title = item.Title,
+                    };
+                    list.Add(dto);
+                }
+                return new MovieTitleResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS,
+                    MovieTitles = list
                 };
-                list.Add(dto);
             }
-            return new MovieTitleResponse
+            else
             {
-                Message = Constants.MESSAGE_SUCCESS,
-                MovieTitles = list
-            };
+                var titles = movielist.Where(xxx => xxx.IsAvailable
+                                                && xxx.ReleaseDate <= DateTime.UtcNow.AddDays(15)
+                                                && xxx.ReleaseDate >= DateTime.UtcNow.AddMonths(-1))
+                                      .Select(xx => new MovieTitleDTO
+                                      {
+                                          MovieId = xx.Id,
+                                          Title = xx.Title,
+                                      }).ToList();
+                return new MovieTitleResponse
+                {
+                    Message = Constants.MESSAGE_SUCCESS,
+                    MovieTitles = titles
+                };
+            }
+            
         }
         /* ---------------------- END GET TITLE MOVIE --------------- */
         
@@ -944,17 +1017,5 @@ namespace Term7MovieService.Services.Implement
         }
         
         /* ------------ END FAKE DATA ZONE ------------------- */
-    }
-
-    public class MovieSorter
-    {//TIME > LOCATION > PRICE
-        public TheaterShowTimeLocationDTO current { get; set; }//TIME
-        public int TimeRecommendPoint { get; set; }
-        public double Distance { get; set; }//LOCATION
-        public double DistancePoint { get; set; }
-        public decimal MinPrice { get; set; } //COST
-        public decimal MaxPrice { get; set; } //PRICE
-        public double PricePoint { get; set; }
-        public double RecommendPoint { get; set; }
     }
 }

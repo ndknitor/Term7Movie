@@ -47,7 +47,7 @@ namespace Term7MovieApi.Controllers
                 case "incoming":
                     return await GetIncomingMovies();
                 case "latest":
-                    return await GetEightLatestMovies();
+                    return await GetEightLatestMovies(new ParentFilterRequest { Page = request.PageIndex, PageSize = request.PageSize, SearchKey = request.SearchKey });
                 case "undermaintain-page":
                     return await GetMoviesPaging(new MovieListPageRequest
                     {
@@ -106,19 +106,10 @@ namespace Term7MovieApi.Controllers
             return Ok(result);
         }
 
-        private async Task<IActionResult> GetEightLatestMovies()
+        private async Task<IActionResult> GetEightLatestMovies(ParentFilterRequest request)
         {
-            try
-            {
-                var result = await _movieService.GetEightLatestMovieForHomepage();
-                if (result == null)
-                    return BadRequest(new ParentResponse { Message = "NULL DATA" });
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest(new ParentResponse { Message = "CANNOT REACH DATABASE" });
-            }
+            var result = await _movieService.GetLatestMovieForNowShowingPage(request);
+            return Ok(result);
         }
 
         private async Task<IActionResult> GetMoviesPaging(MovieListPageRequest request)
