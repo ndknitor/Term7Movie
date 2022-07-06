@@ -245,9 +245,14 @@ namespace Term7MovieRepository.Repositories.Implement
 
         public async Task DeleteMovie(int movieId)
         {
-            Movie movie = await _context.Movies.FindAsync(movieId);
-
+            Movie movie = await _context.Movies
+                                        .Include(a => a.MovieShowtimes)
+                                        .SingleOrDefaultAsync(x => x.Id == movieId);
+            //checking
             if (movie == null) throw new DbNotFoundException();
+
+            if(movie.MovieShowtimes.Where(x => x.StartTime > DateTime.UtcNow).Any())
+                throw new DbBusinessLogicException("Cannot disable this movie because it's already been sold.");
 
             movie.IsAvailable = false;
         }
@@ -477,6 +482,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.Description = request.Description;
                 movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
                 movie.Director = request.Director;
+                movie.IsAvailable = request.isAvailable;
                 movie.Languages = JsonConvert.SerializeObject(request.Language.Distinct());
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
