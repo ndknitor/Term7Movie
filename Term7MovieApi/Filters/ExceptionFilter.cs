@@ -82,6 +82,13 @@ namespace Term7MovieApi.Filters
 
                     break;
 
+                case DbBusinessLogicException:
+
+                    _logger.LogDebug(message);
+                    response.Message = message;
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    context.Result = new JsonResult(response);
+                    break;
                 default:
                     _logger.LogError($"{context.Exception.Source}\n {message}\n {context.Exception.StackTrace}\n" );
 

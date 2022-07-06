@@ -249,6 +249,12 @@ namespace Term7MovieRepository.Repositories.Implement
 
             if (movie == null) throw new DbNotFoundException();
 
+            //check business logic
+            var query = _context.Showtimes.Where(x => x.MovieId == movieId
+                                            && x.StartTime > DateTime.UtcNow);
+            if (await query.AnyAsync())
+                throw new DbBusinessLogicException("Cannot disable this movie because it's already been sold.");
+
             movie.IsAvailable = false;
         }
         public int Count()
@@ -477,6 +483,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 movie.Description = request.Description;
                 movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
                 movie.Director = request.Director;
+                movie.IsAvailable = request.isAvailable;
                 movie.Languages = JsonConvert.SerializeObject(request.Language.Distinct());
                 //movie.DirectorId = request.DirectorId;
                 movie.ExternalId = null;
