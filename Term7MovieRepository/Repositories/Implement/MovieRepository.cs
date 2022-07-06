@@ -300,7 +300,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return movies;
         }
 
-        public async Task<IEnumerable<Movie>> GetEightLatestMovies()
+        public async Task<IEnumerable<Movie>> GetLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
@@ -309,7 +309,8 @@ namespace Term7MovieRepository.Repositories.Implement
             var query = _context.Movies
                 //lấy phim tính từ 1 tháng trước đến bây giờ
                 //order by sẽ được tối ưu hơn khi chỉ lấy phim trong vòng 1 tháng (nếu performance chưa lên thì sẽ chơi trò khác :D)
-                .Where(a => a.ReleaseDate < DateTime.Now
+                .Where(a => a.IsAvailable
+                            && a.ReleaseDate < DateTime.Now.AddDays(15)
                             && a.ReleaseDate > DateTime.Now.AddMonths(-1)
                             && !string.IsNullOrEmpty(a.CoverImageUrl)
                             && !string.IsNullOrEmpty(a.PosterImageUrl))
@@ -323,9 +324,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     ReleaseDate = a.ReleaseDate,
                     Duration = a.Duration,
                     RestrictedAge = a.RestrictedAge
-                })
-                //.AsNoTracking()
-                .Take(8);
+                });
             movies = query.ToList();
             return movies;
 
@@ -334,7 +333,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<Dictionary<int, IEnumerable<MovieType>>> GetCategoriesFromMovieList(int[] MovieIds)
         {
             if (!await _context.Database.CanConnectAsync())
-                return null;
+                return null; //if you can get the movie just skip
             Dictionary<int, IEnumerable<MovieType>> result = new Dictionary<int, IEnumerable<MovieType>>();
             foreach(int movieId in MovieIds)
             {
@@ -519,18 +518,19 @@ namespace Term7MovieRepository.Repositories.Implement
 
         /* ----------------- START GET MOVIE TITLE --------------- */
         public async Task<IEnumerable<Movie>> GetMoviesTitle()
-        {
+        {// does thing making sense now?
             if (!await _context.Database.CanConnectAsync())
-                return null;
+                throw new DbOperationException("DBCONNECTION");
             List<Movie> result = new List<Movie>();
             var query = _context.Movies
-                        .Where(a => a.ReleaseDate >= DateTime.UtcNow
-                                    && a.ReleaseDate <= DateTime.UtcNow.AddDays(45))
+                        .Where(a => a.IsAvailable
+                                    && a.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
+                                    && a.ReleaseDate <= DateTime.UtcNow.AddDays(15))
                         .Select(xxx => new Movie
-                                {
-                                    Id = xxx.Id,
-                                    Title = xxx.Title, 
-                                });
+                        {
+                            Id = xxx.Id,
+                            Title = xxx.Title,
+                        });
             result = await query.ToListAsync();
             return result;
         }

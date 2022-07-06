@@ -2,7 +2,7 @@
 
 namespace Term7MovieCore.Data.Response.Movie
 {
-    public class MovieNotListResponse : ParentResponse
+    public class MovieLatestResponse : ParentResponse
     {
         public IEnumerable<MovieDTO> movieList { get; set; }
     }
