@@ -5,6 +5,7 @@ using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Dto.Theater;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Utility;
@@ -199,6 +200,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 }, splitOn: "Id");
 
                 showtime = list.FirstOrDefault();
+
+                if (showtime == null) throw new DbNotFoundException();
 
                 showtime.ShowtimeTicketTypes = multiQ.Read<ShowtimeTicketTypeDto, TicketTypeDto, ShowtimeTicketTypeDto>((shtt, tt) =>
                 {
