@@ -105,5 +105,8 @@ namespace Term7MovieCore.Data
         public const string REDIS_KEY_LOCKED_TICKET = "LOCKED_TICKETS";
 
         public const string REDIS_KEY_SHOWTIME_TICKET = "SHOWTIME_TICKETS";
+
+        //hehe bois
+        public const string DATABASE_UNAVAILABLE_MESSAGE = "DBCONNECTION";
     }
 }

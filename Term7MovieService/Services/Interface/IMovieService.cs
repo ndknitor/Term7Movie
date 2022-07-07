@@ -24,11 +24,13 @@ namespace Term7MovieService.Services.Interface
 
         Task<MovieCreateResponse> CreateMovie(MovieCreateRequest[] requests);
 
-        Task<ParentResponse> UpdateMovie(MovieUpdateRequest request);
+        //Task<ParentResponse> UpdateMovie(MovieUpdateRequest request);
 
         Task<ParentResponse> DeleteMovie(int movieId);
 
         Task<MovieTitleResponse> GetMovieTitle();
+
+        Task<ParentResponse> ReviveAMovie(int ThatMovieid);
 
         //Saved for some day that doesn't exists :v
         //Task<MovieHomePageResponse> GetMovieForHomePage(MovieHomePageRequest request);

@@ -5,6 +5,7 @@ using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto.Errors;
 using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
+using Term7MovieCore.Data.Response;
 
 namespace Term7MovieRepository.Repositories.Interfaces
 {
@@ -25,7 +26,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<IEnumerable<Movie>> GetMoviesFromSpecificPage(int page, int pageCapacity, string searchKey);
         Task<IEnumerable<MovieType>> GetCategoryFromSpecificMovieId(int movieId);
         Task<CreateMovieError> CreateMovieWithCategory(MovieCreateRequest request);
-        Task<bool> UpdateMovie(MovieUpdateRequest request);
+        //Task<bool> UpdateMovie(MovieUpdateRequest request);
+        Task<ParentResponse> RestoreMovie(int movieid);
         Task<IEnumerable<Movie>> GetMoviesTitle();
         Task<IEnumerable<Movie>> GetRemainInformationForHomePage(int[] MovieIds);
     }

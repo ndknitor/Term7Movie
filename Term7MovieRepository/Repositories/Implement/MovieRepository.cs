@@ -12,6 +12,8 @@ using Term7MovieCore.Data.Request.Movie;
 using Term7MovieCore.Data.Dto.Movie;
 using Newtonsoft.Json;
 using Term7MovieCore.Data.Exceptions;
+using Term7MovieCore.Data.Response;
+using Term7MovieCore.Data;
 
 namespace Term7MovieRepository.Repositories.Implement
 {
@@ -474,20 +476,18 @@ namespace Term7MovieRepository.Repositories.Implement
         /* ----------------- START UPDATE MOVIE ---------------------- */
         public async Task<bool> UpdateMovie(MovieUpdateRequest request)
         {
-            if (!await _context.Database.CanConnectAsync())
-                throw new DbOperationException("DBCONNECTION");
+            throw new NotImplementedException();
+            //if (!await _context.Database.CanConnectAsync())
+            //    throw new DbOperationException("DBCONNECTION");
 
-            Movie movie = await _context.Movies.FindAsync(request.MovieId);
-            if (movie == null)
-                throw new DbBusinessLogicException("Can't find movie id: " + request.MovieId);
-            movie.IsAvailable = request.isAvailable;
-            await _context.SaveChangesAsync();
-            return true;
+            //Movie movie = await _context.Movies.FindAsync(request.MovieId);
+            //if (movie == null)
+            //    throw new DbBusinessLogicException("Can't find movie id: " + request.MovieId);
             //bool DoesItGood = true;
             //using var transaction = await _context.Database.BeginTransactionAsync();
             //try
             //{
-            //    Movie movie = _context.Movies.SingleOrDefault(a => a.Id == request.MovieId);
+            //    //Movie movie = _context.Movies.SingleOrDefault(a => a.Id == request.MovieId);
             //    movie.Title = request.Title;
             //    movie.ReleaseDate = request.ReleasedDate;
             //    movie.Duration = request.Duration;
@@ -525,11 +525,23 @@ namespace Term7MovieRepository.Repositories.Implement
             //    await transaction.CommitAsync();
             //    return DoesItGood;
             //}
-            //catch(Exception ex)
+            //catch (Exception ex)
             //{
             //    await transaction.RollbackAsync();
             //    throw new Exception(ex.Message);
             //}
+        }
+
+        public async Task<ParentResponse> RestoreMovie(int movieid)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new DbOperationException("DBCONNECTION");
+            Movie movie = await _context.Movies.FindAsync(movieid);
+            if (movie == null)
+                throw new DbBusinessLogicException("Movie id: " + movieid + " not found");
+            movie.IsAvailable = true;
+            await _context.SaveChangesAsync();
+            return new ParentResponse { Message = Constants.MESSAGE_SUCCESS };
         }
         /* ----------------- END UPDATE MOVIE ---------------------- */
 
