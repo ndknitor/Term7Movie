@@ -481,7 +481,6 @@ namespace Term7MovieRepository.Repositories.Implement
             if (movie == null)
                 throw new DbBusinessLogicException("Can't find movie id: " + request.MovieId);
             movie.IsAvailable = request.isAvailable;
-            _context.Movies.Update(movie);
             await _context.SaveChangesAsync();
             return true;
             //bool DoesItGood = true;
