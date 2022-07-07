@@ -282,7 +282,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies()
         {
             if (!await _context.Database.CanConnectAsync())    
-                throw new DbOperationException("DBCONNECTION");
+                throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             List<SmallMovieHomePageDTO> movies = new List<SmallMovieHomePageDTO>();
             var query = _context.Movies
                 .Where(a => a.ReleaseDate > DateTime.Now
@@ -305,7 +305,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<Tuple<IEnumerable<Movie>, long>> GetLatestMovies(ParentFilterRequest request)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new DbOperationException("DBCONNECTION");
+                throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             //return null;
             IEnumerable<Movie> movies = new List<Movie>();
             var query = _context.Movies
@@ -372,7 +372,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetRemainInformationForHomePage(int[] MovieIds)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new DbOperationException("DBCONNECTION");
+                throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             List <Movie> result = new List<Movie>();
             for(int i = 0; i < MovieIds.Length; i++)
             {
@@ -478,7 +478,7 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             throw new NotImplementedException();
             //if (!await _context.Database.CanConnectAsync())
-            //    throw new DbOperationException("DBCONNECTION");
+            //    throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
 
             //Movie movie = await _context.Movies.FindAsync(request.MovieId);
             //if (movie == null)
@@ -535,7 +535,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<ParentResponse> RestoreMovie(int movieid)
         {
             if (!await _context.Database.CanConnectAsync())
-                throw new DbOperationException("DBCONNECTION");
+                throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             Movie movie = await _context.Movies.FindAsync(movieid);
             if (movie == null)
                 throw new DbBusinessLogicException("Movie id: " + movieid + " not found");
@@ -549,7 +549,7 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IEnumerable<Movie>> GetMoviesTitle()
         {// does thing making sense now?
             if (!await _context.Database.CanConnectAsync())
-                throw new DbOperationException("DBCONNECTION");
+                throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             List<Movie> result = new List<Movie>();
             var query = _context.Movies
                         .Where(a => a.IsAvailable
