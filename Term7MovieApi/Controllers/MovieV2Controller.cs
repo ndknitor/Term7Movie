@@ -75,21 +75,21 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
-        {
-            try
-            {
-                //_logger.LogInformation(string.Join("", request.CategoryIDs));
-                var result = await _movieService.UpdateMovie(request);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
-            }
-        }
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
+        //{
+        //    try
+        //    {
+        //        //_logger.LogInformation(string.Join("", request.CategoryIDs));
+        //        var result = await _movieService.UpdateMovie(request);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogInformation(ex.Message);
+        //        return BadRequest(new ParentResponse { Message = "Chụp hình gửi Nam Trần nha huhu. " + ex.Message });
+        //    }
+        //}
 
         /* ---------------- START PRIVATE METHODS ----------------- */
         //I have used too many brain cell for this lol if i get it wrong then sorry

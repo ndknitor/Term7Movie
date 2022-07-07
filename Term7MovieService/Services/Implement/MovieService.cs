@@ -491,27 +491,30 @@ namespace Term7MovieService.Services.Implement
             return response;
         }
 
-        public async Task<ParentResponse> UpdateMovie(MovieUpdateRequest request)
-        {
-            ParentResponse response = new ParentResponse();
-            try
-            {
-                if (await movieRepository.UpdateMovie(request))
-                    response.Message = Constants.MESSAGE_SUCCESS;
-                else response.Message = "Some of category was failed while updating movie";
-            }
-            catch (Exception ex)
-            {
-                //if (ex.Message == "DBCONNECTION")
-                //    response.Message = "Data storage unaccessible.";
-                //else response.Message = "Failed to update this movie";
-                if (ex.Message == "MOVIENOTFOUND")
-                    response.Message = "Movie ID not found, the ID was " + request.MovieId;
-                else
-                    throw new Exception(ex.Message);
-            }
-            return response;
-        }
+        //public async Task<ParentResponse> UpdateMovie(MovieUpdateRequest request)
+        //{
+        //    ParentResponse response = new ParentResponse();
+        //    try
+        //    {
+        //        if (await movieRepository.UpdateMovie(request))
+        //            response.Message = Constants.MESSAGE_SUCCESS;
+        //        else response.Message = "Some of category was failed while updating movie";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //if (ex.Message == Constants.DATABASE_UNAVAILABLE_MESSAGE)
+        //        //    response.Message = "Data storage unaccessible.";
+        //        //else response.Message = "Failed to update this movie";
+        //        if (ex.Message == "MOVIENOTFOUND")
+        //            response.Message = "Movie ID not found, the ID was " + request.MovieId;
+        //        else
+        //            throw new Exception(ex.Message);
+        //    }
+        //    return response;
+        //}
+
+        public async Task<ParentResponse> ReviveAMovie(int ThatMovieid) => await movieRepository.RestoreMovie(ThatMovieid);
+
 
         public async Task<ParentResponse> DeleteMovie(int movieid)
         {
@@ -648,7 +651,7 @@ namespace Term7MovieService.Services.Implement
         //    }
         //    catch(Exception ex)
         //    {
-        //        if (ex.Message == "DBCONNECTION")
+        //        if (ex.Message == Constants.DATABASE_UNAVAILABLE_MESSAGE)
         //            return new MovieHomePageResponse { Message = "Can't access database" };
         //        if (ex.Message == "NOT ENOUGH MANA")
         //        {
@@ -708,7 +711,7 @@ namespace Term7MovieService.Services.Implement
             }
             catch(Exception ex)
             {
-                if (ex.Message == "DBCONNECTION")
+                if (ex.Message == Constants.DATABASE_UNAVAILABLE_MESSAGE)
                     return new MovieHomePageResponse { Message = "Can't access database" };
                 if (ex.Message == "NOT ENOUGH MANA")
                 {

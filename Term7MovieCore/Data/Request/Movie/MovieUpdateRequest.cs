@@ -28,8 +28,8 @@ namespace Term7MovieCore.Data.Request.Movie
         public string Description { get; set; }
         [Required]
         public bool isAvailable { get; set; }
-        //[Range(1, int.MaxValue)]
-        //public int? DirectorId { get; set; } = null;
+        [Range(1, int.MaxValue)]
+        public int? DirectorId { get; set; } = null;
         [Required]
         public int[] CategoryIDs { get; set; } = null;
         public string Director { get; set; }

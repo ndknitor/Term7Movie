@@ -79,12 +79,21 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
+        //[Authorize(Roles = Constants.ROLE_ADMIN)]
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
+        //{
+
+        //    var result = await _movieService.UpdateMovie(request);
+        //    return Ok(result);
+        //}
+
         [Authorize(Roles = Constants.ROLE_ADMIN)]
         [HttpPut]
-        public async Task<IActionResult> UpdateMovie(MovieUpdateRequest request)
+        public async Task<IActionResult> SavingMovieFromDisable(int movieid)
         {
 
-            var result = await _movieService.UpdateMovie(request);
+            var result = await _movieService.ReviveAMovie(movieid);
             return Ok(result);
         }
 
