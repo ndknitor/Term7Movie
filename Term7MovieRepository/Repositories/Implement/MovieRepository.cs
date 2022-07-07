@@ -476,55 +476,61 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            if (await _context.Movies.FindAsync(request.MovieId) == null)
-                throw new Exception("MOVIENOTFOUND");
-            bool DoesItGood = true;
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                Movie movie = _context.Movies.SingleOrDefault(a => a.Id == request.MovieId);
-                movie.Title = request.Title;
-                movie.ReleaseDate = request.ReleasedDate;
-                movie.Duration = request.Duration;
-                movie.RestrictedAge = request.RestrictedAge;
-                movie.PosterImageUrl = request.PosterImgURL;
-                movie.CoverImageUrl = request.CoverImgURL;
-                movie.TrailerUrl = request.TrailerURL;
-                movie.Description = request.Description;
-                movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
-                movie.Director = request.Director;
-                movie.IsAvailable = request.isAvailable;
-                movie.Languages = JsonConvert.SerializeObject(request.Language.Distinct());
-                //movie.DirectorId = request.DirectorId;
-                movie.ExternalId = null;
-                _context.Update(movie);
-                await _context.SaveChangesAsync();
-                //dark dark buh buh
-                _context.MovieCategories.RemoveRange(
-                    _context.MovieCategories.Where(a => a.MovieId == movie.Id));
-                await _context.SaveChangesAsync();
-                foreach (int cateID in request.CategoryIDs)
-                {
-                    Category category = await _context.Categories.FindAsync(cateID);
-                    if (category == null && DoesItGood == true)
-                    {
-                        DoesItGood = false;
-                        continue;
-                    }
-                    MovieCategory mc = new MovieCategory();
-                    mc.MovieId = movie.Id;
-                    mc.CategoryId = category.Id;
-                    await _context.MovieCategories.AddAsync(mc);
-                    await _context.SaveChangesAsync();
-                }
-                await transaction.CommitAsync();
-                return DoesItGood;
-            }
-            catch(Exception ex)
-            {
-                await transaction.RollbackAsync();
-                throw new Exception(ex.Message);
-            }
+
+            Movie movie = await _context.Movies.FindAsync(request.MovieId);
+            if (movie == null)
+                throw new DbBusinessLogicException("Can't find movie id: " + request.MovieId);
+            movie.IsAvailable = request.isAvailable;
+            _context.Movies.Update(movie);
+            await _context.SaveChangesAsync();
+            return true;
+            //bool DoesItGood = true;
+            //using var transaction = await _context.Database.BeginTransactionAsync();
+            //try
+            //{
+            //    Movie movie = _context.Movies.SingleOrDefault(a => a.Id == request.MovieId);
+            //    movie.Title = request.Title;
+            //    movie.ReleaseDate = request.ReleasedDate;
+            //    movie.Duration = request.Duration;
+            //    movie.RestrictedAge = request.RestrictedAge;
+            //    movie.PosterImageUrl = request.PosterImgURL;
+            //    movie.CoverImageUrl = request.CoverImgURL;
+            //    movie.TrailerUrl = request.TrailerURL;
+            //    movie.Description = request.Description;
+            //    movie.Actors = JsonConvert.SerializeObject(request.Actors.Distinct());
+            //    movie.Director = request.Director;
+            //    movie.IsAvailable = request.isAvailable;
+            //    movie.Languages = JsonConvert.SerializeObject(request.Language.Distinct());
+            //    //movie.DirectorId = request.DirectorId;
+            //    movie.ExternalId = null;
+            //    _context.Update(movie);
+            //    await _context.SaveChangesAsync();
+            //    //dark dark buh buh
+            //    _context.MovieCategories.RemoveRange(
+            //        _context.MovieCategories.Where(a => a.MovieId == movie.Id));
+            //    await _context.SaveChangesAsync();
+            //    foreach (int cateID in request.CategoryIDs)
+            //    {
+            //        Category category = await _context.Categories.FindAsync(cateID);
+            //        if (category == null && DoesItGood == true)
+            //        {
+            //            DoesItGood = false;
+            //            continue;
+            //        }
+            //        MovieCategory mc = new MovieCategory();
+            //        mc.MovieId = movie.Id;
+            //        mc.CategoryId = category.Id;
+            //        await _context.MovieCategories.AddAsync(mc);
+            //        await _context.SaveChangesAsync();
+            //    }
+            //    await transaction.CommitAsync();
+            //    return DoesItGood;
+            //}
+            //catch(Exception ex)
+            //{
+            //    await transaction.RollbackAsync();
+            //    throw new Exception(ex.Message);
+            //}
         }
         /* ----------------- END UPDATE MOVIE ---------------------- */
 
