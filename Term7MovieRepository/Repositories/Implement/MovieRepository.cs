@@ -314,8 +314,6 @@ namespace Term7MovieRepository.Repositories.Implement
                             && a.ReleaseDate > DateTime.UtcNow.AddMonths(-1)
                             && a.Title.ToLower().Contains(request.SearchKey.ToLower()))
                 .OrderByDescending(a => a.ReleaseDate)
-                .Skip(request.PageSize * (request.Page - 1))
-                .Take(request.PageSize)
                 .Select(a => new Movie
                 {
                     Id = a.Id,
@@ -327,11 +325,9 @@ namespace Term7MovieRepository.Repositories.Implement
                     RestrictedAge = a.RestrictedAge
                 });
             movies = query.ToList();
-            long totalrecord = await _context.Movies.Where(a => a.IsAvailable
-                                                          && a.ReleaseDate < DateTime.UtcNow.AddDays(15)
-                                                          && a.ReleaseDate > DateTime.UtcNow.AddMonths(-1)
-                                                          && a.Title.ToLower().Contains(request.SearchKey.ToLower()))
-                                        .LongCountAsync();
+            long totalrecord = movies.LongCount();
+            movies = movies.Skip(request.PageSize * (request.Page - 1))
+                .Take(request.PageSize);
             return Tuple.Create(movies, totalrecord);
 
         }
