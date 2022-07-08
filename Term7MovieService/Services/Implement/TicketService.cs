@@ -126,7 +126,7 @@ namespace Term7MovieService.Services.Implement
             switch(role)
             {
                 case Constants.ROLE_CUSTOMER:
-                    string showtimeKey = await cacheProvider.GetHashFieldValueAsync<string>(Constants.REDIS_KEY_SHOWTIME_TICKET, Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + showtimeId);
+                    string showtimeKey = await cacheProvider.GetHashFieldValueAsync(Constants.REDIS_KEY_SHOWTIME_TICKET, showtimeId + "");
 
                     if (showtimeKey != null)
                     {

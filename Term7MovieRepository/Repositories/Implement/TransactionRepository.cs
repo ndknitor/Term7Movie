@@ -37,6 +37,8 @@ namespace Term7MovieRepository.Repositories.Implement
 
             dbTransaction.StatusId = statusId;
             dbTransaction.MomoResultCode = momoStatus;
+
+            await _context.SaveChangesAsync();
         }
 
         // Background service => update transaction where staus = pending to cancelled when ValidUntil time due
@@ -51,7 +53,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 int offset = (request.Page - 1) * request.PageSize;
 
                 string sql =
-                    @" SELECT trn.Id, trn.CustomerId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
+                    @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
@@ -137,7 +139,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
 
                 string sql =
-                    @" SELECT trn.Id, trn.CustomerId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
+                    @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id

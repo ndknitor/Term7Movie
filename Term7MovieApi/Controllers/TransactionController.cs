@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
@@ -62,14 +63,17 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [HttpGet("payment-complete")]
-        public IActionResult PaymentComplete()
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)] // policy check if ticket is available
+        [HttpGet("complete-payment")]
+        public async Task<IActionResult> CompletePayment([Required][FromQuery] Guid transactionId)
         {
-            return Ok("Payment Complete");
+            var response = await _transactionService.CheckPaymentStatus(transactionId);
+
+            return Ok(response);
         }
 
         [HttpPost("call-back")]
-        public async Task<IActionResult> MomoIPNCallBack(MomoIPNRequest request)
+        private async Task<IActionResult> MomoIPNCallBack(MomoIPNRequest request)
         {
             await _transactionService.ProcessPaymentAsync(request);
             return NoContent();

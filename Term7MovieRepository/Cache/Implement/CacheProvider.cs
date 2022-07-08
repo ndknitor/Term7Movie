@@ -62,10 +62,9 @@ namespace Term7MovieRepository.Cache.Implement
             return await redis.KeyExistsAsync(key);
         }
 
-        public async Task PutHashMapAsync(string key, IEnumerable<object> valueSet)
+        public async Task PutHashMapAsync<T>(string key, IEnumerable<T> valueSet)
         {
             HashEntry[] entries = new HashEntry[valueSet.Count()];
-            int i = 0;
             switch (valueSet.First())
             {
                 case TicketDto:
@@ -73,11 +72,7 @@ namespace Term7MovieRepository.Cache.Implement
                     string showtimeRedisKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + firstTicket.ShowTimeId;
 
                     TimeSpan expire = firstTicket.ShowStartTime - DateTime.UtcNow;
-                    foreach (var ticket in (IEnumerable<TicketDto>) valueSet)
-                    {
-                        entries[i] = new HashEntry(firstTicket.ShowTimeId, showtimeRedisKey);
-                        i++;
-                    }
+                    entries[0] = new HashEntry(firstTicket.ShowTimeId, showtimeRedisKey);
                     await redis.StringSetAsync(showtimeRedisKey, valueSet.ToJson(), expire);
                     break;
             }
@@ -99,18 +94,18 @@ namespace Term7MovieRepository.Cache.Implement
             return redis.HashExists(hashKey, key);
         }
 
-        public T GetHashFieldValue<T>(string hashKey, string key)
+        public string GetHashFieldValue(string hashKey, string key)
         {
             object o = redis.HashGet(hashKey, key);
 
-            return o == null ? default : (T)o;
+            return o == null ? default : o.ToString();
         }
 
-        public async Task<T> GetHashFieldValueAsync<T>(string hashKey, string key)
+        public async Task<string> GetHashFieldValueAsync(string hashKey, string key)
         {
-            object o = await redis.HashGetAsync(hashKey, key);
+            RedisValue o = await redis.HashGetAsync(hashKey, key);
 
-            return o == null ? default : (T)o;
+            return o .IsNullOrEmpty? default : o.ToString();
         }
     }
 }

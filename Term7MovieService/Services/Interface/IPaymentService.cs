@@ -9,5 +9,6 @@ namespace Term7MovieService.Services.Interface
     {
         MomoPaymentCreateResponse CreateMomoPaymentRequest(TransactionDto transaction, UserDTO user);
         Task ProcessMomoIPNRequestAsync(MomoIPNRequest ipn);
+        Task<int> CheckMomoPayment(TransactionDto transaction);
     }
 }
