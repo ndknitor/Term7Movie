@@ -27,8 +27,16 @@ namespace Term7MovieApi.Controllers
         {
             long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
             //gonna check manager later
-            var result = await _anaService.GetQuickAnalystForDashboard(companyid, managerId);
+            var result = await _anaService.GetQuickAnalystDashboardForManager(companyid, managerId);
             //_logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
+            return Ok(result);
+        }
+
+        [HttpGet("admin")]
+        [Authorize(Roles = Constants.ROLE_ADMIN)]
+        public async Task<IActionResult> QuickDashboardForAdmin()
+        {
+            var result = await _anaService.GetQuickAnalystDashboardForAdmin();
             return Ok(result);
         }
     }

@@ -28,5 +28,8 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(int companyid, 
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+
+        Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(DateTime ThisMondayWeek,
+            DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
     }
 }
