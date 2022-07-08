@@ -36,10 +36,7 @@ namespace Term7MovieApi.Controllers
         [Authorize(Roles = Constants.ROLE_ADMIN)]
         public async Task<IActionResult> QuickDashboardForAdmin()
         {
-            long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
-            //gonna check manager later
             var result = await _anaService.GetQuickAnalystDashboardForAdmin();
-            //_logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
             return Ok(result);
         }
     }
