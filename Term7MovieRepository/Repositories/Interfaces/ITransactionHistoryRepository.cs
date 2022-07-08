@@ -16,5 +16,9 @@ namespace Term7MovieRepository.Repositories.Interfaces
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
         Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(int companyid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek, 
+            DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek, 
+            DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
     }
 }
