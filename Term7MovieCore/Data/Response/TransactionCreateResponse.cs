@@ -2,6 +2,6 @@
 {
     public class TransactionCreateResponse : ParentResponse
     {
-        public MomoPaymentCreateResponse Result {set;get;}
+        //public MomoPaymentCreateResponse Result {set;get;}
     }
 }
