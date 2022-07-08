@@ -227,23 +227,28 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
-                              tt.Id, tt.Name, tt.CompanyId   
+                              tt.Id, tt.Name, tt.CompanyId,
+                              sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle'
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
                             JOIN TicketStatuses ts ON t.StatusId = ts.Id 
                             JOIN ShowtimeTicketTypes shtt ON shtt.Id = t.ShowtimeTicketTypeId 
                             JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id
+                            JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
+                            JOIN Movies m ON m.Id = sh.MovieId
+                            JOIN Theaters th ON sh.TheaterId = th.Id 
                        WHERE t.ShowtimeId = @showtimeId ";
 
 
                 object param = new { showtimeId };
 
-                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(sql,
-                    (t, s, st, tt) =>
+                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto,TicketDto>(sql,
+                    (t, s, st, tt, sh) =>
                     {
                         t.TicketType = tt;
                         s.SeatType = st;
                         t.Seat = s;
+                        t.Showtime = sh;
                         return t;
                     }, param, splitOn: "Id"
                 );

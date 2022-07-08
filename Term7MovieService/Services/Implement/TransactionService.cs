@@ -9,6 +9,7 @@ using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Entities;
+using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
 
@@ -21,70 +22,110 @@ namespace Term7MovieService.Services.Implement
         private readonly ITicketRepository ticketRepo;
         private readonly IPaymentService _paymentService;
         private readonly IMapper mapper;
+        private readonly ICacheProvider cacheProvider;
 
         private object lockObject = new object();
 
-        public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService, IMapper mapper)
+        public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService, IMapper mapper, ICacheProvider cacheProvider)
         {
             _unitOfWork = unitOfWork;
             transactionRepo = _unitOfWork.TransactionRepository;
             ticketRepo = _unitOfWork.TicketRepository;
             _paymentService = paymentService;
             this.mapper = mapper;
+            this.cacheProvider = cacheProvider;
         }
 
         public TransactionCreateResponse CreateTransaction(TransactionCreateRequest request, UserDTO user)
         {
             lock(lockObject)
             {
-                IEnumerable<TicketDto> tickets = ticketRepo.GetTicketByIdList(request.IdList);
+                string showtimeTicketKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + request.ShowtimeId;
 
-                decimal total = tickets.Sum(t => t.SellingPrice);
+                if (!cacheProvider.IsHashExist(Constants.REDIS_KEY_SHOWTIME_TICKET, request.ShowtimeId.ToString())) throw new BadRequestException("Showtime not exist");
 
+                IEnumerable<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(showtimeTicketKey);
 
-                // create transaction - pending
+                if (tickets == null || !tickets.Any()) throw new BadRequestException("No ticket available");
+
+                decimal total = 0;
+
+                foreach(long ticketId in request.TicketIdList)
+                {
+                    TicketDto ticket = tickets.Where(t => t.Id == ticketId).FirstOrDefault();
+
+                    if (ticket == null || ticket.LockedTime > DateTime.UtcNow)
+                    {
+                        throw new BadRequestException($"Ticket with id: {ticketId} is not available");
+                    }
+
+                    total += ticket.SellingPrice;
+                    ticket.LockedTime = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE).AddSeconds(10);
+                    ticket.TransactionId = request.TransactionId;
+                }
+
+                TicketDto first = tickets.First();
+
                 Transaction transaction = new Transaction
                 {
-                    Id = Guid.NewGuid(),
                     CustomerId = user.Id,
+                    Id = request.TransactionId,
                     PurchasedDate = DateTime.UtcNow,
                     StatusId = (int)TransactionStatusEnum.Pending,
-                    ValidUntil = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE - 1),
+                    TheaterId = first.Showtime.TheaterId,
+                    ValidUntil = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE),
                     Total = total,
+                    ShowtimeId = request.ShowtimeId
                 };
 
                 transactionRepo.CreateTransaction(transaction);
 
-                TransactionDto transactionDto = mapper.Map<TransactionDto>(transaction);
-
                 if (_unitOfWork.Complete())
                 {
-
-                    // lock ticket
-                    ticketRepo.LockTicket(request.IdList);
-
-                    // create momo payment request
-                    transactionDto.Tickets = tickets;
-
-                    var result = _paymentService.CreateMomoPaymentRequest(transactionDto, user);
-
-                    if (result == null) throw new DbOperationException("Cannot create momo payment request");
+                    cacheProvider.Expire = first.ShowStartTime - DateTime.UtcNow;
+                    if (cacheProvider.Expire > TimeSpan.Zero) cacheProvider.SetValue(showtimeTicketKey, tickets);
 
                     return new TransactionCreateResponse
                     {
-                        Result = result,
                         Message = Constants.MESSAGE_SUCCESS
                     };
                 }
-
+                     
                 throw new DbOperationException();
             }
-            
-
-            // successs => change transaction success => status add to history o controller khasc
-
-            // add transaction id to ticket
         }
+
+        public async Task<ParentResponse> CheckPaymentStatus(Guid transactionId)
+        {
+            TransactionDto transaction = await transactionRepo.GetTransactionByIdAsync(transactionId);
+
+            if (transaction == null) throw new DbNotFoundException();
+
+            if (transaction.ValidUntil < DateTime.UtcNow) throw new BadRequestException("Transaction Expired");
+
+            int statusId = await _paymentService.CheckMomoPayment(transaction);
+
+            if (statusId != (int)TransactionStatusEnum.Successful)
+            {
+                throw new BadRequestException("Transaction failed");
+            }
+
+            string showtimeTicketKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + transaction.ShowtimeId;
+
+            List<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(showtimeTicketKey).ToList();
+
+            IEnumerable<long> boughtTicket = tickets.Where(t => t.TransactionId == transactionId).Select(t => t.Id) ;
+
+            await ticketRepo.BuyTicket(transactionId, boughtTicket);
+
+            await transactionRepo.UpdateTransaction(transactionId, statusId, 0);
+
+            return new ParentResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
+
         public async Task<ParentResultResponse> GetAllTransactionAsync(TransactionFilterRequest request, long userId, string roleId)
         {
             var result = await transactionRepo.GetAllTransactionAsync(request, userId, roleId);

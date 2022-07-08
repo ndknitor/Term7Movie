@@ -11,6 +11,7 @@ namespace Term7MovieCore.Entities
         public User Customer { set; get; }
         public int? TheaterId { set; get; }
         public Theater Theater { set; get; }
+        public long? ShowtimeId { set; get; }
         [Required]
         public DateTime PurchasedDate { set; get; }
         public DateTime ValidUntil { set; get; }

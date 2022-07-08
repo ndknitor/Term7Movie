@@ -148,7 +148,7 @@ namespace Term7MovieApi.Handlers
 
             ITicketRepository ticketRepository = _unitOfWork.TicketRepository;
 
-            return await ticketRepository.IsTicketInShowtimeValid(resource.ShowtimeId, resource.IdList);
+            return await ticketRepository.IsTicketInShowtimeValid(resource.ShowtimeId, resource.TicketIdList);
         }
 
         private async Task<bool> IsShowtimeNotOverlapValid<T>( T resource)

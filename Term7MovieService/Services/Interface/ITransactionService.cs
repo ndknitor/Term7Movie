@@ -14,6 +14,7 @@ namespace Term7MovieService.Services.Interface
         TransactionCreateResponse CreateTransaction(TransactionCreateRequest request, UserDTO user);
         Task ProcessPaymentAsync(MomoIPNRequest ipn);
         Task<ParentResultResponse> GetTransactionByIdAsync(Guid transactionId);
+        Task<ParentResponse> CheckPaymentStatus(Guid transactionId);
         Task<ParentResultResponse> GetAllTransactionAsync(TransactionFilterRequest request, long userId, string roleId);
     }
 }

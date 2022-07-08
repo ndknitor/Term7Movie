@@ -11,13 +11,11 @@ namespace Term7MovieCore.Data.Request
     public class TransactionCreateRequest
     {
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD)]
+        public Guid TransactionId { get; set; }
+        [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         public long ShowtimeId { set; get; }
         [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
-        [Range(1, int.MaxValue, ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD)]
-        public int TheaterId { set; get; }
-        [Required(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_REQUIRED)]
         [UniqueLongIdList(ErrorMessage = Constants.CONSTRAINT_REQUEST_MESSAGE_INVALID_FIELD)]
-        public IEnumerable<long> IdList { set; get; }
+        public IEnumerable<long> TicketIdList { set; get; }
     }
 }
