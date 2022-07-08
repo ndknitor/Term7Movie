@@ -64,7 +64,6 @@ namespace Term7MovieRepository.Cache.Implement
 
         public async Task PutHashMapAsync<T>(string key, IEnumerable<T> valueSet)
         {
-            HashEntry[] entries = new HashEntry[valueSet.Count()];
             switch (valueSet.First())
             {
                 case TicketDto:
@@ -72,11 +71,16 @@ namespace Term7MovieRepository.Cache.Implement
                     string showtimeRedisKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + firstTicket.ShowTimeId;
 
                     TimeSpan expire = firstTicket.ShowStartTime - DateTime.UtcNow;
-                    entries[0] = new HashEntry(firstTicket.ShowTimeId, showtimeRedisKey);
+
+                    HashEntry[] entries = new HashEntry[]
+                    {
+                        new HashEntry(firstTicket.ShowTimeId, showtimeRedisKey)
+                    };
+
                     await redis.StringSetAsync(showtimeRedisKey, valueSet.ToJson(), expire);
+                    await redis.HashSetAsync(key, entries);
                     break;
             }
-            await redis.HashSetAsync(key, entries);
         }
 
         public async Task PutHashMapAsync(string key, HashEntry[] entries)
