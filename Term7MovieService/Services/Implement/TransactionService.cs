@@ -83,7 +83,12 @@ namespace Term7MovieService.Services.Implement
                 if (_unitOfWork.Complete())
                 {
                     cacheProvider.Expire = first.ShowStartTime - DateTime.UtcNow;
-                    if (cacheProvider.Expire > TimeSpan.Zero) cacheProvider.SetValue(showtimeTicketKey, tickets);
+                    if (cacheProvider.Expire > TimeSpan.Zero)
+                    {
+                        cacheProvider.SetValue(showtimeTicketKey, tickets);
+                    }
+
+                    ticketRepo.LockTicket(request.TicketIdList);
 
                     return new TransactionCreateResponse
                     {
