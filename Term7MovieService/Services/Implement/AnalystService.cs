@@ -12,7 +12,7 @@ namespace Term7MovieService.Services.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IShowtimeRepository showRepository;
-        private readonly ITicketRepository ticketRepository;
+        //private readonly ITicketRepository ticketRepository;
         private readonly ICompanyRepository companyRepository;
         private readonly ITransactionHistoryRepository tranHisRepository;
 
@@ -20,12 +20,12 @@ namespace Term7MovieService.Services.Implement
         {
             _unitOfWork = unitOfWork;
             showRepository = _unitOfWork.ShowtimeRepository;
-            ticketRepository = _unitOfWork.TicketRepository;
+            //ticketRepository = _unitOfWork.TicketRepository;
             tranHisRepository = _unitOfWork.TransactionHistoryRepository;
             companyRepository = _unitOfWork.CompanyRepository;
         }
 
-        public async Task<DashboardResponse> GetQuickAnalystForDashboard(int companyid, long? managerid)
+        public async Task<DashboardResponse> GetQuickAnalystDashboardForManager(int companyid, long? managerid)
         {
             if (managerid == null)
                 throw new DbForbiddenException();
@@ -43,9 +43,23 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
+        public async Task<DashboardResponse> GetQuickAnalystDashboardForAdmin()
+        {
+            var result = await GettingAnalystForOneWeek();
+            bool Analysable = IsItSundayYet(DateTime.UtcNow);
+            return new DashboardResponse
+            {
+                ShowtimeDashboard = result.Item1,
+                TicketSoldDashboard = result.Item2,
+                IncomeDashboard = result.Item3,
+                IsItStatistical = Analysable,
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
+
 
         /* ------------------------------------- START PRIVATE FUNCTION --------------------------------- */
-        
+
         //______ START GETTING QUICK ANALYST
         private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek(int companyid)
         {
@@ -59,6 +73,21 @@ namespace Term7MovieService.Services.Implement
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(companyid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            //trả 404 nếu 1 trong những thứ trên có vấn đề hence
+            return Tuple.Create(showtimeQuanity, ticketSold, Income);
+        }
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek()
+        {
+            DateTime RightNow = DateTime.UtcNow;
+            DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
+            DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
+            DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
+            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(MondayThisWeek, 
+                MondayPreviousWeek, SundayPreviousWeek);
+            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(MondayThisWeek, 
+                MondayPreviousWeek, SundayPreviousWeek);
+            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(MondayThisWeek, 
+                MondayPreviousWeek, SundayPreviousWeek);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
         }
