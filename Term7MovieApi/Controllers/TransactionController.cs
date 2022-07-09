@@ -67,7 +67,8 @@ namespace Term7MovieApi.Controllers
         [HttpGet("complete-payment")]
         public async Task<IActionResult> CompletePayment([Required][FromQuery] Guid transactionId)
         {
-            var response = await _transactionService.CheckPaymentStatus(transactionId);
+            long userId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            var response = await _transactionService.CheckPaymentStatus(transactionId, userId);
 
             return Ok(response);
         }
