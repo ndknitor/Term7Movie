@@ -9,6 +9,7 @@ using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Entities;
+using Term7MovieCore.Extensions;
 using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
@@ -102,32 +103,51 @@ namespace Term7MovieService.Services.Implement
             }
         }
 
-        public async Task<ParentResponse> CheckPaymentStatus(Guid transactionId)
+        public async Task<ParentResponse> CheckPaymentStatus(Guid transactionId, long userId)
         {
             TransactionDto transaction = await transactionRepo.GetTransactionByIdAsync(transactionId);
 
             if (transaction == null) throw new DbNotFoundException();
 
+            if (transaction.CustomerId != userId) throw new DbForbiddenException();
+
             if (transaction.ValidUntil < DateTime.UtcNow) throw new BadRequestException("Transaction Expired");
 
-            int statusId = await _paymentService.CheckMomoPayment(transaction);
+            //int statusId = await _paymentService.CheckMomoPayment(transaction);
 
-            if (statusId != (int)TransactionStatusEnum.Successful)
-            {
-                throw new BadRequestException("Transaction failed");
-            }
+            //if (statusId != (int)TransactionStatusEnum.Successful)
+            //{
+            //    throw new BadRequestException("Transaction failed");
+            //}
 
             string showtimeTicketKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + transaction.ShowtimeId;
 
             List<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(showtimeTicketKey).ToList();
 
-            IEnumerable<long> boughtTicket = tickets.Where(t => t.TransactionId == transactionId).Select(t => t.Id) ;
+            List<long> boughtTicket = new List<long>();
+
+            foreach (TicketDto ticket in tickets)
+            {
+                if (ticket.TransactionId == transactionId)
+                {
+                    boughtTicket.Add(ticket.Id);
+                    tickets.Remove(ticket);
+                }
+            }
+
+            TicketDto first = tickets.FirstOrDefault();
+
+            if (first != null && first.ShowStartTime < DateTime.UtcNow)
+            {
+                cacheProvider.Expire = DateTime.UtcNow - first.ShowStartTime;
+                await cacheProvider.SetValueAsync(showtimeTicketKey, tickets);
+            }
 
             await ticketRepo.BuyTicket(transactionId, boughtTicket);
 
             await transactionHistoryRepo.CreateTransactionHistory(boughtTicket);
 
-            await transactionRepo.UpdateTransaction(transactionId, statusId, 0);
+            await transactionRepo.UpdateTransaction(transactionId, (int)TransactionStatusEnum.Successful, 0);
 
             return new ParentResponse
             {
@@ -149,6 +169,8 @@ namespace Term7MovieService.Services.Implement
         public async Task<ParentResultResponse> GetTransactionByIdAsync(Guid transactionId)
         {
             var result = await transactionRepo.GetTransactionByIdAsync(transactionId);
+
+            if (result.StatusId == (int)TransactionStatusEnum.Successful) result.QRCodeUrl = result.ToJson().ToBase64String();
 
             return new ParentResultResponse
             {
