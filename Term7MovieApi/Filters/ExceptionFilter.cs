@@ -58,7 +58,7 @@ namespace Term7MovieApi.Filters
 
                     _logger.LogDebug(message);
 
-                    response.Message = Constants.MESSAGE_BAD_REQUEST;
+                    response.Message = message;
                     context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                     context.Result = new JsonResult(response);
                     break;
