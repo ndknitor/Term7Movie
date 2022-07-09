@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Enum;
 using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
@@ -182,6 +183,25 @@ namespace Term7MovieRepository.Repositories.Implement
                     });
 
                 return transaction;
+            }
+        }
+
+        public void CancelAllExpiredTransaction()
+        {
+            using(var con = new SqlConnection(connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" UPDATE Transactions 
+                       SET StatusId = @StatusCancel 
+                       WHERE StatusId = @StatusPending AND ValidUntil < GETUTCDATE() ";
+
+                object param = new
+                {
+                    StatusCancel = (int)TransactionStatusEnum.Cancelled,
+                    StatusPending = (int) TransactionStatusEnum.Pending
+                };
+
+                con.Execute(sql, param);
             }
         }
     }

@@ -112,6 +112,7 @@ namespace Term7MovieApi.Extensions
         {
             services.AddHostedService<DeleteExpiredRefreshTokenService>();
             services.AddHostedService<DistributedCacheSupportService>();
+            services.AddHostedService<CancelExpiredPendingTransactionService>();
             return services;
         }
 

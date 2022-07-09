@@ -19,6 +19,7 @@ namespace Term7MovieService.Services.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITransactionRepository transactionRepo;
+        private readonly ITransactionHistoryRepository transactionHistoryRepo;
         private readonly ITicketRepository ticketRepo;
         private readonly IPaymentService _paymentService;
         private readonly IMapper mapper;
@@ -34,6 +35,7 @@ namespace Term7MovieService.Services.Implement
             _paymentService = paymentService;
             this.mapper = mapper;
             this.cacheProvider = cacheProvider;
+            transactionHistoryRepo = _unitOfWork.TransactionHistoryRepository;
         }
 
         public TransactionCreateResponse CreateTransaction(TransactionCreateRequest request, UserDTO user)
@@ -122,6 +124,8 @@ namespace Term7MovieService.Services.Implement
             IEnumerable<long> boughtTicket = tickets.Where(t => t.TransactionId == transactionId).Select(t => t.Id) ;
 
             await ticketRepo.BuyTicket(transactionId, boughtTicket);
+
+            await transactionHistoryRepo.CreateTransactionHistory(boughtTicket);
 
             await transactionRepo.UpdateTransaction(transactionId, statusId, 0);
 
