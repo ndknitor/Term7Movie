@@ -126,13 +126,12 @@ namespace Term7MovieService.Services.Implement
 
             List<long> boughtTicket = new List<long>();
 
-            foreach (TicketDto ticket in tickets)
+            int index = -1;
+
+            while ((index = tickets.FindIndex(t => t.TransactionId == transaction.Id)) > -1)
             {
-                if (ticket.TransactionId == transactionId)
-                {
-                    boughtTicket.Add(ticket.Id);
-                    tickets.Remove(ticket);
-                }
+                boughtTicket.Add(tickets[index].Id);
+                tickets.RemoveAt(index);
             }
 
             TicketDto first = tickets.FirstOrDefault();
