@@ -56,9 +56,12 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
+                              , sh.Id, sh.MovieId, m.Title 'MovieTitle'
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
                             JOIN Users u ON trn.CustomerId = u.Id
+                            JOIN Showtimes sh ON trn.ShowtimeId = sh.Id
+                            JOIN Movies m ON m.Id = sh.MovieId
                        WHERE 1=1 " +
 
                        GetAdditionTransactionFilter(request, userId, role, FILTER_BY_ROLE) +
@@ -82,10 +85,11 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + count, param);
 
-                IEnumerable<TransactionDto> transactions = multiQ.Read<TransactionDto, UserDTO, TransactionDto>(
-                    (trn, u) =>
+                IEnumerable<TransactionDto> transactions = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto, TransactionDto>(
+                    (trn, u, sh) =>
                     {
                         trn.Customer = u;
+                        trn.Showtime = sh;
                         return trn;
                     }, splitOn: "Id");
 
@@ -142,9 +146,12 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
+                              , sh.Id, sh.MovieId, m.Title 'MovieTitle'
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
                             JOIN Users u ON trn.CustomerId = u.Id
+                            JOIN Showtimes sh ON trn.ShowtimeId = sh.Id
+                            JOIN Movies m ON m.Id = sh.MovieId
                        WHERE trn.Id = @transactionId ; ";
 
                 string queryTicket =
