@@ -171,16 +171,19 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + queryTicket, param);
 
-                TransactionDto transaction = multiQ.Read<TransactionDto, UserDTO, TransactionDto>(
-                    (trn, u) =>
+                TransactionDto transaction = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto,TransactionDto>(
+                    (trn, u, sh) =>
                     {
                         trn.Customer = u;
+                        trn.Showtime = sh;
                         return trn;
                     }, splitOn: "Id").FirstOrDefault();
 
                 if (transaction == null) throw new DbNotFoundException();
 
-                transaction.Tickets = multiQ.Read<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(
+                if (transaction.StatusId == (int) TransactionStatusEnum.Successful)
+                {
+                    transaction.Tickets = multiQ.Read<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, TicketDto>(
                     (t, s, st, tt) =>
                     {
                         s.SeatType = st;
@@ -188,6 +191,7 @@ namespace Term7MovieRepository.Repositories.Implement
                         t.TicketType = tt;
                         return t;
                     });
+                }
 
                 return transaction;
             }
@@ -209,6 +213,24 @@ namespace Term7MovieRepository.Repositories.Implement
                 };
 
                 con.Execute(sql, param);
+            }
+        }
+
+        public async Task<TransactionDto> GetTransactionInfoByIdAsync(Guid id)
+        {
+            using (var con = new SqlConnection(connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId
+                       FROM Transactions trn
+                       WHERE trn.Id = @id ";
+
+                object param = new
+                {
+                    id
+                };
+
+                return await con.QueryFirstOrDefaultAsync<TransactionDto>(sql, param);
             }
         }
     }
