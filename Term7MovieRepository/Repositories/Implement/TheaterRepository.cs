@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Theater;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -185,11 +186,20 @@ namespace Term7MovieRepository.Repositories.Implement
         }
         public async Task DeleteTheaterAsync(int id)
         {
+            var showtime = await _context.Showtimes.AsNoTracking().Where(sh => sh.TheaterId == id && sh.StartTime > DateTime.UtcNow).FirstOrDefaultAsync();
+            if (showtime != null)
+            {
+                throw new BadRequestException("There is a not-yet-showed showtime in this theater");
+            }
+
             Theater theater = await _context.Theaters.FindAsync(id);
 
             if (theater == null) return;
 
             theater.Status = false;
+
+            await DisableAllRoom(id);
+
         }
 
         public async Task<IEnumerable<TheaterDto>> GetTheaterByManagerIdAsync(long managerId)
@@ -201,7 +211,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql = 
                     " SELECT Id " +
                     " FROM Theaters " +
-                    " WHERE ManagerId = @managerId ";
+                    " WHERE ManagerId = @managerId AND Status = 1 ";
                 object param = new { managerId };
                 theaters = await con.QueryAsync<TheaterDto>(sql, param);
             }
@@ -215,7 +225,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 throw new Exception("DBCONNECTION");
             List<TheaterNameDTO> result = new List<TheaterNameDTO>();
             var query = _context.Theaters
-                            .Where(a => a.CompanyId == companyid)
+                            .Where(a => a.CompanyId == companyid && a.Status == true)
                             .Select(xxx => new TheaterNameDTO
                             {
                                 Name = xxx.Name,
@@ -238,6 +248,15 @@ namespace Term7MovieRepository.Repositories.Implement
             }
 
             return sql;
+        }
+
+        private async Task DisableAllRoom(int theaterId)
+        {
+            using(var con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql = @" UPDATE Rooms SET Status = 0 WHERE TheaterId = @theaterId ";
+                await con.ExecuteAsync(sql, new { theaterId });
+            }
         }
     }
 }

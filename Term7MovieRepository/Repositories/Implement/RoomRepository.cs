@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Room;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -31,14 +32,14 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql = 
                    @" SELECT Id, No, TheaterId, NumberOfRow, NumberOfColumn, Status
                        FROM Rooms
-                       WHERE TheaterId = @TheaterId 
+                       WHERE TheaterId = @TheaterId AND Status = 1
                        ORDER BY Id 
                        OFFSET @offset ROWS 
                        FETCH NEXT @fetch ROWS ONLY ; ";
 
                 string count = @" SELECT COUNT(*) 
                                   FROM Rooms 
-                                  WHERE TheaterId = @TheaterId ; ";
+                                  WHERE TheaterId = @TheaterId AND Status = 1 ; ";
 
                 var param = new { offset, fetch, request.TheaterId };
 
@@ -104,12 +105,22 @@ namespace Term7MovieRepository.Repositories.Implement
         }
         public async Task DeleteRoom(int id)
         {
+
+            var showtime = _context.Showtimes.AsNoTracking().Where(sh => sh.RoomId == id && sh.StartTime > DateTime.UtcNow).FirstOrDefaultAsync();
+
+            if (showtime != null)
+            {
+                throw new BadRequestException("There is a not-yet-showed showtime in this room");
+            }
+
             Room dbRoom = await _context.Rooms.FindAsync(id);
 
             if (dbRoom == null) return;
 
             dbRoom.Status = false;
         }
+
+
 
         public async Task<bool> CheckRoomExist(long managerId, int theaterId, int roomId)
         {
@@ -119,7 +130,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     " SELECT 1 " +
                     " FROM Theaters t JOIN Rooms r ON t.Id = r.TheaterId " +
-                    " WHERE t.ManagerId = @managerId AND t.Id = @theaterId AND r.Id = @roomId ";
+                    " WHERE t.ManagerId = @managerId AND t.Id = @theaterId AND r.Id = @roomId AND r.Status = 1 ";
 
                 object param = new { managerId, theaterId, roomId };
                 int count = await con.ExecuteScalarAsync<int>(sql, param);
@@ -137,7 +148,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     " SELECT r.Id " +
                     " FROM Theaters t JOIN Rooms r ON t.Id = r.TheaterId " +
-                    " WHERE t.ManagerId = @managerId ";
+                    " WHERE t.ManagerId = @managerId AND r.Status = 1 ";
 
                 object param = new { managerId };
 
@@ -153,7 +164,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 return null;
             List<RoomNumberDTO> result = new List<RoomNumberDTO>();
             var query = _context.Rooms
-                                .Where(a => a.TheaterId == theaterid)
+                                .Where(a => a.TheaterId == theaterid && a.Status == true)
                                 .Select(a => new RoomNumberDTO
                                 {
                                     RoomID = a.Id,
