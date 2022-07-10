@@ -11,6 +11,7 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task UpdateTransaction(Guid id, int statusId, int momoStatus);
         Task<PagingList<TransactionDto>> GetAllTransactionAsync(TransactionFilterRequest request, long userId, string role);
         Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId);
+        Task<TransactionDto> GetTransactionInfoByIdAsync(Guid transactionId);
         void CancelAllExpiredTransaction();
     }
 }

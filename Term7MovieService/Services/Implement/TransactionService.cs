@@ -105,7 +105,7 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<ParentResponse> CheckPaymentStatus(Guid transactionId, long userId)
         {
-            TransactionDto transaction = await transactionRepo.GetTransactionByIdAsync(transactionId);
+            TransactionDto transaction = await transactionRepo.GetTransactionInfoByIdAsync(transactionId);
 
             if (transaction == null) throw new DbNotFoundException();
 
