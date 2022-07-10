@@ -136,9 +136,9 @@ namespace Term7MovieService.Services.Implement
 
             TicketDto first = tickets.FirstOrDefault();
 
-            if (first != null && first.ShowStartTime < DateTime.UtcNow)
+            if (first != null && first.ShowStartTime > DateTime.UtcNow)
             {
-                cacheProvider.Expire = DateTime.UtcNow - first.ShowStartTime;
+                cacheProvider.Expire = first.ShowStartTime - DateTime.UtcNow;
                 await cacheProvider.SetValueAsync(showtimeTicketKey, tickets);
             }
 
