@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Term7MovieCore.Data.Dto
+{
+    public class CompanyDto
+    {
+        public int Id { set; get; }
+        public string Name { set; get; }
+        public string LogoUrl { set; get; }
+        public bool IsActive { set; get; }
+        public long? ManagerId { set; get; }
+        public string ManagerName { set; get; }
+        public string ManagerEmail { set; get; }
+        public IEnumerable<TheaterDto> Theaters { set; get; }
+    }
+}
