@@ -15,5 +15,7 @@ namespace Term7MovieService.Services.Interface
         Task<ParentResultResponse> GetTicketDetail(long id, long showtimeId, string role);
 
         Task<ParentResponse> CreateTicketAsync(TicketListCreateRequest request);
+
+        Task<ParentResponse> LockTicketAsync(LockTicketRequest request);
     }
 }

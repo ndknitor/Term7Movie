@@ -56,7 +56,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
-                              , sh.Id, sh.MovieId, m.Title 'MovieTitle'
+                              , sh.Id, sh.MovieId, m.Title 'MovieTitle', sh.StartTime, sh.EndTime
+                              , m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
                             JOIN Users u ON trn.CustomerId = u.Id
@@ -85,9 +86,10 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + count, param);
 
-                IEnumerable<TransactionDto> transactions = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto, TransactionDto>(
-                    (trn, u, sh) =>
+                IEnumerable<TransactionDto> transactions = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto, MovieModelDto, TransactionDto>(
+                    (trn, u, sh, m) =>
                     {
+                        sh.Movie = m;
                         trn.Customer = u;
                         trn.Showtime = sh;
                         return trn;
@@ -146,7 +148,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
-                              , sh.Id, sh.MovieId, m.Title 'MovieTitle'
+                              , sh.Id, sh.MovieId, m.Title 'MovieTitle', sh.StartTime, sh.EndTime
+                              , m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
                             JOIN Users u ON trn.CustomerId = u.Id
@@ -171,9 +174,10 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + queryTicket, param);
 
-                TransactionDto transaction = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto,TransactionDto>(
-                    (trn, u, sh) =>
+                TransactionDto transaction = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto, MovieModelDto, TransactionDto>(
+                    (trn, u, sh, m) =>
                     {
+                        sh.Movie = m;
                         trn.Customer = u;
                         trn.Showtime = sh;
                         return trn;

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
@@ -10,7 +5,6 @@ using Term7MovieCore.Data.Dto.Ticket;
 using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
-using Term7MovieCore.Entities;
 using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
@@ -173,6 +167,40 @@ namespace Term7MovieService.Services.Implement
             }
 
             throw new BadRequestException("Invalid Seat Id or ShowtimeTicketTypeId");
+        }
+
+        public async Task<ParentResponse> LockTicketAsync(LockTicketRequest request)
+        {
+            string showtimeTicketId = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + request.ShowtimeId;
+
+            List<TicketDto> tickets = (await cacheProvider.GetValueAsync<IEnumerable<TicketDto>>(showtimeTicketId)).ToList();
+
+            if (tickets == null || !tickets.Any())
+            {
+                throw new BadRequestException($"Ticket id {request.TicketId} not found");
+            }
+
+            TicketDto ticket = tickets.Find(t => t.Id == request.TicketId);
+            if (ticket == null) new BadRequestException($"Ticket id {request.TicketId} not found");
+
+            DateTime utcNow = DateTime.UtcNow;
+
+            ticket.LockedTime = utcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE);
+
+            int count = await ticketRepository.LockTicketAsync(request.TicketId);
+
+            if (count == 0) throw new DbOperationException();
+
+            if (ticket.ShowStartTime > utcNow)
+            {
+                cacheProvider.Expire = ticket.ShowStartTime - utcNow;
+                await cacheProvider.SetValueAsync(showtimeTicketId, tickets);
+            }
+
+            return new ParentResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS
+            };
         }
     }
 }

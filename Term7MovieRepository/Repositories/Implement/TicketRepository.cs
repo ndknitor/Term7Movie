@@ -341,6 +341,22 @@ namespace Term7MovieRepository.Repositories.Implement
             }
         }
 
+        public async Task<int> LockTicketAsync(long ticketId)
+        {
+            int count = 0;
+            using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
+            {
+                string sql =
+                    " UPDATE Tickets " +
+                    " SET LockedTime = @time " +
+                    " WHERE Id = @id ";
+                object param = new { ticketId, time = DateTime.UtcNow.AddMinutes(Constants.LOCK_TICKET_IN_MINUTE) };
+
+                count = await con.ExecuteAsync(sql, param);
+            }
+            return count;
+        }
+
         public async Task<Tuple<decimal, decimal>> GetMinAndMaxPriceFromShowTimeId(long showtimeid)
         {
             if (!await _context.Database.CanConnectAsync())
