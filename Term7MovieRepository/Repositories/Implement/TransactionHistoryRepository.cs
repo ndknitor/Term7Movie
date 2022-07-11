@@ -456,9 +456,136 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, int companyid)
+        public async Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, int companyid)
         {
-            throw new NotImplementedException();
+            if (!await _context.Database.CanConnectAsync())
+                throw new DbOperationException("DBCONNECTION");
+            List<YearlyIncomeDTO> result = new List<YearlyIncomeDTO>();
+            bool IsItOldSchool = true;
+            if (DateTime.UtcNow.Year == year)
+                IsItOldSchool = false;
+            if (IsItOldSchool)
+            {
+                for (int i = 1; i < 13; i++)
+                {
+                    //joiny joiny yes papa, 3 join statement? no papa, telling lies?, no papa, open your source code, huhuhu
+                    var DateInMonth = GetFirstDateAndLastDateOfTheMonth(i, year);
+                    var query = _context.TransactionHistories
+                                                    .Join(_context.Tickets,
+                                                        th => th.TicketId,
+                                                        tic => tic.Id, (th, tic)
+                                                         => new
+                                                         {
+                                                             PurchasedDate = th.PurchasedDate,
+                                                             Income = tic.ReceivePrice,
+                                                             Showtimeid = tic.ShowTimeId
+                                                         })
+                                                    .Join(_context.Showtimes,
+                                                        pretable => pretable.Showtimeid,
+                                                        st => st.Id, (pretable, st)
+                                                        => new
+                                                        {
+                                                            PurchasedDate = pretable.PurchasedDate,
+                                                            Income = pretable.Income,
+                                                            Theaterid = st.TheaterId
+                                                        })
+                                                    .Join(_context.Theaters,
+                                                        prepretable => prepretable.Theaterid,
+                                                        theater => theater.Id, (prepretable, theater)
+                                                        => new
+                                                        {
+                                                            PurchasedDate = prepretable.PurchasedDate,
+                                                            Income = prepretable.Income,
+                                                            Companyid = theater.CompanyId
+                                                        })
+                                                    .Where(xxx => xxx.PurchasedDate >= DateInMonth.Item1
+                                                                    && xxx.PurchasedDate <= DateInMonth.Item2
+                                                                    && xxx.Companyid == companyid)
+                                                    .Select(xx => new YearlyIncomeDTO
+                                                    {
+                                                        Month = i,
+                                                        Income = xx.Income
+                                                    });
+                    if (query.Any())
+                    {
+                        YearlyIncomeDTO dto = new YearlyIncomeDTO
+                        {
+                            Income = await query.SumAsync(x => x.Income),
+                            Month = i
+                        };
+                        result.Add(dto);
+                    }
+                    else
+                    {
+                        YearlyIncomeDTO dto = new YearlyIncomeDTO
+                        {
+                            Income = 0,
+                            Month = i
+                        };
+                        result.Add(dto);
+                    }
+                }
+                return result;
+            }
+            for (int i = 1; i <= DateTime.UtcNow.Month; i++)
+            {
+                var DateInMonth = GetFirstDateAndLastDateOfTheMonth(i, year);
+                var query = _context.TransactionHistories
+                                                    .Join(_context.Tickets,
+                                                        th => th.TicketId,
+                                                        tic => tic.Id, (th, tic)
+                                                         => new
+                                                         {
+                                                             PurchasedDate = th.PurchasedDate,
+                                                             Income = tic.ReceivePrice,
+                                                             Showtimeid = tic.ShowTimeId
+                                                         })
+                                                    .Join(_context.Showtimes,
+                                                        pretable => pretable.Showtimeid,
+                                                        st => st.Id, (pretable, st)
+                                                        => new
+                                                        {
+                                                            PurchasedDate = pretable.PurchasedDate,
+                                                            Income = pretable.Income,
+                                                            Theaterid = st.TheaterId
+                                                        })
+                                                    .Join(_context.Theaters,
+                                                        prepretable => prepretable.Theaterid,
+                                                        theater => theater.Id, (prepretable, theater)
+                                                        => new
+                                                        {
+                                                            PurchasedDate = prepretable.PurchasedDate,
+                                                            Income = prepretable.Income,
+                                                            Companyid = theater.CompanyId
+                                                        })
+                                                    .Where(xxx => xxx.PurchasedDate >= DateInMonth.Item1
+                                                                    && xxx.PurchasedDate <= DateInMonth.Item2
+                                                                    && xxx.Companyid == companyid)
+                                                    .Select(xx => new YearlyIncomeDTO
+                                                    {
+                                                        Month = i,
+                                                        Income = xx.Income
+                                                    });
+                if (query.Any())
+                {
+                    YearlyIncomeDTO dto = new YearlyIncomeDTO
+                    {
+                        Income = await query.SumAsync(x => x.Income),
+                        Month = i
+                    };
+                    result.Add(dto);
+                }
+                else
+                {
+                    YearlyIncomeDTO dto = new YearlyIncomeDTO
+                    {
+                        Income = 0,
+                        Month = i
+                    };
+                    result.Add(dto);
+                }
+            }
+            return result;
         }
 
         public async Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year)
