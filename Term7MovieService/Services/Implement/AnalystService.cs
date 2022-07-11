@@ -57,36 +57,6 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<YearlyIncomeResponse> GetYearlyIncomeForManager(int companyid, int year, long? managerid)
-        {
-            if (managerid == null)
-                throw new DbForbiddenException();
-            if (await companyRepository.GetManagerIdFromCompanyId(companyid) != managerid)
-                throw new DbForbiddenException();
-            var result = await tranHisRepository.GetIncomeForAYear(year, companyid);
-            return new YearlyIncomeResponse
-            {
-                Result = result,
-                HighestIncome = result.Max(a => a.Income),
-                LowestIncome = result.Min(a => a.Income),
-                Message = Constants.MESSAGE_SUCCESS
-            };
-        }
-
-        public async Task<YearlyIncomeResponse> GetYearlyIncomeForAdmin(int year)
-        {
-            var result = await tranHisRepository.GetIncomeForAYear(year);
-            return new YearlyIncomeResponse
-            {
-                Result = result,
-                HighestIncome = result.Max(a => a.Income),
-                LowestIncome = result.Min(a => a.Income),
-                Message = Constants.MESSAGE_SUCCESS
-            };
-        }
-
-
-
 
         /* ------------------------------------- START PRIVATE FUNCTION --------------------------------- */
 

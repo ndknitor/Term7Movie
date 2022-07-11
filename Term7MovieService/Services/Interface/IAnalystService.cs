@@ -6,7 +6,5 @@ namespace Term7MovieService.Services.Interface
     {
         Task<DashboardResponse> GetQuickAnalystDashboardForManager(int companyid, long? managerid);
         Task<DashboardResponse> GetQuickAnalystDashboardForAdmin();
-        Task<YearlyIncomeResponse> GetYearlyIncomeForManager(int companyid, int year, long? managerid);
-        Task<YearlyIncomeResponse> GetYearlyIncomeForAdmin(int year);
     }
 }
