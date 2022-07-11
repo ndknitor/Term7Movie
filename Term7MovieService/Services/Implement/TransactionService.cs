@@ -169,7 +169,7 @@ namespace Term7MovieService.Services.Implement
         {
             var result = await transactionRepo.GetTransactionByIdAsync(transactionId);
 
-            if (result.StatusId == (int)TransactionStatusEnum.Successful) result.QRCodeUrl = result.ToJson().ToBase64String();
+            if (result.StatusId == (int)TransactionStatusEnum.Successful) result.QRCodeUrl = result.ToJson().ToSHA256String();
 
             return new ParentResultResponse
             {
