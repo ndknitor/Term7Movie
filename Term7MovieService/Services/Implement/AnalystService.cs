@@ -57,6 +57,25 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
+        public Task<YearlyIncomeResponse> GetYearlyIncomeForManager(int companyid, int year)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<YearlyIncomeResponse> GetYearlyIncomeForAdmin(int year)
+        {
+            var result = await tranHisRepository.GetIncomeForAYear(year);
+            return new YearlyIncomeResponse
+            {
+                Result = result,
+                HighestIncome = result.Max(a => a.Income),
+                LowestIncome = result.Min(a => a.Income),
+                Message = Constants.MESSAGE_SUCCESS
+            };
+        }
+
+
+
 
         /* ------------------------------------- START PRIVATE FUNCTION --------------------------------- */
 

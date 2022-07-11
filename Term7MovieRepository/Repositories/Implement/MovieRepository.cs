@@ -309,10 +309,7 @@ namespace Term7MovieRepository.Repositories.Implement
             //return null;
             IEnumerable<Movie> movies = new List<Movie>();
             var query = _context.Movies
-                //lấy phim tính từ 1 tháng trước đến bây giờ
-                //order by sẽ được tối ưu hơn khi chỉ lấy phim trong vòng 1 tháng (nếu performance chưa lên thì sẽ chơi trò khác :D)
                 .Where(a => a.IsAvailable
-                            && a.ReleaseDate < DateTime.UtcNow.AddDays(15)
                             && a.ReleaseDate > DateTime.UtcNow.AddMonths(-1)
                             && a.Title.ToLower().Contains(request.SearchKey.ToLower()))
                 .OrderByDescending(a => a.ReleaseDate)

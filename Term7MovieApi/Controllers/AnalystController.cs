@@ -39,5 +39,12 @@ namespace Term7MovieApi.Controllers
             var result = await _anaService.GetQuickAnalystDashboardForAdmin();
             return Ok(result);
         }
+
+        [HttpGet("abcdefu")]
+        public async Task<IActionResult> YearlyIncome(int year)
+        {
+            var result = await _anaService.GetYearlyIncomeForAdmin(year);
+            return Ok(result);
+        }
     }
 }
