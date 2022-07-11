@@ -174,11 +174,8 @@ namespace Term7MovieService.Services.Implement
             {
                 //we don't even touch showtime
                 var LatestMoviesList = cachedlist.Where(x => x.IsAvailable
-                                        && x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
                                         && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
                                         && x.Title.ToLower().Contains(request.SearchKey.ToLower()))
-                                        .Skip(request.PageSize * (request.Page -1))
-                                        .Take(request.PageSize)
                                         .Select(x => new MovieDTO
                                         {
                                             MovieId = x.Id,
@@ -196,11 +193,9 @@ namespace Term7MovieService.Services.Implement
                                             }),
                                         });
                 //current paging is follow searchkey
-                long totalrecord = cachedlist.Where(x => x.IsAvailable
-                                        && x.ReleaseDate <= DateTime.UtcNow.AddDays(15)
-                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
-                                        && x.Title.Contains(request.SearchKey))
-                                        .LongCount();
+                long totalrecord = LatestMoviesList.LongCount();
+                LatestMoviesList = LatestMoviesList.Skip(request.PageSize * (request.Page - 1))
+                                        .Take(request.PageSize);
                 PagingList<MovieDTO> result = new PagingList<MovieDTO>()
                 {
                     Results = LatestMoviesList,
@@ -560,7 +555,6 @@ namespace Term7MovieService.Services.Implement
             else
             {
                 var titles = movielist.Where(xxx => xxx.IsAvailable
-                                                && xxx.ReleaseDate <= DateTime.UtcNow.AddDays(15)
                                                 && xxx.ReleaseDate >= DateTime.UtcNow.AddMonths(-1))
                                       .Select(xx => new MovieTitleDTO
                                       {
