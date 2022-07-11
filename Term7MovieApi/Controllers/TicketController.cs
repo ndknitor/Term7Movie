@@ -51,5 +51,13 @@ namespace Term7MovieApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpPatch("lock")]
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)]
+        public async Task<IActionResult> LockTicketAsync([FromBody] LockTicketRequest request)
+        {
+            var response = await _ticketService.LockTicketAsync(request);
+            return Ok(response);
+        }
     }
 }
