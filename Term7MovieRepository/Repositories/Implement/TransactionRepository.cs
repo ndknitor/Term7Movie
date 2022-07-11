@@ -56,7 +56,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
-                              , sh.Id, sh.MovieId, m.Title 'MovieTitle', sh.StartTime, sh.EndTime
+                              , sh.Id, sh.MovieId, m.Title 'MovieTitle', sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName'
                               , m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
@@ -148,13 +148,15 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT trn.Id, trn.CustomerId, trn.ShowtimeId, trn.TheaterId, th.Name 'TheaterName', trn.PurchasedDate, trn.Total, trn.QRCodeUrl, trn.ValidUntil, trn.MomoResultCode, trn.StatusId, trns.Name 'StatusName' 
                               , u.Id, u.FullName, u.Email
-                              , sh.Id, sh.MovieId, m.Title 'MovieTitle', sh.StartTime, sh.EndTime
+                              , sh.Id, sh.MovieId, m.Title 'MovieTitle', sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName'
                               , m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl
+                              , r.Id, r.No
                        FROM Transactions trn JOIN TransactionStatuses trns ON trn.StatusId = trns.Id 
                             JOIN Theaters th ON trn.TheaterId = th.Id
                             JOIN Users u ON trn.CustomerId = u.Id
                             JOIN Showtimes sh ON trn.ShowtimeId = sh.Id
                             JOIN Movies m ON m.Id = sh.MovieId
+                            JOIN Rooms r ON r.Id = sh.RoomId
                        WHERE trn.Id = @transactionId ; ";
 
                 string queryTicket =
@@ -174,9 +176,10 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 var multiQ = await con.QueryMultipleAsync(sql + queryTicket, param);
 
-                TransactionDto transaction = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto, MovieModelDto, TransactionDto>(
-                    (trn, u, sh, m) =>
+                TransactionDto transaction = multiQ.Read<TransactionDto, UserDTO, ShowtimeDto, MovieModelDto, RoomDto, TransactionDto>(
+                    (trn, u, sh, m, r) =>
                     {
+                        sh.Room = r;
                         sh.Movie = m;
                         trn.Customer = u;
                         trn.Showtime = sh;
