@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
@@ -205,11 +206,17 @@ namespace Term7MovieService.Services.Implement
 
         public ParentResultResponse GetTicketOnSelling()
         {
-            var result = cacheProvider.GetValue<IEnumerable<TicketDto>>(Constants.REDIS_KEY_TICKET);
+            List<TicketDto> ticketlist = new List<TicketDto>();
+            foreach(var item in cacheProvider.GetAllHashKey(Constants.FLASH_SALE))
+            {
+                TicketDto ticket = JsonConvert.DeserializeObject<TicketDto>(item.Value);
+                ticketlist.Add(ticket);
+            }
+
             return new ParentResultResponse
             {
                 Message = Constants.MESSAGE_SUCCESS,
-                Result = result
+                Result = ticketlist
             };
         }
     }
