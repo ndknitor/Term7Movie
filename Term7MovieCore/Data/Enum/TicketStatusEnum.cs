@@ -3,6 +3,7 @@
     public enum TicketStatusEnum
     {
         Available = 1,
-        Unavailable = 2
+        Unavailable = 2,
+        Sold = 3
     }
 }
