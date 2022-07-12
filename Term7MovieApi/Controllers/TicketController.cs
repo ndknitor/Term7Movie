@@ -59,5 +59,11 @@ namespace Term7MovieApi.Controllers
             var response = await _ticketService.LockTicketAsync(request);
             return Ok(response);
         }
+
+        [HttpGet("sales")]
+        public IActionResult SanSaleShopee()
+        {//shortest code challenge lul
+            return Ok(_ticketService.GetTicketOnSelling());
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
@@ -200,6 +201,25 @@ namespace Term7MovieService.Services.Implement
             return new ParentResponse
             {
                 Message = Constants.MESSAGE_SUCCESS
+            };
+        }
+
+        public ParentResultResponse GetTicketOnSelling()
+        {
+            List<TicketDto> ticketlist = new List<TicketDto>();
+            foreach(var item in cacheProvider.GetAllHashValue(Constants.REDIS_KEY_SHOWTIME_TICKET))
+            {
+                //throw new Exception("result: " + item.ToString());
+                IEnumerable<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(item);
+                if (tickets == null) continue;
+                tickets = tickets.Where(x => (x.LockedTime <= DateTime.UtcNow || x.LockedTime == null)
+                                                && x.TicketType.Name.Equals(Constants.FLASH_SALE));
+                ticketlist.AddRange(tickets);
+            }
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = ticketlist
             };
         }
     }

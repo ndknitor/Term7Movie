@@ -19,5 +19,7 @@ namespace Term7MovieRepository.Cache.Interface
         bool IsHashExist(string hashKey, string key);
         string GetHashFieldValue(string hashKey, string key);
         Task<string> GetHashFieldValueAsync(string hashKey, string key);
+        //public string[] GetAllHashKey(string hashKey);
+        public RedisValue[] GetAllHashValue(string hashKey);
     }
 }

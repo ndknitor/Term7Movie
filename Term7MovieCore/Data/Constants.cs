@@ -108,5 +108,7 @@ namespace Term7MovieCore.Data
 
         //hehe bois
         public const string DATABASE_UNAVAILABLE_MESSAGE = "DBCONNECTION";
+
+        public const string FLASH_SALE = "Flash Sale";
     }
 }
