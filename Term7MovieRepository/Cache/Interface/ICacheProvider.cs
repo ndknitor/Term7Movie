@@ -20,6 +20,6 @@ namespace Term7MovieRepository.Cache.Interface
         string GetHashFieldValue(string hashKey, string key);
         Task<string> GetHashFieldValueAsync(string hashKey, string key);
         //public string[] GetAllHashKey(string hashKey);
-        public HashEntry[] GetAllHashKey(string hashKey);
+        public RedisValue[] GetAllHashKey(string hashKey);
     }
 }

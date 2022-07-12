@@ -111,18 +111,11 @@ namespace Term7MovieRepository.Cache.Implement
 
             return o .IsNullOrEmpty? default : o.ToString();
         }
-        //i will be back a sec
-        public HashEntry[] GetAllHashKey(string hashKey)
+        
+        public RedisValue[] GetAllHashKey(string hashKey)
         {
-            var result = redis.HashGetAll(hashKey);
+            var result = redis.HashValues(hashKey);
             return result;
-            //var result = redis.HashKeys(hashKey);
-            //string[] allkeys = new string[result.Length];
-            //for(int i = 0; i < allkeys.Length; i++)
-            //{
-            //    allkeys[i] = result[i];
-            //}
-            //return result != null ? result.toob;
         }
     }
 }

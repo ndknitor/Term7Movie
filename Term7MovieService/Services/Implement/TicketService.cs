@@ -207,12 +207,15 @@ namespace Term7MovieService.Services.Implement
         public ParentResultResponse GetTicketOnSelling()
         {
             List<TicketDto> ticketlist = new List<TicketDto>();
-            foreach(var item in cacheProvider.GetAllHashKey(Constants.FLASH_SALE))
+            foreach(var item in cacheProvider.GetAllHashKey(Constants.REDIS_KEY_SHOWTIME_TICKET))
             {
-                TicketDto ticket = JsonConvert.DeserializeObject<TicketDto>(item.Value);
-                ticketlist.Add(ticket);
+                //throw new Exception("result: " + item.ToString());
+                IEnumerable<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(item);
+                if (tickets == null) continue;
+                ticketlist.AddRange(tickets);
             }
-
+            ticketlist = ticketlist.Where(x => (x.LockedTime <= DateTime.UtcNow || x.LockedTime == null)
+                                                && x.TicketType.Name.Equals(Constants.FLASH_SALE)).ToList();
             return new ParentResultResponse
             {
                 Message = Constants.MESSAGE_SUCCESS,
