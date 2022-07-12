@@ -25,13 +25,11 @@ namespace Term7MovieService.Services.Implement
             companyRepository = _unitOfWork.CompanyRepository;
         }
 
-        public async Task<DashboardResponse> GetQuickAnalystDashboardForManager(int companyid, long? managerid)
+        public async Task<DashboardResponse> GetQuickAnalystDashboardForManager(long? managerid)
         {
             if (managerid == null)
                 throw new DbForbiddenException();
-            if (await companyRepository.GetManagerIdFromCompanyId(companyid) != managerid)
-                throw new DbForbiddenException();
-            var result = await GettingAnalystForOneWeek(companyid);
+            var result = await GettingAnalystForOneWeek(managerid.Value);
             bool S1mple = IsItSundayYet(DateTime.UtcNow);
             return new DashboardResponse
             {
@@ -57,13 +55,11 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<YearlyIncomeResponse> GetYearlyIncomeForManager(int companyid, int year, long? managerid)
+        public async Task<YearlyIncomeResponse> GetYearlyIncomeForManager(int year, long? managerid)
         {
             if (managerid == null)
                 throw new DbForbiddenException();
-            if (await companyRepository.GetManagerIdFromCompanyId(companyid) != managerid)
-                throw new DbForbiddenException();
-            var result = await tranHisRepository.GetIncomeForAYear(year, companyid);
+            var result = await tranHisRepository.GetIncomeForAYear(year, managerid.Value);
             return new YearlyIncomeResponse
             {
                 Result = result,
@@ -91,17 +87,17 @@ namespace Term7MovieService.Services.Implement
         /* ------------------------------------- START PRIVATE FUNCTION --------------------------------- */
 
         //______ START GETTING QUICK ANALYST
-        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek(int companyid)
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek(long managerid)
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(companyid
+            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(companyid
+            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(companyid
+            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);

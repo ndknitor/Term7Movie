@@ -139,25 +139,25 @@ namespace Term7MovieRepository.Repositories.Implement
             }
         }
 
-        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(int companyid, /*bool Comparable,*/
+        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
             var TotalShowtimeIds = await _context.Theaters
                                 .Include(a => a.Showtimes)
-                                .Where(a => a.CompanyId == companyid)
+                                .Where(a => a.ManagerId == managerid)
                                 .SelectMany(a => a.Showtimes)
                                 .Select(a => a.Id).ToListAsync();
             var OldShowtimeIds = await _context.Theaters
                                     .Include(a => a.Showtimes)
-                                    .Where(a => a.CompanyId == companyid)
+                                    .Where(a => a.ManagerId == managerid)
                                     .SelectMany(a => a.Showtimes)
                                     .Where(a => a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
                                     .Select(a => a.Id).ToListAsync();
             var NewShowtimeIds = await _context.Theaters
                                     .Include(a => a.Showtimes)
-                                    .Where(a => a.CompanyId == companyid)
+                                    .Where(a => a.ManagerId == managerid)
                                     .SelectMany(a => a.Showtimes)
                                     .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisMondayWeek)
                                     .Select(a => a.Id).ToListAsync();
@@ -224,7 +224,7 @@ namespace Term7MovieRepository.Repositories.Implement
             
         }
 
-        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(int companyid, /*bool Comparable,*/
+        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             //throw new NotImplementedException();
@@ -232,18 +232,18 @@ namespace Term7MovieRepository.Repositories.Implement
                 throw new DbOperationException("DBCONNECTION");
             var TotalShowtimeIds = await _context.Theaters
                                 .Include(a => a.Showtimes)
-                                .Where(a => a.CompanyId == companyid)
+                                .Where(a => a.ManagerId == managerid)
                                 .SelectMany(a => a.Showtimes)
                                 .Select(a => a.Id).ToListAsync();
             var OldShowtimeIds = await _context.Theaters
                                     .Include(a => a.Showtimes)
-                                    .Where(a => a.CompanyId == companyid)
+                                    .Where(a => a.ManagerId == managerid)
                                     .SelectMany(a => a.Showtimes)
                                     .Where(a => a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
                                     .Select(a => a.Id).ToListAsync();
             var NewShowtimeIds = await _context.Theaters
                                     .Include(a => a.Showtimes)
-                                    .Where(a => a.CompanyId == companyid)
+                                    .Where(a => a.CompanyId == managerid)
                                     .SelectMany(a => a.Showtimes)
                                     .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisMondayWeek)
                                     .Select(a => a.Id).ToListAsync();
@@ -456,7 +456,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, int companyid)
+        public async Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, long managerid)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
@@ -496,11 +496,11 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         {
                                                             PurchasedDate = prepretable.PurchasedDate,
                                                             Income = prepretable.Income,
-                                                            Companyid = theater.CompanyId
+                                                            Managerid = theater.ManagerId
                                                         })
                                                     .Where(xxx => xxx.PurchasedDate >= DateInMonth.Item1
                                                                     && xxx.PurchasedDate <= DateInMonth.Item2
-                                                                    && xxx.Companyid == companyid)
+                                                                    && xxx.Managerid == managerid)
                                                     .Select(xx => new YearlyIncomeDTO
                                                     {
                                                         Month = i,
@@ -556,11 +556,11 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         {
                                                             PurchasedDate = prepretable.PurchasedDate,
                                                             Income = prepretable.Income,
-                                                            Companyid = theater.CompanyId
+                                                            Managerid = theater.ManagerId
                                                         })
                                                     .Where(xxx => xxx.PurchasedDate >= DateInMonth.Item1
                                                                     && xxx.PurchasedDate <= DateInMonth.Item2
-                                                                    && xxx.Companyid == companyid)
+                                                                    && xxx.Managerid == managerid)
                                                     .Select(xx => new YearlyIncomeDTO
                                                     {
                                                         Month = i,

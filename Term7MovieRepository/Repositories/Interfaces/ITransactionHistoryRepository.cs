@@ -12,15 +12,15 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<PagingList<TransactionHistory>> GetAllTransactionHistoryByCompanyId(ParentFilterRequest request, long managerId);
         TransactionHistory GetTransactionHistoryById(long id);
         Task CreateTransactionHistory(IEnumerable<long> idList);
-        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(int companyid, /*bool Comparable,*/
+        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(int companyid, /*bool Comparable,*/
+        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
         Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
         Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, int companyid);
+        Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, long managerid);
         Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year);
     }
 }
