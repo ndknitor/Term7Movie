@@ -522,20 +522,20 @@ namespace Term7MovieRepository.Repositories.Implement
             return valid;
         }
 
-        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(int companyid,
+        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(long managerid,
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception("DBCONNECTION");
             int TotalShowtime = await _context.Showtimes.Include(a => a.Theater)
-                                            .Where(xxx => xxx.Theater.CompanyId == companyid)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid)
                                             .CountAsync();
             int ShowtimePreviousWeek = await _context.Showtimes.Include(a => a.Theater)
-                                            .Where(xxx => xxx.Theater.CompanyId == companyid &&
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid &&
                                             xxx.StartTime <= SundayPreviousWeek && xxx.StartTime >= MondayPreviousWeek)
                                             .CountAsync();
             int ShowtimeThisWeek = await _context.Showtimes.Include(a => a.Theater)
-                                            .Where(xxx => xxx.Theater.CompanyId == companyid &&
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid &&
                                             xxx.StartTime <= DateTime.UtcNow && xxx.StartTime >= ThisMondayWeek)
                                             .CountAsync();
             if(TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)

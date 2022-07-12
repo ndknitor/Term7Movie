@@ -22,38 +22,62 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet("dashboard")]
-        [Authorize(Roles = Constants.ROLE_MANAGER)]
-        public async Task<IActionResult> QuickDashboard(int companyid)
+        [Authorize(Roles = Constants.ROLE_MANAGER + "," +  Constants.ROLE_ADMIN)]
+        public async Task<IActionResult> QuickDashboard()
         {
             long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
-            //gonna check manager later
-            var result = await _anaService.GetQuickAnalystDashboardForManager(companyid, managerId);
-            //_logger.LogInformation("You cost: " + slow.ElapsedMilliseconds);
-            return Ok(result);
+            string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+            switch(role)
+            {
+                case Constants.ROLE_MANAGER:
+                    return await QuickDashboardForManager(managerId);
+                case Constants.ROLE_ADMIN:
+                    return await QuickDashboardForAdmin();
+                default:
+                    return Forbid();
+            }
         }
 
-        [HttpGet("dashboard/admin")]
-        [Authorize(Roles = Constants.ROLE_ADMIN)]
-        public async Task<IActionResult> QuickDashboardForAdmin()
+        [HttpGet("yearly-income")]
+        [Authorize(Roles = Constants.ROLE_ADMIN + "," + Constants.ROLE_MANAGER)]
+        public async Task<IActionResult> YearlyIncome(int year)
+        {
+            string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
+            long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            switch(role)
+            {
+                case Constants.ROLE_MANAGER:
+                    return await YearlyIncomeForManager(managerId, year);
+                case Constants.ROLE_ADMIN:
+                    return await YearlyIncomeForAdmin(year);
+                default:
+                    return Forbid();
+            }
+        }
+
+
+        private async Task<IActionResult> QuickDashboardForAdmin()
         {
             var result = await _anaService.GetQuickAnalystDashboardForAdmin();
             return Ok(result);
         }
 
-        [HttpGet("yearly-income/admin")]
-        [Authorize(Roles = Constants.ROLE_ADMIN)]
-        public async Task<IActionResult> YearlyIncome(int year)
+        private async Task<IActionResult> QuickDashboardForManager(long? managerid)
         {
-            var result = await _anaService.GetYearlyIncomeForAdmin(year);
+            var result = await _anaService.GetQuickAnalystDashboardForManager(managerid);
             return Ok(result);
         }
 
-        [HttpGet("yearly-income/manager")]
-        [Authorize(Roles = Constants.ROLE_MANAGER)]
-        public async Task<IActionResult> YearlyIncome(int year, int companyid)
+
+        private async Task<IActionResult> YearlyIncomeForManager(long? managerid, int year)
         {
-            long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
-            var result = await _anaService.GetYearlyIncomeForManager(companyid, year, managerId);
+            var result = await _anaService.GetYearlyIncomeForManager(year, managerid);
+            return Ok(result);
+        }
+
+        private async Task<IActionResult> YearlyIncomeForAdmin(int year)
+        {
+            var result = await _anaService.GetYearlyIncomeForAdmin(year);
             return Ok(result);
         }
     }
