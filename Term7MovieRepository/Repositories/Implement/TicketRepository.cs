@@ -5,6 +5,7 @@ using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
 using Term7MovieCore.Data.Dto.Analyst;
+using Term7MovieCore.Data.Enum;
 using Term7MovieCore.Data.Options;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Entities;
@@ -156,9 +157,9 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 string sql =
                     " UPDATE Tickets " +
-                    " SET TransactionId = @transactionId " +
+                    " SET TransactionId = @transactionId, StatusId = @StatusId " +
                     " WHERE Id IN @idList ";
-                object param = new { transactionId, idList };
+                object param = new { transactionId, idList, StatusId = (int) TicketStatusEnum.Sold };
 
                 int count = await con.ExecuteAsync(sql, param);
 
