@@ -202,5 +202,15 @@ namespace Term7MovieService.Services.Implement
                 Message = Constants.MESSAGE_SUCCESS
             };
         }
+
+        public ParentResultResponse GetTicketOnSelling()
+        {
+            var result = cacheProvider.GetValue<IEnumerable<TicketDto>>(Constants.REDIS_KEY_TICKET);
+            return new ParentResultResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS,
+                Result = result
+            };
+        }
     }
 }
