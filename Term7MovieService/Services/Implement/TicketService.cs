@@ -211,11 +211,11 @@ namespace Term7MovieService.Services.Implement
             {
                 //throw new Exception("result: " + item.ToString());
                 IEnumerable<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(item);
+                tickets = tickets.Where(x => (x.LockedTime <= DateTime.UtcNow || x.LockedTime == null)
+                                                && x.TicketType.Name.Equals(Constants.FLASH_SALE));
                 if (tickets == null) continue;
                 ticketlist.AddRange(tickets);
             }
-            ticketlist = ticketlist.Where(x => (x.LockedTime <= DateTime.UtcNow || x.LockedTime == null)
-                                                && x.TicketType.Name.Equals(Constants.FLASH_SALE)).ToList();
             return new ParentResultResponse
             {
                 Message = Constants.MESSAGE_SUCCESS,
