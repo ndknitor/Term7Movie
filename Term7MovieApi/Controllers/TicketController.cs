@@ -61,8 +61,9 @@ namespace Term7MovieApi.Controllers
         }
 
         [HttpGet("sales")]
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)]
         public IActionResult SanSaleShopee()
-        {//shortest code challenge lul
+        {
             return Ok(_ticketService.GetTicketOnSelling());
         }
     }

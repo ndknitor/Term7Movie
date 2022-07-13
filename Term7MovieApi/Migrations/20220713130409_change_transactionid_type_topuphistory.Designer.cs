@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Term7MovieCore.Entities;
 
@@ -11,9 +12,10 @@ using Term7MovieCore.Entities;
 namespace Term7MovieApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220713130409_change_transactionid_type_topuphistory")]
+    partial class change_transactionid_type_topuphistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -703,9 +705,6 @@ namespace Term7MovieApi.Migrations
 
                     b.Property<DateTime>("RecordDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("TransactionId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");

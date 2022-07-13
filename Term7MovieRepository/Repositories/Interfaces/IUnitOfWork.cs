@@ -25,6 +25,7 @@
         IPaymentRequestRepository PaymentRequestRepository { get; }
         ITicketTypeRepository TicketTypeRepository { get; }
         IShowtimeTicketTypeRepository ShowtimeTicketTypeRepository { get; }
+        ITopUpHistoryRepository TopUpHistoryRepository { get; }
         bool HasChange();
 
         Task<bool> CompleteAsync();
