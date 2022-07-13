@@ -9,7 +9,7 @@ namespace Term7MovieCore.Entities
         public int Id { set; get; }
         [Column(TypeName = "nvarchar(30)"), Required]
         public string Name { set; get; }
-        [Column(TypeName = "varchar(200)")]
+        [Column(TypeName = "varchar(max)")]
         public string LogoUrl { set; get; }
         public bool IsActive { set; get; }
         public long? ManagerId { set; get; }
