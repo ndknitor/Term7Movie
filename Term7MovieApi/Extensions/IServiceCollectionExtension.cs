@@ -60,6 +60,8 @@ namespace Term7MovieApi.Extensions
 
             services.AddScoped<IAnalystService, AnalystService>();
 
+            services.AddScoped<ITopUpService, TopUpService>();
+
             return services;
         }
 

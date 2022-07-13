@@ -73,6 +73,16 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = Constants.ROLE_CUSTOMER)] // policy check if ticket is available
+        [HttpGet("wallet-complete-payment")]
+        public async Task<IActionResult> CompletePaymentUsingPoint([Required][FromQuery] Guid transactionId)
+        {
+            long userId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+            var response = await _transactionService.CheckPaymentStatus(transactionId, userId, true);
+
+            return Ok(response);
+        }
+
         [HttpPost("call-back")]
         private async Task<IActionResult> MomoIPNCallBack(MomoIPNRequest request)
         {

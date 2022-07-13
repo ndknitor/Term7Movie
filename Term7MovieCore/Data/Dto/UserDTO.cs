@@ -10,7 +10,7 @@
         public string PictureUrl { get; set; }
         public int? CompanyId { set; get; }
         public CompanyDto Company { set; get; }
-        public int? Point { get; set; }
+        public decimal Point { get; set; }
         public int StatusId { set; get; }
         public string StatusName { set; get; }
         public RoleDto Role { set; get; }
