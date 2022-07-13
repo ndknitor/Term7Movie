@@ -13,7 +13,8 @@ namespace Term7MovieCore.Entities
         public string Address { set; get; }
         [Column(TypeName = "varchar(200)")]
         public string PictureUrl { set; get; }
-        public int? Point { set; get; }
+        [Column(TypeName = "money")]
+        public decimal Point { set; get; }
         public int? CompanyId { set; get; }
         public virtual TheaterCompany Company { set; get; }
         [Required]
@@ -25,5 +26,6 @@ namespace Term7MovieCore.Entities
         public ICollection<Theater> Theaters { set; get; }
         public ICollection<PromotionCode> PromotionCodes { set; get; }
         public ICollection<MovieRating> MovieRatings { set; get; }
+        public ICollection<TopUpHistory> TopUpHistories { set; get; }
     }
 }

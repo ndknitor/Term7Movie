@@ -25,8 +25,11 @@ namespace Term7MovieService.Services.Implement
         private readonly IPaymentService _paymentService;
         private readonly IMapper mapper;
         private readonly ICacheProvider cacheProvider;
+        private readonly ITopUpHistoryRepository topUpHistoryRepository;
 
         private object lockObject = new object();
+
+        private const string DESCRIPTION_PURCHASE_TICKET = "Purchase ticket";
 
         public TransactionService(IUnitOfWork unitOfWork, IPaymentService paymentService, IMapper mapper, ICacheProvider cacheProvider)
         {
@@ -37,6 +40,7 @@ namespace Term7MovieService.Services.Implement
             this.mapper = mapper;
             this.cacheProvider = cacheProvider;
             transactionHistoryRepo = _unitOfWork.TransactionHistoryRepository;
+            topUpHistoryRepository = _unitOfWork.TopUpHistoryRepository;
         }
 
         public TransactionCreateResponse CreateTransaction(TransactionCreateRequest request, UserDTO user)
@@ -103,7 +107,7 @@ namespace Term7MovieService.Services.Implement
             }
         }
 
-        public async Task<ParentResponse> CheckPaymentStatus(Guid transactionId, long userId)
+        public async Task<ParentResponse> CheckPaymentStatus(Guid transactionId, long userId, bool isUsingPoint = false)
         {
             TransactionDto transaction = await transactionRepo.GetTransactionInfoByIdAsync(transactionId);
 
@@ -140,6 +144,22 @@ namespace Term7MovieService.Services.Implement
             {
                 cacheProvider.Expire = first.ShowStartTime - DateTime.UtcNow;
                 await cacheProvider.SetValueAsync(showtimeTicketKey, tickets);
+            }
+
+            if (isUsingPoint)
+            {
+                TopUpHistory topUpHistory = new TopUpHistory
+                {
+                    Amount = -transaction.Total,
+                    Description = DESCRIPTION_PURCHASE_TICKET,
+                    Id = Guid.NewGuid(),
+                    RecordDate = DateTime.UtcNow,
+                    TransactionId = transaction.Id,
+                    UserId = transaction.CustomerId
+                };
+                await topUpHistoryRepository.CreateTopUpHistory(topUpHistory);
+
+                if (!await _unitOfWork.CompleteAsync()) throw new DbOperationException();
             }
 
             await ticketRepo.BuyTicket(transactionId, boughtTicket);
