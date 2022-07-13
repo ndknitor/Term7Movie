@@ -1,13 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:term7moviemobile/controllers/auth_controller.dart';
 import 'package:term7moviemobile/services/auth_services.dart';
-import 'package:get/get.dart' hide Response;
 import 'package:term7moviemobile/utils/constants.dart';
-
-import '../routes/routes.dart';
 
 class Api {
   final Dio api = Dio();
@@ -30,8 +25,7 @@ class Api {
           if (await refreshToken()) {
             return handler.resolve(await _retry(error.requestOptions));
           } else {
-            _storage.deleteAll();
-            Routes.getLoginRoute();
+            AuthController.instance.signOut();
           }
         }
       }
@@ -51,19 +45,23 @@ class Api {
   }
 
   Future<bool> refreshToken() async {
-    final refreshToken = await _storage.read(key: 'refreshToken');
-    final response = await AuthServices.getNewAccessToken(refreshToken);
+    try {
+      final refreshToken = await _storage.read(key: 'refreshToken');
+      final response = await AuthServices.getNewAccessToken(refreshToken);
 
-    if (response.statusCode == 200) {
-      accessToken = response.data['accessToken'];
-      print(accessToken);
-      await _storage.write(key: 'accessToken', value: accessToken);
-      return true;
-    } else {
-      // refresh token is wrong
-      accessToken = null;
-      _storage.deleteAll();
-      Get.toNamed("login");
+      if (response.statusCode == 200) {
+        accessToken = response.data['accessToken'];
+        print(accessToken);
+        await _storage.write(key: 'accessToken', value: accessToken);
+        return true;
+      } else {
+        // refresh token is wrong
+        // accessToken = null;
+        // _storage.deleteAll();
+        // Get.toNamed("login");
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }

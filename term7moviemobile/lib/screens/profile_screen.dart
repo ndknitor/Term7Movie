@@ -65,10 +65,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         width: double.maxFinite,
                         decoration: const BoxDecoration(
                           color: MyTheme.backgroundColor,
-                          // borderRadius: BorderRadius.only(
-                          //   bottomRight: Radius.circular(40),
-                          //   bottomLeft: Radius.circular(40),
-                          // ),
                         ),
                       ),
                       const SizedBox(
@@ -172,10 +168,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             size: 20,
                           ),
                           title: const Text(
-                            'Transaction',
+                            'Booking History',
                             style: TextStyle(color: Colors.black),
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            Get.toNamed("/history");
+                          },
                         ),
                       ),
                       Padding(

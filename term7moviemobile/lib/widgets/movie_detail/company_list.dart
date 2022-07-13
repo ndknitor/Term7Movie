@@ -7,19 +7,23 @@ import 'package:term7moviemobile/utils/constants.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 
 class CompanyList extends StatefulWidget {
-  const CompanyList({Key? key}) : super(key: key);
+  final String movieId;
+  const CompanyList({Key? key, required this.movieId}) : super(key: key);
 
   @override
   State<CompanyList> createState() => _CompanyListState();
 }
 
 class _CompanyListState extends State<CompanyList> {
-  ShowtimeController controller = Get.put(ShowtimeController());
+  late ShowtimeController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = Get.put(ShowtimeController());
     controller.fetchCompanies();
+    controller.theaterId.value = -1;
+    controller.showtimes = [];
   }
 
   @override
@@ -129,7 +133,8 @@ class _CompanyListState extends State<CompanyList> {
                                                     GestureDetector(
                                                         onTap: () {
                                                           controller.theaterId.value = e.id!;
-                                                          controller.fetchShowtimes(e.id!);
+                                                          controller.movieId = widget.movieId;
+                                                          controller.fetchShowtimes();
                                                         },
                                                         child:Padding(
                                                           padding:
@@ -142,10 +147,10 @@ class _CompanyListState extends State<CompanyList> {
                                                     controller.theaterId.value == e.id! ?
                                                     Row(
                                                       children:
-                                                          controller.showtimes.length == 0 ? [Container(child: Text('There is no showtime now', style: TextStyle(fontSize: 12, color: MyTheme.grayColor),))] :
-                                                          controller.showtimes.map((e) =>  GestureDetector(
+                                                          controller.showtimes.length == 0 ? [Container()] :
+                                                          controller.showtimes.map((showtime) =>  GestureDetector(
                                                             onTap: () {
-                                                              Get.toNamed("/booking/${e.id}");
+                                                              Get.toNamed("/booking/${showtime.id}");
                                                             },
                                                             child: Container(
                                                             margin: EdgeInsets.only(right: 8),
@@ -160,7 +165,7 @@ class _CompanyListState extends State<CompanyList> {
                                                                 vertical: 8,
                                                                 horizontal: 12),
                                                             child: Text(
-                                                              DateFormat.Hm().format(DateTime.parse(e.startTime!).add(Duration(hours: 7))),
+                                                              DateFormat.Hm().format(DateTime.parse(showtime.startTime!).add(Duration(hours: 7))),
                                                               textAlign: TextAlign.center,
                                                               style: const TextStyle(
                                                                   fontSize: 12,

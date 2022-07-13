@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:term7moviemobile/controllers/movie_detail_controller.dart';
+import 'package:term7moviemobile/controllers/showtime_controller.dart';
 import 'package:term7moviemobile/utils/constants.dart';
 import 'package:term7moviemobile/utils/convert_color.dart';
 import 'package:term7moviemobile/utils/theme.dart';
@@ -10,7 +11,9 @@ import 'package:term7moviemobile/widgets/movie_detail/company_list.dart';
 import 'package:term7moviemobile/widgets/date_picker.dart';
 import 'package:term7moviemobile/widgets/movie_detail/background_widget.dart';
 import 'package:term7moviemobile/widgets/movie_detail/cast_bar.dart';
-import 'package:term7moviemobile/widgets/movie_detail/trailer_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:html/parser.dart' show parse;
+// import 'package:html/dom.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   const MovieDetailScreen({Key? key}) : super(key: key);
@@ -23,6 +26,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   MovieDetailController controller = Get.put(MovieDetailController());
+  ShowtimeController showtimeController = Get.put(ShowtimeController());
 
   @override
   void initState() {
@@ -34,6 +38,19 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    Future<void>? _launched;
+
+    Future<void> launchYoutube(Uri url) async {
+      if (!await launchUrl(
+        url,
+        mode: LaunchMode.inAppWebView,
+        webViewConfiguration: const WebViewConfiguration(
+            headers: <String, String>{'my_header_key': 'my_header_value'}),
+      )) {
+        throw 'Could not launch $url';
+      }
+    }
+    
     return Scaffold(body: LayoutBuilder(
       builder: (ctx, constraints) {
         return Obx(
@@ -87,8 +104,17 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                               ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter)),
+                          child: Center(child: IconButton(
+                            onPressed: () => setState(() {
+                              _launched = launchYoutube(Uri.parse(controller.movie!.trailerUrl!));
+                            }),
+                            icon: Icon(Icons.play_arrow_rounded,
+                                color: Colors.white, size: 60),
+                          ),),
                         ),
-                        const ArrowBack(color: Colors.white,),
+                        const ArrowBack(
+                          color: Colors.white,
+                        ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -102,8 +128,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: Image.network(
-                                        controller.movie?.posterImgUrl ??
-                                            'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png',
+                                        controller.movie!.posterImgUrl!.length == 0 ?
+                                            'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png' : controller.movie!.posterImgUrl!,
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -127,15 +153,13 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                               color: MyTheme.textColor),
                                         ),
                                       ),
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        // physics: NeverScrollableScrollPhysics(),
-                                        child: Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 8, bottom: 8),
-                                          width: size.width,
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                            left: 8, bottom: 8),
+                                        width: size.width,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
                                           child: Row(
-                                            mainAxisSize: MainAxisSize.min,
                                             children: controller
                                                 .movie!.categories!
                                                 .map((e) =>
@@ -145,7 +169,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                                             right: 8),
                                                         alignment:
                                                             Alignment.center,
-                                                        decoration: BoxDecoration(
+                                                        decoration:
+                                                            BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(4),
@@ -153,8 +178,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                                                   e.color!)
                                                               .withOpacity(0.2),
                                                         ),
-                                                        padding:
-                                                            EdgeInsets.symmetric(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
                                                                 vertical: 2,
                                                                 horizontal: 6),
                                                         child: Text(
@@ -188,15 +213,21 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(4),
-                                                  color: controller.movie?.ageRestrict ==
-                                                      0 ? MyTheme.successColor : MyTheme.errorColor),
+                                                  color: controller.movie
+                                                              ?.ageRestrict ==
+                                                          0
+                                                      ? MyTheme.successColor
+                                                      : MyTheme.errorColor),
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 2, horizontal: 6),
                                               child: Text(
                                                 controller.movie?.ageRestrict ==
                                                         0
                                                     ? 'P'
-                                                    : 'C' + controller.movie!.ageRestrict.toString(),
+                                                    : 'C' +
+                                                        controller
+                                                            .movie!.ageRestrict
+                                                            .toString(),
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 10,
@@ -253,25 +284,37 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                           ],
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 8, bottom: 8),
+                                      Container(
+                                        padding:
+                                            EdgeInsets.only(left: 8, bottom: 8),
                                         child: Row(
                                           children: [
                                             Icon(Icons.language,
                                                 color: MyTheme.primaryColor,
-                                                size: 22),
+                                                size: 20),
                                             SizedBox(
-                                              width: 4,
+                                              width: 2,
                                             ),
                                             Text(
-                                              'Languages:',
+                                              'Languages: ',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w300,
                                                 fontSize: 12,
                                                 color: MyTheme.textColor,
                                               ),
                                             ),
+                                            Container(
+                                              width: size.width - 270,
+                                              child: Text(
+                                                controller.movie!.languageList!
+                                                    .join(", "),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w300,
+                                                  fontSize: 12,
+                                                  color: MyTheme.textColor,
+                                                ),
+                                              ),
+                                            )
                                           ],
                                         ),
                                       )
@@ -319,10 +362,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                             buildTitle('Description'),
                                             Padding(
                                               padding:
-                                                  EdgeInsets.only(left: 24),
+                                                  EdgeInsets.only(left: 16, right: 16),
                                               child: Text(
-                                                controller.movie?.description ??
-                                                    'There is no description',
+                                                parse(controller.movie!.description).querySelector("body")!.text,
+                                                maxLines: 24,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14,
@@ -332,19 +376,34 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
                                               ),
                                             ),
                                             buildTitle('Actors'),
-                                            CastBar(size: size),
+                                            Padding(
+                                                padding:
+                                                EdgeInsets.only(left: 16, right: 16),
+                                                child: CastBar(
+                                                    size: size,
+                                                    list: controller
+                                                        .movie!.actors!)),
                                             buildTitle('Director'),
-                                            CastBar(size: size),
-                                            buildTitle('Trailer'),
-                                            // const TrailerBar()
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 16, right: 16),
+                                              child: CastBar(
+                                                  size: size,
+                                                  list: controller
+                                                      .movie!.director!
+                                                      .split(",")),
+                                            ),
                                           ],
                                         ),
                                         Column(
-                                            children: [
-                                              MyDatePicker(),
-                                              CompanyList(),
-                                            ],
-                                          ),
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            MyDatePicker(),
+                                            CompanyList(movieId: controller.id,),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ),

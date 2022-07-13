@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:term7moviemobile/models/movie_model.dart';
+import 'package:term7moviemobile/utils/constants.dart';
 
 class CarouselSliderDataFound extends StatefulWidget {
   final List<MovieModel> carouselList;
@@ -34,7 +35,7 @@ class _CarouselSliderDataFoundState extends State<CarouselSliderDataFound> {
                       child: Stack(
                         children: <Widget>[
                           CachedNetworkImage(
-                            imageUrl: e.coverImgUrl ?? '',
+                            imageUrl: e.coverImgUrl!.length == 0 ? Constants.defaultImage : e.coverImgUrl!,
                             errorWidget: (context, url, error) =>
                                 Icon(Icons.error),
                             progressIndicatorBuilder:

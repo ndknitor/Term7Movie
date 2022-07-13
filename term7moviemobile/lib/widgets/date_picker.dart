@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:date_picker_timeline/extra/style.dart';
+import 'package:term7moviemobile/controllers/showtime_controller.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 
 class MyDatePicker extends StatelessWidget {
@@ -14,7 +15,7 @@ class MyDatePicker extends StatelessWidget {
         children: [
           DatePicker(
             DateTime.now(),
-            initialSelectedDate: DateTime.now(),
+            initialSelectedDate: ShowtimeController.instance.seletedDate,
             height: 94,
             selectedTextColor: MyTheme.primaryColor,
             deactivatedColor: MyTheme.textColor,
@@ -22,6 +23,7 @@ class MyDatePicker extends StatelessWidget {
             dateTextStyle: defaultDateTextStyle.copyWith(
               color: MyTheme.textColor,
             ),
+            onDateChange: ShowtimeController.instance.handleDateChange,
             dayTextStyle:
             defaultDayTextStyle.copyWith(color: MyTheme.textColor),
             monthTextStyle:

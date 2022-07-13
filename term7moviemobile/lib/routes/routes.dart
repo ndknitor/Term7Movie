@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:term7moviemobile/controllers/main_controller.dart';
+import 'package:term7moviemobile/screens/booking_history_screen.dart';
 import 'package:term7moviemobile/screens/booking_screen.dart';
 import 'package:term7moviemobile/screens/checkout_screen.dart';
 import 'package:term7moviemobile/screens/details_screen.dart';
-import 'package:term7moviemobile/screens/home_screen.dart';
+import 'package:term7moviemobile/screens/history_detail.dart';
 import 'package:term7moviemobile/screens/location_screen.dart';
 import 'package:term7moviemobile/screens/login_screen.dart';
 import 'package:term7moviemobile/screens/main_screen.dart';
@@ -23,6 +23,8 @@ class Routes {
   static String detail = "/detail/:id";
   static String booking = "/booking/:id";
   static String checkout = "/checkout";
+  static String history = "/history";
+  static String historyDetail = "/history/:id";
 
   static String getSplashRoute() => splash;
   static String getOnBoardRoute() => onboard;
@@ -34,13 +36,13 @@ class Routes {
   static String getDetailRoute() => detail;
   static String getBookingRoute() => booking;
   static String getCheckoutRoute() => checkout;
+  static String getHistoryRoute() => history;
+  static String getHistoryDetailRoute() => historyDetail;
 
   static List<GetPage> routes = [
     GetPage(
       name: home,
       page: () => MainScreen(),
-      transition: Transition.fade,
-      transitionDuration: Duration(milliseconds: 500),
     ),
     GetPage(name: splash, page: () => SplashScreen()),
     GetPage(name: onboard, page: () => OnBoardingScreen()),
@@ -51,5 +53,7 @@ class Routes {
     GetPage(name: detail, page: () => MovieDetailScreen()),
     GetPage(name: booking, page: () => BookingScreen()),
     GetPage(name: checkout, page: () => CheckOutScreen()),
+    GetPage(name: history, page: () => BookingHistoryScreen()),
+    GetPage(name: historyDetail, page: () => HistoryDetailScreen()),
   ];
 }

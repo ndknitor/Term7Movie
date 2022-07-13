@@ -11,16 +11,24 @@ class MovieModel {
   String? posterImgUrl;
   String? trailerUrl;
   String? description;
+  List<String>? languageList;
+  List<String>? actors;
+  String? director;
 
   MovieModel(
       {this.movieId,
-        this.title,
-        this.categories,
-        this.ageRestrict,
-        this.duration,
-        this.releaseDate,
-        this.coverImgUrl,
-        this.posterImgUrl, this.trailerUrl, this.description});
+      this.title,
+      this.categories,
+      this.ageRestrict,
+      this.duration,
+      this.releaseDate,
+      this.coverImgUrl,
+      this.posterImgUrl,
+      this.trailerUrl,
+      this.description,
+      this.languageList,
+      this.actors,
+      this.director});
 
   MovieModel.fromJson(Map<String, dynamic> json) {
     movieId = json['movieId'];
@@ -34,10 +42,23 @@ class MovieModel {
     ageRestrict = json['restrictedAge'];
     duration = json['duration'];
     releaseDate = json['releaseDate'];
-    coverImgUrl = json['coverImgUrl'] ?? json['coverImgURL'];
-    posterImgUrl = json['posterImgUrl'] ?? json['posterImgURL'];
+    coverImgUrl = json['coverImgURL'] ?? json['coverImageUrl'];
+    posterImgUrl = json['posterImgURL'] ?? json['posterImageUrl'];
     trailerUrl = json['trailerUrl'];
     description = json['description'];
+    if (json['languageList'] != null) {
+      languageList = [];
+      json['languageList'].forEach((v) {
+        languageList!.add(v);
+      });
+    }
+    director = json['director'];
+    if (json['beautifyActors'] != null) {
+      actors = [];
+      json['beautifyActors'].forEach((v) {
+        actors!.add(v);
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -47,6 +68,9 @@ class MovieModel {
     if (this.categories != null) {
       data['movieTypes'] = this.categories!.map((v) => v.toJson()).toList();
     }
+    if (this.languageList != null) {
+      data['languageList'] = this.languageList!.toList();
+    }
     data['restrictedAge'] = this.ageRestrict;
     data['duration'] = this.duration;
     data['releaseDate'] = this.releaseDate;
@@ -54,7 +78,10 @@ class MovieModel {
     data['posterImgURL'] = this.posterImgUrl;
     data['trailerUrl'] = this.trailerUrl;
     data['description'] = this.description;
+    data['director'] = this.director;
+    if (this.actors != null) {
+      data['beautifyActors'] = this.actors!.toList();
+    }
     return data;
   }
-
 }

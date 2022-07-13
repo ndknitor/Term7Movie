@@ -6,7 +6,7 @@ import 'package:term7moviemobile/services/api.dart';
 class MovieServices {
   static Future<List<MovieModel>> getLatestMovies(Map<String, dynamic>? queryParams) async {
     var res = await Api().api.get('/movies', queryParameters: queryParams);
-    return List<MovieModel>.from(res.data['movieList'].map((x) => MovieModel.fromJson(x)));
+    return List<MovieModel>.from(res.data['movieList']['results'].map((x) => MovieModel.fromJson(x)));
   }
 
   static Future<List<MovieModel>> getUpcomingMovies(Map<String, dynamic>? queryParams) async {
