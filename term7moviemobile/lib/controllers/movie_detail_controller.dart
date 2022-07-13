@@ -4,18 +4,16 @@ import 'package:term7moviemobile/services/movie_services.dart';
 
 class MovieDetailController extends GetxController {
   static MovieDetailController instance = Get.find();
-  String id = Get.parameters['id']!;
   var isLoading = false.obs;
   MovieModel? movie;
+  String id = '';
 
   void fetchMovieDetail() async {
-    setIsLoading(false);
     try {
       setIsLoading(true);
-
+      id = Get.parameters['id']!;
       movie = await MovieServices.getMovieDetail(
           {'Action': 'detail', 'MovieId': id});
-      update();
     } finally {
       setIsLoading(false);
     }

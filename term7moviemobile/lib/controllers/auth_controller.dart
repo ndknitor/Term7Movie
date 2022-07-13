@@ -68,7 +68,6 @@ class AuthController extends GetxController {
               key: 'refreshToken', value: res.data['refreshToken']);
         }
         getSuccessSnackBar("Successfully logged in as ${_user.value!.email}");
-        //RoomServices.getRoomById("1").then((value) => print(value));
       }
     } on FirebaseAuthException catch (e) {
       getErrorSnackBar("Google Login Failed", e);

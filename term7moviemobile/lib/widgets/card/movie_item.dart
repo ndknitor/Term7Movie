@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:term7moviemobile/models/home_showtime_model.dart';
 import 'package:term7moviemobile/utils/constants.dart';
 import 'package:term7moviemobile/utils/theme.dart';
@@ -15,7 +16,8 @@ class MovieItem extends StatelessWidget {
       padding: const EdgeInsets.only(left: 10.0),
       child: GestureDetector(
         onTap: () {
-          Get.toNamed("/detail/${data.movieId}");
+          Get.toNamed("/booking/${data.showTimeId}");
+          // Get.toNamed("/detail/${data.movieId}");
         },
         child: SingleChildScrollView(
           physics: const NeverScrollableScrollPhysics(),
@@ -35,7 +37,7 @@ class MovieItem extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: CachedNetworkImage(
-                      imageUrl: data.coverImgURL?? Constants.defaultImage,
+                      imageUrl: data.coverImgURL == '' ? Constants.defaultImage : data.coverImgURL ?? Constants.defaultImage,
                       width: 200,
                       height: 150,
                       fit: BoxFit.cover,
@@ -75,7 +77,7 @@ class MovieItem extends StatelessWidget {
                         width: 16,
                       ),
                       Text(
-                        (data.distanceCalculated ?? 0 / 1000).toStringAsFixed(2) +
+                        (data.distanceCalculated!/1000).toStringAsFixed(2) +
                             "km",
                         style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w600),
@@ -113,7 +115,7 @@ class MovieItem extends StatelessWidget {
                         padding:
                             EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                         child: Text(
-                          data.formattedStartTime?.split(' ')[1] ?? '00:00',
+                          DateFormat.Hm().format(DateTime.parse(data.startTime!).add(Duration(hours: 7))),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               fontSize: 12,

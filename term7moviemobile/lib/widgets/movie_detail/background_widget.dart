@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class BackgroundWidget extends StatelessWidget {
+class BackgroundWidget extends StatefulWidget {
   const BackgroundWidget({
     Key? key,
     required this.size,
@@ -11,15 +12,24 @@ class BackgroundWidget extends StatelessWidget {
   final Size size;
 
   @override
+  State<BackgroundWidget> createState() => _BackgroundWidgetState();
+}
+
+class _BackgroundWidgetState extends State<BackgroundWidget> {
+  @override
   Widget build(BuildContext context) {
+
+
     return Column(
       children: [
         Container(
-          height: size.height / 3,
+          height: widget.size.height / 3,
           decoration: BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover, image: NetworkImage(coverImgUrl)),
-              ),
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              image: NetworkImage(widget.coverImgUrl),
+            ),
+          ),
         ),
       ],
     );

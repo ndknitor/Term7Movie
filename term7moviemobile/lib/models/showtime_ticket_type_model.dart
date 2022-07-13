@@ -2,7 +2,7 @@ import 'package:term7moviemobile/models/ticket_type_model.dart';
 
 class ShowtimeTicketTypeModel {
   String? id;
-  int? receivePrice;
+  double? receivePrice;
   TicketTypeModel? ticketType;
 
   ShowtimeTicketTypeModel(

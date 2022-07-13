@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:term7moviemobile/controllers/showtime_controller.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 import 'package:term7moviemobile/widgets/date_picker.dart';
 
@@ -7,9 +9,12 @@ class ShowTimeScreen extends StatefulWidget {
 
   @override
   State<ShowTimeScreen> createState() => _ShowTimeScreenState();
+
 }
 
 class _ShowTimeScreenState extends State<ShowTimeScreen> {
+  ShowtimeController controller = Get.put(ShowtimeController());
+
   @override
   Widget build(BuildContext context) {
     return Column(
