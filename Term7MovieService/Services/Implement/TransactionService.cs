@@ -138,14 +138,6 @@ namespace Term7MovieService.Services.Implement
                 tickets.RemoveAt(index);
             }
 
-            TicketDto first = tickets.FirstOrDefault();
-
-            if (first != null && first.ShowStartTime > DateTime.UtcNow)
-            {
-                cacheProvider.Expire = first.ShowStartTime - DateTime.UtcNow;
-                await cacheProvider.SetValueAsync(showtimeTicketKey, tickets);
-            }
-
             if (isUsingPoint)
             {
                 TopUpHistory topUpHistory = new TopUpHistory
@@ -160,6 +152,14 @@ namespace Term7MovieService.Services.Implement
                 await topUpHistoryRepository.CreateTopUpHistory(topUpHistory);
 
                 if (!await _unitOfWork.CompleteAsync()) throw new DbOperationException();
+            }
+
+            TicketDto first = tickets.FirstOrDefault();
+
+            if (first != null && first.ShowStartTime > DateTime.UtcNow)
+            {
+                cacheProvider.Expire = first.ShowStartTime - DateTime.UtcNow;
+                await cacheProvider.SetValueAsync(showtimeTicketKey, tickets);
             }
 
             await ticketRepo.BuyTicket(transactionId, boughtTicket);
