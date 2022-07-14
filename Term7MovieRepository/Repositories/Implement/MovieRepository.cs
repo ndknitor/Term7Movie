@@ -544,13 +544,13 @@ namespace Term7MovieRepository.Repositories.Implement
 
         /* ----------------- START GET MOVIE TITLE --------------- */
         public async Task<IEnumerable<Movie>> GetMoviesTitle()
-        {// does thing making sense now?
+        {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             List<Movie> result = new List<Movie>();
             var query = _context.Movies
                         .Where(a => a.IsAvailable
-                                    && a.ReleaseDate <= DateTime.UtcNow.AddMonths(1))
+                                    && a.ReleaseDate.Date <= DateTime.UtcNow.Date)
                         .Select(xxx => new Movie
                         {
                             Id = xxx.Id,
@@ -559,23 +559,5 @@ namespace Term7MovieRepository.Repositories.Implement
             result = await query.ToListAsync();
             return result;
         }
-
-
-        /* ------------------ END GET MOVIE TITLE --------------- */
-
-        /* ----------------- START PRIVATE FUNCTION ------------------ */
-        //private async Task<int> GetExternalId() //Don't use it
-        //{
-        //    //it gonna cost medium performance for this but i have no choice
-        //    for(int i = 1; i <= int.MaxValue; i++)
-        //    {
-        //        var movie = _context.Movies.FirstOrDefault(a => a.Id == i);
-        //        if (movie == null) return i;
-        //    }
-        //    return Index;
-        //}
-
-        /* ----------------- END PRIVATE FUNCTION --------------------- */
-
     }
 }

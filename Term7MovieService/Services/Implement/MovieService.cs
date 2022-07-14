@@ -555,7 +555,7 @@ namespace Term7MovieService.Services.Implement
             else
             {
                 var titles = movielist.Where(xxx => xxx.IsAvailable
-                                                && xxx.ReleaseDate <= DateTime.UtcNow.AddMonths(1))
+                                                && xxx.ReleaseDate?.Date <= DateTime.UtcNow.Date)
                                       .Select(xx => new MovieTitleDTO
                                       {
                                           MovieId = xx.Id,
