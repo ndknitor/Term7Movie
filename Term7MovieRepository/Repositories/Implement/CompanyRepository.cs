@@ -86,7 +86,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
                                          FROM Theaters
-                                         WHERE CompanyId = @id ";
+                                         WHERE CompanyId = @id AND Status = 1 ";
                 object param = new { id };
 
                 var multiQ = await con.QueryMultipleAsync(sql + theaterQuery, param);
