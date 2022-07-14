@@ -98,7 +98,7 @@ namespace Term7MovieApi.Controllers
             //chưa dùng đến. (để dự phòng thôi)
             try
             {
-                var result = await _movieService.GetThreeLosslessLatestMovieForHomepage();
+                var result = await _movieService.GetThreeLosslessIncomingMovieForHomepage();
                 if (result == null)
                     return BadRequest(new ParentResponse { Message = "NULL DATA" });
                 return Ok(result);

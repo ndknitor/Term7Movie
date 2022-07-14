@@ -11,7 +11,7 @@ namespace Term7MovieService.Services.Interface
 
         Task<ParentResultResponse> GetMovieById(int id);
         
-        Task<IncomingMovieResponse> GetThreeLosslessLatestMovieForHomepage();
+        Task<IncomingMovieResponse> GetThreeLosslessIncomingMovieForHomepage();
 
         Task<MovieLatestResponse> GetLatestMovieForNowShowingPage(ParentFilterRequest request);
 

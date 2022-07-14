@@ -279,14 +279,14 @@ namespace Term7MovieRepository.Repositories.Implement
         //                join tick in _context.Tickets on st.
         //}
 
-        public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies()
+        public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessIncomingMovies()
         {
             if (!await _context.Database.CanConnectAsync())    
                 throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);
             List<SmallMovieHomePageDTO> movies = new List<SmallMovieHomePageDTO>();
             var query = _context.Movies
-                .Where(a => a.ReleaseDate > DateTime.Now
-                            && a.ReleaseDate < DateTime.Now.AddMonths(1)
+                .Where(a => a.ReleaseDate > DateTime.UtcNow
+                            && a.ReleaseDate < DateTime.UtcNow.AddMonths(1)
                             && !string.IsNullOrEmpty(a.CoverImageUrl)
                             && !string.IsNullOrEmpty(a.PosterImageUrl))
                 .OrderByDescending(a => a.ReleaseDate)
@@ -310,7 +310,7 @@ namespace Term7MovieRepository.Repositories.Implement
             IEnumerable<Movie> movies = new List<Movie>();
             var query = _context.Movies
                 .Where(a => a.IsAvailable
-                            && a.ReleaseDate > DateTime.UtcNow.AddMonths(-1)
+                            && a.ReleaseDate <= DateTime.UtcNow.AddMonths(1)
                             && a.Title.ToLower().Contains(request.SearchKey.ToLower()))
                 .OrderByDescending(a => a.ReleaseDate)
                 .Select(a => new Movie
@@ -550,7 +550,7 @@ namespace Term7MovieRepository.Repositories.Implement
             List<Movie> result = new List<Movie>();
             var query = _context.Movies
                         .Where(a => a.IsAvailable
-                                    && a.ReleaseDate >= DateTime.UtcNow.AddMonths(-1))
+                                    && a.ReleaseDate <= DateTime.UtcNow.AddMonths(1))
                         .Select(xxx => new Movie
                         {
                             Id = xxx.Id,
