@@ -174,7 +174,7 @@ namespace Term7MovieService.Services.Implement
             {
                 //we don't even touch showtime
                 var LatestMoviesList = cachedlist.Where(x => x.IsAvailable
-                                        && x.ReleaseDate >= DateTime.UtcNow.AddMonths(-1)
+                                        && x.ReleaseDate <= DateTime.UtcNow.AddMonths(1)
                                         && x.Title.ToLower().Contains(request.SearchKey.ToLower()))
                                         .Select(x => new MovieDTO
                                         {
@@ -555,7 +555,7 @@ namespace Term7MovieService.Services.Implement
             else
             {
                 var titles = movielist.Where(xxx => xxx.IsAvailable
-                                                && xxx.ReleaseDate >= DateTime.UtcNow.AddMonths(-1))
+                                                && xxx.ReleaseDate <= DateTime.UtcNow.AddMonths(1))
                                       .Select(xx => new MovieTitleDTO
                                       {
                                           MovieId = xx.Id,
