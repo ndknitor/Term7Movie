@@ -50,7 +50,8 @@ namespace Term7MovieRepository.Repositories.Implement
                 string theaterQuery = !request.TheaterIncluded ? "" :
 
                  @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
-                                         FROM Theaters ";
+                    FROM Theaters 
+                    WHERE Status = 1 ";
 
                 object param = new { fetch, offset , request.SearchKey};
 
@@ -112,7 +113,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 string theaterQuery = @" SELECT Id, Name, Address, CompanyId, ManagerId, Status, Latitude, Longitude
                                          FROM Theaters
-                                         WHERE ManagerId = @managerId ";
+                                         WHERE ManagerId = @managerId AND Status = 1 ";
 
                 object param = new { managerId };
 
