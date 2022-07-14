@@ -107,10 +107,10 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public async Task<IncomingMovieResponse> GetThreeLosslessLatestMovieForHomepage()
+        public async Task<IncomingMovieResponse> GetThreeLosslessIncomingMovieForHomepage()
         {
             //Handle Error
-            IEnumerable<SmallMovieHomePageDTO> rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
+            IEnumerable<SmallMovieHomePageDTO> rawData = await movieRepository.GetLessThanThreeLosslessIncomingMovies();
             if (!rawData.Any()) 
                 return new IncomingMovieResponse { Message = "Empty database" };
 
@@ -709,7 +709,7 @@ namespace Term7MovieService.Services.Implement
                     return new MovieHomePageResponse { Message = "Can't access database" };
                 if (ex.Message == "NOT ENOUGH MANA")
                 {
-                    var rawData = await movieRepository.GetLessThanThreeLosslessLatestMovies();
+                    var rawData = await movieRepository.GetLessThanThreeLosslessIncomingMovies();
                     List<MovieHomePageDTO> result = new List<MovieHomePageDTO>();
                     foreach (var item in rawData)
                     {

@@ -279,7 +279,7 @@ namespace Term7MovieRepository.Repositories.Implement
         //                join tick in _context.Tickets on st.
         //}
 
-        public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessLatestMovies()
+        public async Task<IEnumerable<SmallMovieHomePageDTO>> GetLessThanThreeLosslessIncomingMovies()
         {
             if (!await _context.Database.CanConnectAsync())    
                 throw new DbOperationException(Constants.DATABASE_UNAVAILABLE_MESSAGE);

@@ -109,7 +109,7 @@ namespace Term7MovieApi.Controllers
         //I have used too many brain cell for this lol if i get it wrong then sorry
         private async Task<IActionResult> GetIncomingMovies()
         {
-            var result = await _movieService.GetThreeLosslessLatestMovieForHomepage();
+            var result = await _movieService.GetThreeLosslessIncomingMovieForHomepage();
             if (result == null)
                 return BadRequest(new ParentResponse { Message = "NULL DATA" });
             return Ok(result);
