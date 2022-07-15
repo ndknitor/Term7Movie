@@ -328,11 +328,24 @@ namespace Term7MovieRepository.Repositories.Implement
 
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
-                string sql = @" SELECT 1
-                                FROM Showtimes 
-                                WHERE RoomId = @RoomId AND TheaterId = @TheaterId AND @StartTime BETWEEN StartTime AND EndTime ";
+                string checkStartime =
+                    @" ; WITH CTE_GETDURATION_BY_MOVIEID(Duration) AS (
 
-                int count = await con.QueryFirstOrDefaultAsync<int>(sql, request);
+                            SELECT Duration
+                            FROM Movies
+                            WHERE Id = @MovieId
+                        )
+
+                       SELECT 1
+                       FROM Showtimes
+                       WHERE RoomId = @RoomId AND TheaterId = @TheaterId 
+                                        AND @StartTime BETWEEN StartTime AND EndTime
+                                        AND (
+                                                SELECT DATEADD(MINUTE, Duration, @StartTime)
+                                                FROM CTE_GETDURATION_BY_MOVIEID
+                                            ) BETWEEN StartTime AND EndTime ; ";
+
+                int count = await con.QueryFirstOrDefaultAsync<int>(checkStartime, request);
 
                 valid = count == 0;
             }
@@ -346,9 +359,22 @@ namespace Term7MovieRepository.Repositories.Implement
 
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
-                string sql = @" SELECT 1
-                                FROM Showtimes 
-                                WHERE Id = @Id AND @StartTime BETWEEN StartTime AND EndTime ";
+                string sql = 
+                    @" ; WITH CTE_GETDURATION_BY_MOVIEID(Duration) AS (
+
+                            SELECT Duration
+                            FROM Movies
+                            WHERE Id = @MovieId
+                        )
+
+                       SELECT 1
+                       FROM Showtimes sh
+                       WHERE Id = @Id 
+                              AND @StartTime BETWEEN StartTime AND EndTime
+                              AND (
+                                      SELECT DATEADD(MINUTE, Duration, @StartTime)
+                                      FROM CTE_GETDURATION_BY_MOVIEID
+                                  ) BETWEEN StartTime AND EndTime ; ";
 
                 int count = await con.QueryFirstOrDefaultAsync<int>(sql, request);
 
