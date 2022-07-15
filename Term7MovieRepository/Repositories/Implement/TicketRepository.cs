@@ -47,7 +47,7 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
-                              tt.Id, tt.Name, tt.CompanyId   
+                              tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice   
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
                             JOIN TicketStatuses ts ON t.StatusId = ts.Id 
@@ -122,7 +122,7 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, 
-                              tt.Id, tt.Name, tt.CompanyId,   
+                              tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice,   
                               sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle',
                               m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl,
                               r.Id, r.No
@@ -237,7 +237,7 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
-                              tt.Id, tt.Name, tt.CompanyId,
+                              tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice,
                               sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle',
                               m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl,
                               r.Id, r.No
@@ -320,7 +320,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" SELECT t.Id, t.SellingPrice, tt.Id, tt.Name 
+                    @" SELECT t.Id, t.SellingPrice, tt.Id, tt.Name, tt.DefaultPrice 
                        FROM Tickets t JOIN ShowtimeTicketTypes shtt ON t.ShowtimeTicketTypeId = shtt.Id
                             JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
                        WHERE t.Id IN @idList 

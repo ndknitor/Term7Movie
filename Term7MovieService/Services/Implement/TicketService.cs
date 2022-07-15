@@ -204,15 +204,17 @@ namespace Term7MovieService.Services.Implement
             };
         }
 
-        public ParentResultResponse GetTicketOnSelling()
+        public async Task<ParentResultResponse> GetTicketOnSellingAsync()
         {
             List<TicketDto> ticketlist = new List<TicketDto>();
-            foreach(var item in cacheProvider.GetAllHashValue(Constants.REDIS_KEY_SHOWTIME_TICKET))
+            var showtimeTicketKeys = await cacheProvider.GetAllHashValueAsync(Constants.REDIS_KEY_SHOWTIME_TICKET);
+            foreach (var item in showtimeTicketKeys)
             {
-                //throw new Exception("result: " + item.ToString());
-                IEnumerable<TicketDto> tickets = cacheProvider.GetValue<IEnumerable<TicketDto>>(item);
+                IEnumerable<TicketDto> tickets = await cacheProvider.GetValueAsync<IEnumerable<TicketDto>>(item);
+                
                 if (tickets == null) continue;
-                tickets = tickets.Where(x => (x.LockedTime <= DateTime.UtcNow || x.LockedTime == null)
+
+                tickets = tickets.Where(x => (x.LockedTime < DateTime.UtcNow || x.LockedTime == null)
                                                 && x.TicketType.Name.Equals(Constants.FLASH_SALE));
                 ticketlist.AddRange(tickets);
             }

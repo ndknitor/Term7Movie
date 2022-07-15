@@ -29,7 +29,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" SELECT tt.Id, tt.Name, tt.CompanyId 
+                    @" SELECT tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice 
                        FROM TicketTypes tt JOIN Companies c ON  tt.CompanyId = c.Id
                        WHERE c.ManagerId = @managerId ";
 
@@ -48,7 +48,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" SELECT Id, Name, CompanyId
+                    @" SELECT Id, Name, CompanyId, DefaultPrice
                        FROM TicketTypes 
                        WHERE Id = @id ";
 
@@ -67,8 +67,8 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string sql =
-                    @" INSERT INTO TicketTypes (Name, CompanyId) 
-                       SELECT @Name, Id
+                    @" INSERT INTO TicketTypes (Name, CompanyId, DefaultPrice) 
+                       SELECT @Name, Id, @DefaultPrice
                        FROM Companies 
                        WHERE ManagerId = @managerId ";
                 object param = new

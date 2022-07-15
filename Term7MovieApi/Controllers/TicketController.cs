@@ -62,9 +62,10 @@ namespace Term7MovieApi.Controllers
 
         [HttpGet("sales")]
         [Authorize(Roles = Constants.ROLE_CUSTOMER)]
-        public IActionResult SanSaleShopee()
+        public async Task<IActionResult> SanSaleShopee()
         {
-            return Ok(_ticketService.GetTicketOnSelling());
+            var response = await _ticketService.GetTicketOnSellingAsync();
+            return Ok(response);
         }
     }
 }

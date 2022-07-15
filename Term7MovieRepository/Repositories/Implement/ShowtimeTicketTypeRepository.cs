@@ -28,7 +28,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 string sql =
                     @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, 
                               sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId,
-                              tt.Id, tt.Name, tt.CompanyId  
+                              tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice  
                        FROM ShowtimeTicketTypes shtt JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
                             JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
                        WHERE shtt.ShowtimeId = @showtimeId AND sh.StartTime > GETUTCDATE() ";

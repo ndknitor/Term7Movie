@@ -112,9 +112,9 @@ namespace Term7MovieRepository.Cache.Implement
             return o .IsNullOrEmpty? default : o.ToString();
         }
         
-        public RedisValue[] GetAllHashValue(string hashKey)
+        public async Task<IEnumerable<RedisValue>> GetAllHashValueAsync(string hashKey)
         {
-            var result = redis.HashValues(hashKey);
+            var result = await redis.HashValuesAsync(hashKey);
             return result;
         }
     }
