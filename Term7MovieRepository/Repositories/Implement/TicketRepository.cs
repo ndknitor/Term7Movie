@@ -124,7 +124,8 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.SeatId, s.Id, s.Name, s.RoomId, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name, 
                               tt.Id, tt.Name, tt.CompanyId,   
                               sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle',
-                              m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl
+                              m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl,
+                              r.Id, r.No
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
                             JOIN TicketStatuses ts ON t.StatusId = ts.Id 
@@ -133,18 +134,20 @@ namespace Term7MovieRepository.Repositories.Implement
                             JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
                             JOIN Movies m ON m.Id = sh.MovieId
                             JOIN Theaters th ON sh.TheaterId = th.Id 
+                            JOIN Rooms r ON sh.RoomId = r.Id
                        WHERE t.Id = @id " +
 
                        GetAdditionalTicketFilter( new TicketFilterRequest { IsNotShowedYet = isNotShowed }, FILTER_BY_IS_SHOWED);
                 object param = new { id };
 
-                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto, MovieModelDto, TicketDto>( sql,
-                    (t, s, st, tt, sh, m) =>
+                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto, MovieModelDto, RoomDto, TicketDto>( sql,
+                    (t, s, st, tt, sh, m, r) =>
                     {
                         t.TicketType = tt;
                         s.SeatType = st;
                         t.Seat = s;
                         sh.Movie = m;
+                        sh.Room = r;
                         t.Showtime = sh;
                         return t;
                     }, param, splitOn: "Id"
@@ -201,12 +204,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     {
                         await transaction.CommitAsync();
 
-                        ShowtimeDto showtime = GetShowtimeByShowtimeTicketType(request.Tickets.First().ShowtimeTicketTypeId);
-
-                        IEnumerable<TicketDto> tickets = await GetTicketByShowtimeId(showtime.Id);
-
-                        await _cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_SHOWTIME_TICKET, tickets);
-
+                        Task t = SetTicketToCacheAsync(request);
                         return count;
                     }
                 } 
@@ -218,6 +216,15 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 return 0;
             }
+        }
+
+        private async Task SetTicketToCacheAsync(TicketListCreateRequest request)
+        {
+            ShowtimeDto showtime = GetShowtimeByShowtimeTicketType(request.Tickets.First().ShowtimeTicketTypeId);
+
+            IEnumerable<TicketDto> tickets = await GetTicketByShowtimeId(showtime.Id);
+
+            await _cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_SHOWTIME_TICKET, tickets);
         }
 
         private async Task<IEnumerable<TicketDto>> GetTicketByShowtimeId(long showtimeId)
@@ -232,7 +239,8 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
                               tt.Id, tt.Name, tt.CompanyId,
                               sh.Id, sh.MovieId, sh.RoomId, sh.StartTime, sh.EndTime, sh.TheaterId, th.Name 'TheaterName', m.Title 'MovieTitle',
-                              m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl
+                              m.Id, m.Title, m.PosterImageUrl, m.CoverImageUrl,
+                              r.Id, r.No
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
                             JOIN TicketStatuses ts ON t.StatusId = ts.Id 
@@ -241,18 +249,19 @@ namespace Term7MovieRepository.Repositories.Implement
                             JOIN Showtimes sh ON shtt.ShowtimeId = sh.Id
                             JOIN Movies m ON m.Id = sh.MovieId
                             JOIN Theaters th ON sh.TheaterId = th.Id 
+                            JOIN Rooms r ON sh.RoomId = r.Id
                        WHERE t.ShowtimeId = @showtimeId ";
-
 
                 object param = new { showtimeId };
 
-                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto, MovieModelDto, TicketDto>(sql,
-                    (t, s, st, tt, sh, m) =>
+                IEnumerable<TicketDto> tickets = await con.QueryAsync<TicketDto, SeatDto, SeatTypeDto, TicketTypeDto, ShowtimeDto, MovieModelDto, RoomDto, TicketDto>(sql,
+                    (t, s, st, tt, sh, m, r) =>
                     {
                         t.TicketType = tt;
                         s.SeatType = st;
                         t.Seat = s;
                         sh.Movie = m;
+                        sh.Room = r;
                         t.Showtime = sh;
                         return t;
                     }, param, splitOn: "Id"

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Collections;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Request;
 using Term7MovieCore.Data.Response;
 using Term7MovieCore.Data.Response.Theater;
@@ -85,6 +86,21 @@ namespace Term7MovieService.Services.Implement
             }
 
             return null;
+        }
+
+        public async Task<ParentResponse> UpdateTheaterDefaultPrice(long managerId, TheaterDefaultPriceUpdateRequest request)
+        {
+            await theaterRepo.UpdateDefaultPriceAsync(request, managerId);
+
+            if (! await _unitOfWork.CompleteAsync())
+            {
+                throw new DbOperationException();
+            }
+
+            return new ParentResponse
+            {
+                Message = Constants.MESSAGE_SUCCESS
+            };
         }
 
         public async Task<ParentResponse> UpdateTheaterAsync(TheaterUpdateRequest request)

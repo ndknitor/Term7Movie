@@ -8,7 +8,7 @@ namespace Term7MovieCore.Data.ValidationAttributes
         {
             DateTime startTime = Convert.ToDateTime(value);
             DateTime now = DateTime.UtcNow;
-            return startTime <= now.AddMinutes(Constants.CREATE_SHOWTIME_UPPER_BOUND_IN_MINUTE) &&
+            return /*startTime <= now.AddMinutes(Constants.CREATE_SHOWTIME_UPPER_BOUND_IN_MINUTE) &&*/
                 startTime > now;
         }
     }

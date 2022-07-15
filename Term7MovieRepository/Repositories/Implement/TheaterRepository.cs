@@ -33,7 +33,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string sql =
-                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status " +
+                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status, DefaultPrice  " +
                     " FROM Theaters " +
                     " WHERE Status = 1 " +
 
@@ -90,7 +90,7 @@ namespace Term7MovieRepository.Repositories.Implement
                 int fetch = request.PageSize;
 
                 string query =
-                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status " +
+                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status, DefaultPrice  " +
                     " FROM Theaters " +
                     " WHERE Status = 1 AND ManagerId = @managerId " +
 
@@ -140,7 +140,7 @@ namespace Term7MovieRepository.Repositories.Implement
             using(SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string queryTheater =
-                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status " +
+                    " SELECT Id, Name, Address, Latitude, Longitude, CompanyId, ManagerId, Status, DefaultPrice " +
                     " FROM Theaters " +
                     " WHERE Status = 1 AND Id = @id ; ";
 
@@ -183,6 +183,17 @@ namespace Term7MovieRepository.Repositories.Implement
             dbTheater.Latitude = theater.Latitude;
             dbTheater.Longitude = theater.Longitude;
             dbTheater.Status = theater.Status;
+        }
+
+        public async Task UpdateDefaultPriceAsync(TheaterDefaultPriceUpdateRequest request, long managerId)
+        {
+            var theater = await _context.Theaters.FindAsync(request.TheaterId);
+
+            if (theater == null) throw new DbNotFoundException();
+
+            if (theater.ManagerId != managerId) throw new DbNotFoundException();
+
+            theater.DefaultPrice = request.DefaultPrice;
         }
         public async Task DeleteTheaterAsync(int id)
         {

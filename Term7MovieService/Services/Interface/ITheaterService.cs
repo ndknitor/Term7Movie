@@ -16,5 +16,6 @@ namespace Term7MovieService.Services.Interface
         Task<ParentResponse> DeleteTheaterAsync(int id);
         Task<Location> GetLocationByAddressAsync(string address);
         Task<TheaterNameResponse> GetTheaterNamesFromCompany(int companyId, long? managerid);
+        Task<ParentResponse> UpdateTheaterDefaultPrice(long managerId, TheaterDefaultPriceUpdateRequest request);
     }
 }
