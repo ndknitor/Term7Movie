@@ -178,9 +178,10 @@ namespace Term7MovieRepository.Repositories.Implement
             using (SqlConnection con = new SqlConnection(_connectionOption.FCinemaConnection))
             {
                 string query =
-                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl, r.Id, r.No, r.TheaterId, r.NumberOfRow, r.NumberOfColumn, r.Status " +
+                    " SELECT sh.Id, sh.MovieId, sh.RoomId, sh.TheaterId, th.Name 'TheaterName', sh.StartTime, sh.EndTime, m.Id, m.Title, m.Duration, m.RestrictedAge, m.PosterImageUrl, r.Id, r.No, r.TheaterId, r.NumberOfRow, r.NumberOfColumn, r.Status " +
                     " FROM Showtimes sh JOIN Movies m ON sh.MovieId = m.Id " +
                     "       JOIN Rooms r ON sh.RoomId = r.Id " +
+                    "       JOIN Theaters th ON sh.TheaterId = th.Id " +
                     " WHERE sh.Id = @id ; ";
 
                 string showtimeTiketType =
