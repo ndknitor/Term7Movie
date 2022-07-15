@@ -340,7 +340,7 @@ namespace Term7MovieRepository.Repositories.Implement
                        FROM Showtimes
                        WHERE RoomId = @RoomId AND TheaterId = @TheaterId 
                                         AND @StartTime BETWEEN StartTime AND EndTime
-                                        AND (
+                                        OR (
                                                 SELECT DATEADD(MINUTE, Duration, @StartTime)
                                                 FROM CTE_GETDURATION_BY_MOVIEID
                                             ) BETWEEN StartTime AND EndTime ; ";
@@ -371,7 +371,7 @@ namespace Term7MovieRepository.Repositories.Implement
                        FROM Showtimes sh
                        WHERE Id = @Id 
                               AND @StartTime BETWEEN StartTime AND EndTime
-                              AND (
+                              OR (
                                       SELECT DATEADD(MINUTE, Duration, @StartTime)
                                       FROM CTE_GETDURATION_BY_MOVIEID
                                   ) BETWEEN StartTime AND EndTime ; ";
