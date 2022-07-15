@@ -46,7 +46,7 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
-        [HttpPatch] // chua viet policy
+        [HttpPatch]
         [Authorize(Roles = Constants.ROLE_MANAGER)]
         public async Task<IActionResult> UpdateShowtimeAsync(ShowtimeUpdateRequest request)
         {
