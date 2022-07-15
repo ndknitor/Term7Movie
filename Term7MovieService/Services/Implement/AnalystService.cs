@@ -1,8 +1,11 @@
 ﻿
+using Newtonsoft.Json;
+using StackExchange.Redis;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Data.Exceptions;
 using Term7MovieCore.Data.Response.Analyst;
+using Term7MovieRepository.Cache.Interface;
 using Term7MovieRepository.Repositories.Interfaces;
 using Term7MovieService.Services.Interface;
 
@@ -16,13 +19,17 @@ namespace Term7MovieService.Services.Implement
         private readonly ICompanyRepository companyRepository;
         private readonly ITransactionHistoryRepository tranHisRepository;
 
-        public AnalystService(IUnitOfWork unitOfWork)
+        private readonly ICacheProvider cacheProvider;
+
+        public AnalystService(IUnitOfWork unitOfWork, ICacheProvider cacheProvider)
         {
             _unitOfWork = unitOfWork;
             showRepository = _unitOfWork.ShowtimeRepository;
             //ticketRepository = _unitOfWork.TicketRepository;
             tranHisRepository = _unitOfWork.TransactionHistoryRepository;
             companyRepository = _unitOfWork.CompanyRepository;
+
+            this.cacheProvider = cacheProvider;
         }
 
         public async Task<DashboardResponse> GetQuickAnalystDashboardForManager(long? managerid)
@@ -43,13 +50,26 @@ namespace Term7MovieService.Services.Implement
 
         public async Task<DashboardResponse> GetQuickAnalystDashboardForAdmin()
         {
-            var result = await GettingAnalystForOneWeek();
+            var result = await cacheProvider.GetValueAsync<DashboardDTO>(Constants.REDIS_VALUE_ADMIN_DASHBOARD);
             bool Analysable = IsItSundayYet(DateTime.UtcNow);
+            if (result != null)
+            {
+                return new DashboardResponse
+                {
+                    ShowtimeDashboard = result.Showtime,
+                    TicketSoldDashboard = result.TicketSold,
+                    IncomeDashboard = result.Income,
+                    IsItStatistical = Analysable,
+                    Message = Constants.MESSAGE_SUCCESS
+                };
+            }
+            var DbResult = await GettingAnalystForOneWeek();
+
             return new DashboardResponse
             {
-                ShowtimeDashboard = result.Item1,
-                TicketSoldDashboard = result.Item2,
-                IncomeDashboard = result.Item3,
+                ShowtimeDashboard = DbResult.Item1,
+                TicketSoldDashboard = DbResult.Item2,
+                IncomeDashboard = DbResult.Item3,
                 IsItStatistical = Analysable,
                 Message = Constants.MESSAGE_SUCCESS
             };
@@ -93,11 +113,11 @@ namespace Term7MovieService.Services.Implement
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(managerid
+            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanityAsync(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(managerid
+            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeekAsync(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(managerid
+            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeekAsync(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
@@ -108,11 +128,11 @@ namespace Term7MovieService.Services.Implement
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(MondayThisWeek, 
+            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanityAsync(MondayThisWeek, 
                 MondayPreviousWeek, SundayPreviousWeek);
-            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(MondayThisWeek, 
+            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeekAsync(MondayThisWeek, 
                 MondayPreviousWeek, SundayPreviousWeek);
-            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(MondayThisWeek, 
+            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeekAsync(MondayThisWeek, 
                 MondayPreviousWeek, SundayPreviousWeek);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
@@ -174,6 +194,23 @@ namespace Term7MovieService.Services.Implement
         private bool IsItSundayYet(DateTime WhichDayIsIt)
         {
             return (int)WhichDayIsIt.DayOfWeek == 0 ? true : false;
+        }
+
+        private void SetAnalystOnRedis(DashboardDTO adminvalue
+            , DashboardDTO managervalue, long? ManagerId)
+        {
+            //easy admin caching
+            cacheProvider.SetValue(Constants.REDIS_VALUE_ADMIN_DASHBOARD, adminvalue);
+            //so damn complex manager caching :(
+            HashEntry[] rawdataCollection = new HashEntry[managervalue.Count];
+            int i = 0;
+            foreach(var item in managervalue)
+            {
+                HashEntry rawdata = new HashEntry(item.Key, JsonConvert.SerializeObject(item.Value));
+                rawdataCollection[i] = rawdata;
+                i++;
+            }
+            cacheProvider.PutHashMapAsync(Constants.REDIS_KEY_DASHBOARD, rawdataCollection);
         }
         /* ------------------------------------- END PRIVATE FUNCTION --------------------------------- */
     }

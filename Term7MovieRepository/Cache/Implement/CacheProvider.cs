@@ -1,6 +1,7 @@
 ﻿using StackExchange.Redis;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Dto;
+using Term7MovieCore.Data.Dto.Analyst;
 using Term7MovieCore.Extensions;
 using Term7MovieRepository.Cache.Interface;
 

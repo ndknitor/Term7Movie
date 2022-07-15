@@ -549,7 +549,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return valid;
         }
 
-        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(long managerid,
+        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanityAsync(long managerid,
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -593,7 +593,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(DateTime ThisMondayWeek, 
+        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanityAsync(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -608,6 +608,93 @@ namespace Term7MovieRepository.Repositories.Implement
                                             .Where(xxx => xxx.StartTime <= DateTime.UtcNow 
                                                         && xxx.StartTime >= ThisMondayWeek)
                                                         .CountAsync();
+            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
+            {
+                TotalShowtime = 1;
+                ShowtimePreviousWeek = 1;
+                ShowtimeThisWeek = 1;
+            }
+            ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
+            dto.TotalShowtimeQuantity = TotalShowtime;
+            dto.OldShowtimeQuantity = ShowtimePreviousWeek;
+            dto.NewShowtimeQuantity = ShowtimeThisWeek;
+            if (ShowtimeThisWeek > ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimePreviousWeek * (float)100F / (float)ShowtimeThisWeek);
+                dto.IsShowtimeUpOrDown = true;
+            }
+            else if (ShowtimeThisWeek < ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimeThisWeek * (float)100F / (float)ShowtimePreviousWeek);
+                dto.IsShowtimeUpOrDown = false;
+            }
+            else if (ShowtimeThisWeek == ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = 0.69F;
+                dto.IsShowtimeUpOrDown = true; //be positive, why not (:
+            }
+            return dto;
+        }
+
+        public ShowtimeQuanityDTO GetQuickShowtimeQuanity(long managerid,
+            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
+        {
+            if (!_context.Database.CanConnect())
+                throw new Exception("DBCONNECTION");
+            int TotalShowtime = _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid)
+                                            .Count();
+            int ShowtimePreviousWeek = _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid &&
+                                            xxx.StartTime <= SundayPreviousWeek && xxx.StartTime >= MondayPreviousWeek)
+                                            .Count();
+            int ShowtimeThisWeek = _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid &&
+                                            xxx.StartTime <= DateTime.UtcNow && xxx.StartTime >= ThisMondayWeek)
+                                            .Count();
+            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
+            {
+                TotalShowtime = 1;
+                ShowtimePreviousWeek = 1;
+                ShowtimeThisWeek = 1;
+            }
+            ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
+            dto.TotalShowtimeQuantity = TotalShowtime;
+            dto.OldShowtimeQuantity = ShowtimePreviousWeek;
+            dto.NewShowtimeQuantity = ShowtimeThisWeek;
+            if (ShowtimeThisWeek > ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimePreviousWeek * (float)100F / (float)ShowtimeThisWeek);
+                dto.IsShowtimeUpOrDown = true;
+            }
+            else if (ShowtimeThisWeek < ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimeThisWeek * (float)100F / (float)ShowtimePreviousWeek);
+                dto.IsShowtimeUpOrDown = false;
+            }
+            else if (ShowtimeThisWeek == ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = 0.69F;
+                dto.IsShowtimeUpOrDown = true; //be positive, why not (:
+            }
+            return dto;
+        }
+
+        public ShowtimeQuanityDTO GetQuickShowtimeQuanity(DateTime ThisMondayWeek,
+            DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
+        {
+            if (!_context.Database.CanConnect())
+                throw new Exception("DBCONNECTION");
+            int TotalShowtime = _context.Showtimes
+                                            .Count();
+            int ShowtimePreviousWeek = _context.Showtimes
+                                            .Where(xxx => xxx.StartTime <= SundayPreviousWeek
+                                                        && xxx.StartTime >= MondayPreviousWeek)
+                                                        .Count();
+            int ShowtimeThisWeek = _context.Showtimes
+                                            .Where(xxx => xxx.StartTime <= DateTime.UtcNow
+                                                        && xxx.StartTime >= ThisMondayWeek)
+                                                        .Count();
             if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
             {
                 TotalShowtime = 1;

@@ -106,6 +106,10 @@ namespace Term7MovieCore.Data
 
         public const string REDIS_KEY_SHOWTIME_TICKET = "SHOWTIME_TICKETS";
 
+        public const string REDIS_KEY_DASHBOARD = "DASHBOARD";
+        //small note: redis_key mean a key lead to another key and redis_value a key lead to value completely
+        public const string REDIS_VALUE_ADMIN_DASHBOARD = "ADMIN_DASHBOARD";
+
         //hehe bois
         public const string DATABASE_UNAVAILABLE_MESSAGE = "DBCONNECTION";
 

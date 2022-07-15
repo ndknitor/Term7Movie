@@ -12,15 +12,24 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<PagingList<TransactionHistory>> GetAllTransactionHistoryByCompanyId(ParentFilterRequest request, long managerId);
         TransactionHistory GetTransactionHistoryById(long id);
         Task CreateTransactionHistory(IEnumerable<long> idList);
-        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeekAsync(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeekAsync(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek, 
+        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeekAsync(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek, 
+        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeekAsync(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
         Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, long managerid);
         Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year);
+
+        //TicketSoldDTO GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        //    DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        //IncomeDTO GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        //    DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        //TicketSoldDTO GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek,
+        //    DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        //IncomeDTO GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek,
+        //    DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
     }
 }

@@ -139,7 +139,7 @@ namespace Term7MovieRepository.Repositories.Implement
             }
         }
 
-        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeekAsync(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -224,7 +224,7 @@ namespace Term7MovieRepository.Repositories.Implement
             
         }
 
-        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeekAsync(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             //throw new NotImplementedException();
@@ -311,7 +311,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek,
+        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeekAsync(DateTime ThisMondayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -382,7 +382,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek,
+        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeekAsync(DateTime ThisMondayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
