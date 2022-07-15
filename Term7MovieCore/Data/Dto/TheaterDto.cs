@@ -11,7 +11,7 @@ namespace Term7MovieCore.Data.Dto
         public int CompanyId { set; get; }
         public long ManagerId { set; get; }
         public bool Status { set; get; }
-
+        public decimal DefaultPrice { set; get; }
         public IEnumerable<ShowtimeDto> Showtimes { set; get; }
         public IEnumerable<RoomDto> Rooms { set; get; }
         public int TotalRoom { set; get; }

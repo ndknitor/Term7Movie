@@ -14,6 +14,8 @@ namespace Term7MovieCore.Entities
         public string Latitude { set; get; } // North to South
         [Column(TypeName = "varchar(20)")]
         public string Longitude { set; get; } // West to East
+        [Column(TypeName = "money")]
+        public decimal DefaultPrice { set; get; } = 0;
         [Required]
         public int CompanyId { set; get; }
         public TheaterCompany Company { set; get; }

@@ -91,6 +91,17 @@ namespace Term7MovieApi.Controllers
             return Ok(response);
         }
 
+        [HttpPatch]
+        [Authorize(Roles = Constants.ROLE_MANAGER)]
+        public async Task<IActionResult> UpdateDefaultPrice([FromBody] TheaterDefaultPriceUpdateRequest request)
+        {
+            long managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
+
+            var response = await _theaterService.UpdateTheaterDefaultPrice(managerId, request);
+
+            return Ok(response);
+        }
+
         [HttpPut]
         [Authorize(Roles = Constants.ROLE_MANAGER)]
         public async Task<IActionResult> UpdateTheaterAsync(TheaterUpdateRequest request)
