@@ -67,7 +67,7 @@ namespace Term7MovieRepository.Repositories.Implement
 
                 string showtimeTiketType = 
                     !request.IsIncludeTicketType ? "" : 
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
 
@@ -141,7 +141,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " ; ";
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice 
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id ";
 
                 object param = new { managerId, offset, fetch };
@@ -184,7 +184,7 @@ namespace Term7MovieRepository.Repositories.Implement
                     " WHERE sh.Id = @id ; ";
 
                 string showtimeTiketType =
-                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId 
+                   @" SELECT shtt.Id, shtt.ShowtimeId, shtt.TicketTypeId, shtt.ReceivePrice, tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice
                       FROM ShowtimeTicketTypes shtt JOIN TicketTypes tt ON shtt.TicketTypeId = tt.Id 
                       WHERE shtt.ShowtimeId = @id ";
 

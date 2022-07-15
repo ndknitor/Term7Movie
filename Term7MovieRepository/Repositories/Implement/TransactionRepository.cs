@@ -164,7 +164,7 @@ namespace Term7MovieRepository.Repositories.Implement
                               t.ReceivePrice, t.SellingPrice, t.StatusId, ts.Name 'StatusName',
                               t.LockedTime, t.TransactionId, t.ShowtimeTicketTypeId,
                               t.SeatId, s.Id, s.Name, s.ColumnPos, s.RowPos, s.SeatTypeId, st.Id, st.Name,  
-                              tt.Id, tt.Name, tt.CompanyId   
+                              tt.Id, tt.Name, tt.CompanyId, tt.DefaultPrice   
                        FROM Tickets t JOIN Seats s ON t.SeatId = s.Id
                             JOIN SeatTypes st ON s.SeatTypeId = st.Id
                             JOIN TicketStatuses ts ON t.StatusId = ts.Id 
