@@ -125,9 +125,10 @@ namespace Term7MovieService.Services.Implement
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
+            DateTime SundayThisWeek = ThisSunday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(managerid
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(managerid, SundayThisWeek
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
@@ -140,9 +141,10 @@ namespace Term7MovieService.Services.Implement
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
+            DateTime SundayThisWeek = ThisSunday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(MondayThisWeek,
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(MondayThisWeek, SundayThisWeek,
                 MondayPreviousWeek, SundayPreviousWeek);
             var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(MondayThisWeek,
                 MondayPreviousWeek, SundayPreviousWeek);
@@ -155,10 +157,11 @@ namespace Term7MovieService.Services.Implement
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
+            DateTime LastDateOfMonth = ThisLastMonth(RightNow);
             DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
             DateTime LastDateOfPreviousMonth = LastPreviousMonthDate(RightNow);
             var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentMonth(managerid
-                , FirstDateOfTheMonth, FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
+                , FirstDateOfTheMonth, LastDateOfMonth, FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
             var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentMonth(managerid
                 , FirstDateOfTheMonth, FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
             var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentMonth(managerid
@@ -170,9 +173,10 @@ namespace Term7MovieService.Services.Implement
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
+            DateTime LastDateOfMonth = ThisLastMonth(RightNow);
             DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
             DateTime LastDateOfPreviousMonth = LastPreviousMonthDate(RightNow);
-            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentMonth(FirstDateOfTheMonth,
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentMonth(FirstDateOfTheMonth, LastDateOfMonth,
                 FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
             var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentMonth(FirstDateOfTheMonth,
                 FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
@@ -235,7 +239,6 @@ namespace Term7MovieService.Services.Implement
                 default: throw new NotSupportedException();
             }
         }
-
         private DateTime HowManyDaysUntilFirstMonth(DateTime InTheMeantime)
         {
             if (InTheMeantime.Day == 1) return InTheMeantime.Date;
@@ -253,6 +256,27 @@ namespace Term7MovieService.Services.Implement
                 return new DateTime(InTheMeantime.Year - 1, 12, 31);
             DateTime firsttime = new DateTime(InTheMeantime.Year, InTheMeantime.Month - 1, 1);
             return firsttime.AddMonths(1).AddTicks(-1);
+        }
+        private DateTime ThisSunday(DateTime NOW)
+        {
+            int dayname = (int)NOW.DayOfWeek;
+            switch (dayname)
+            {
+                case 0: return NOW.Date.AddDays(1).AddTicks(-1);
+                case 1: return NOW.AddDays(6).AddDays(1).AddTicks(-1);
+                case 2: return NOW.AddDays(5).AddDays(1).AddTicks(-1);
+                case 3: return NOW.AddDays(4).AddDays(1).AddTicks(-1);
+                case 4: return NOW.AddDays(3).AddDays(1).AddTicks(-1);
+                case 5: return NOW.AddDays(2).AddDays(1).AddTicks(-1);
+                case 6: return NOW.AddDays(1).AddDays(1).AddTicks(-1);
+                default: throw new NotImplementedException();
+            }
+        }
+
+        private DateTime ThisLastMonth(DateTime NOW)
+        {
+            DateTime first = new DateTime(NOW.Year, NOW.Month, 1);
+            return first.AddMonths(1).AddTicks(-1);
         }
 
         private bool IsItSundayYet(DateTime WhichDayIsIt)

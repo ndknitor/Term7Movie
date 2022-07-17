@@ -550,7 +550,7 @@ namespace Term7MovieRepository.Repositories.Implement
         }
 
         public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(long managerid,
-            DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
+            DateTime ThisMondayWeek, DateTime ThisSundayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception("DBCONNECTION");
@@ -563,14 +563,8 @@ namespace Term7MovieRepository.Repositories.Implement
                                             .CountAsync();
             int ShowtimeThisWeek = await _context.Showtimes.Include(a => a.Theater)
                                             .Where(xxx => xxx.Theater.ManagerId == managerid &&
-                                            xxx.StartTime <= DateTime.UtcNow && xxx.StartTime >= ThisMondayWeek)
+                                            xxx.StartTime <= ThisSundayWeek && xxx.StartTime >= ThisMondayWeek)
                                             .CountAsync();
-            if(TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
-            {
-                TotalShowtime = 1;
-                ShowtimePreviousWeek = 1;
-                ShowtimeThisWeek = 1;
-            }
             ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
             dto.TotalShowtimeQuantity = TotalShowtime;
             dto.OldShowtimeQuantity = ShowtimePreviousWeek;
@@ -587,13 +581,13 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             else if(ShowtimeThisWeek == ShowtimePreviousWeek)
             {
-                dto.PercentShowtimeChange = 0.69F;
+                dto.PercentShowtimeChange = 0;
                 dto.IsShowtimeUpOrDown = true; //be positive, why not (:
             }
             return dto;
         }
 
-        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(DateTime ThisMondayWeek, 
+        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(DateTime ThisMondayWeek, DateTime ThisSundayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -605,15 +599,9 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         && xxx.StartTime >= MondayPreviousWeek)
                                                         .CountAsync();
             int ShowtimeThisWeek = await _context.Showtimes
-                                            .Where(xxx => xxx.StartTime <= DateTime.UtcNow 
+                                            .Where(xxx => xxx.StartTime <= ThisSundayWeek
                                                         && xxx.StartTime >= ThisMondayWeek)
                                                         .CountAsync();
-            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
-            {
-                TotalShowtime = 1;
-                ShowtimePreviousWeek = 1;
-                ShowtimeThisWeek = 1;
-            }
             ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
             dto.TotalShowtimeQuantity = TotalShowtime;
             dto.OldShowtimeQuantity = ShowtimePreviousWeek;
@@ -630,14 +618,14 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             else if (ShowtimeThisWeek == ShowtimePreviousWeek)
             {
-                dto.PercentShowtimeChange = 0.69F;
+                dto.PercentShowtimeChange = 0;
                 dto.IsShowtimeUpOrDown = true; //be positive, why not (:
             }
             return dto;
         }
 
         public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(long managerid,
-            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+            DateTime ThisFirstMonth, DateTime ThisLastMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new Exception("DBCONNECTION");
@@ -650,14 +638,8 @@ namespace Term7MovieRepository.Repositories.Implement
                                             .CountAsync();
             int ShowtimeThisWeek = await _context.Showtimes.Include(a => a.Theater)
                                             .Where(xxx => xxx.Theater.ManagerId == managerid &&
-                                            xxx.StartTime <= DateTime.UtcNow && xxx.StartTime >= ThisFirstMonth)
+                                            xxx.StartTime <= ThisLastMonth && xxx.StartTime >= ThisFirstMonth)
                                             .CountAsync();
-            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
-            {
-                TotalShowtime = 1;
-                ShowtimePreviousWeek = 1;
-                ShowtimeThisWeek = 1;
-            }
             ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
             dto.TotalShowtimeQuantity = TotalShowtime;
             dto.OldShowtimeQuantity = ShowtimePreviousWeek;
@@ -674,15 +656,13 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             else if (ShowtimeThisWeek == ShowtimePreviousWeek)
             {
-                dto.PercentShowtimeChange = 0.69F;
+                dto.PercentShowtimeChange = 0;
                 dto.IsShowtimeUpOrDown = true; //be positive, why not (:
             }
             return dto;
         }
-
-        
-        
-        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(DateTime ThisFirstMonth,
+ 
+        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(DateTime ThisFirstMonth, DateTime ThisLastMonth,
             DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -694,15 +674,9 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         && xxx.StartTime >= FirstPreviousMonth)
                                                         .CountAsync();
             int ShowtimeThisWeek = await _context.Showtimes
-                                            .Where(xxx => xxx.StartTime <= DateTime.UtcNow
+                                            .Where(xxx => xxx.StartTime <= ThisLastMonth
                                                         && xxx.StartTime >= ThisFirstMonth)
                                                         .CountAsync();
-            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
-            {
-                TotalShowtime = 1;
-                ShowtimePreviousWeek = 1;
-                ShowtimeThisWeek = 1;
-            }
             ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
             dto.TotalShowtimeQuantity = TotalShowtime;
             dto.OldShowtimeQuantity = ShowtimePreviousWeek;
@@ -719,7 +693,7 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             else if (ShowtimeThisWeek == ShowtimePreviousWeek)
             {
-                dto.PercentShowtimeChange = 0.69F;
+                dto.PercentShowtimeChange = 0;
                 dto.IsShowtimeUpOrDown = true; //be positive, why not (:
             }
             return dto;
