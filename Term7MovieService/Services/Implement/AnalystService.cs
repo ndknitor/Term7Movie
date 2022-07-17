@@ -47,7 +47,7 @@ namespace Term7MovieService.Services.Implement
                 //like it was nothing :v
             {
                 var result = await GettingAnalystForTwoMonth(managerid.Value);
-                bool S1mple = IsItSundayYet(DateTime.UtcNow);
+                bool S1mple = IsItLastMonthYet(DateTime.UtcNow);
                 return new DashboardResponse
                 {
                     ShowtimeDashboard = result.Item1,
@@ -77,7 +77,7 @@ namespace Term7MovieService.Services.Implement
             else
             {
                 var result = await GettingAnalystForTwoMonth();
-                bool Analysable = IsItSundayYet(DateTime.UtcNow);
+                bool Analysable = IsItLastMonthYet(DateTime.UtcNow);
                 return new DashboardResponse
                 {
                     ShowtimeDashboard = result.Item1,
@@ -154,15 +154,15 @@ namespace Term7MovieService.Services.Implement
         private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoMonth(long managerid)
         {
             DateTime RightNow = DateTime.UtcNow;
-            DateTime MondayThisWeek = HowManyDaysUntilFirstMonth(RightNow);
-            DateTime MondayPreviousWeek = FirstPreviousMonthDate(RightNow);
-            DateTime SundayPreviousWeek = LastPreviousMonthDate(RightNow);
-            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(managerid
-                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(managerid
-                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentWeek(managerid
-                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
+            DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
+            DateTime LastDateOfPreviousMonth = LastPreviousMonthDate(RightNow);
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentMonth(managerid
+                , FirstDateOfTheMonth, FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
+            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentMonth(managerid
+                , FirstDateOfTheMonth, FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
+            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentMonth(managerid
+                , FirstDateOfTheMonth, FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
         }
@@ -172,11 +172,11 @@ namespace Term7MovieService.Services.Implement
             DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
             DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
             DateTime LastDateOfPreviousMonth = LastPreviousMonthDate(RightNow);
-            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(FirstDateOfTheMonth,
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentMonth(FirstDateOfTheMonth,
                 FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
-            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(FirstDateOfTheMonth,
+            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentMonth(FirstDateOfTheMonth,
                 FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
-            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentWeek(FirstDateOfTheMonth,
+            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentMonth(FirstDateOfTheMonth,
                 FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
@@ -224,14 +224,14 @@ namespace Term7MovieService.Services.Implement
         {
             int DayOfTheWeek = (int)InTheMeantime.DayOfWeek;
             switch (DayOfTheWeek)
-            {
-                case 0: return InTheMeantime.AddDays(0 - 7).Date;
-                case 1: return InTheMeantime.AddDays(6 - 7).Date;
-                case 2: return InTheMeantime.AddDays(5 - 7).Date;
-                case 3: return InTheMeantime.AddDays(4 - 7).Date;
-                case 4: return InTheMeantime.AddDays(3 - 7).Date;
-                case 5: return InTheMeantime.AddDays(2 - 7).Date;
-                case 6: return InTheMeantime.AddDays(1 - 7).Date;
+            {//.adddays(1).addticks(-1) mean get the datetime of the last in that specific date
+                case 0: return InTheMeantime.AddDays(0 - 7).AddDays(1).AddTicks(-1);
+                case 1: return InTheMeantime.AddDays(6 - 7).AddDays(1).AddTicks(-1);
+                case 2: return InTheMeantime.AddDays(5 - 7).AddDays(1).AddTicks(-1);
+                case 3: return InTheMeantime.AddDays(4 - 7).AddDays(1).AddTicks(-1);
+                case 4: return InTheMeantime.AddDays(3 - 7).AddDays(1).AddTicks(-1);
+                case 5: return InTheMeantime.AddDays(2 - 7).AddDays(1).AddTicks(-1);
+                case 6: return InTheMeantime.AddDays(1 - 7).AddDays(1).AddTicks(-1);
                 default: throw new NotSupportedException();
             }
         }
@@ -252,7 +252,7 @@ namespace Term7MovieService.Services.Implement
             if (InTheMeantime.Month == 1)
                 return new DateTime(InTheMeantime.Year - 1, 12, 31);
             DateTime firsttime = new DateTime(InTheMeantime.Year, InTheMeantime.Month - 1, 1);
-            return firsttime.AddMonths(1).AddDays(-1);
+            return firsttime.AddMonths(1).AddTicks(-1);
         }
 
         private bool IsItSundayYet(DateTime WhichDayIsIt)
