@@ -16,6 +16,7 @@ class MoviesController extends GetxController with GetSingleTickerProviderStateM
     "incoming",
   ];
   var isAddLoading = false.obs;
+  String searchText = '';
 
   @override
   void onInit() {
@@ -61,7 +62,13 @@ class MoviesController extends GetxController with GetSingleTickerProviderStateM
     try{
       isAddLoading.value = true;
       page++;
-      List<MovieModel> _data = await MovieServices.getLatestMovies({'Action': 'latest', 'PageIndex': page});
+      List<MovieModel> _data;
+      if (searchText.isNotEmpty) {
+        _data = await MovieServices.getLatestMovies({'Action': 'latest', 'PageIndex': page, 'SearchKey': searchText});
+      } else {
+        _data = await MovieServices.getLatestMovies({'Action': 'latest', 'PageIndex': page});
+      }
+
       movies.addAll(_data);
     }
     finally{
@@ -72,8 +79,9 @@ class MoviesController extends GetxController with GetSingleTickerProviderStateM
   void searchMovie(String value) async {
     try {
       isLoading.value = true;
+      searchText = value;
       List<MovieModel> _data = await MovieServices.getLatestMovies({'Action': 'latest', 'SearchKey': value});
-      movies.addAll(_data);
+      movies.assignAll(_data);
     } finally {
       isLoading.value = false;
     }

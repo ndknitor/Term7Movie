@@ -25,11 +25,6 @@ class ShowtimeController extends GetxController {
   }
 
   void fetchShowtimes() async {
-    // print({
-    //   'TheaterId': theaterId,
-    //   'MovieId': MovieDetailController.instance.id,
-    //   'Date': seletedDate.toIso8601String().split('T')[0],
-    // });
     try{
       isLoading.value = true;
       showtimes = [];
@@ -49,5 +44,12 @@ class ShowtimeController extends GetxController {
     seletedDate = date;
     isSelected.value = -1;
     theaterId.value = -1;
+    print(seletedDate);
   }
+
+  // void reset() {
+  //   isSelected.value = -1;
+  //   theaterId.value = -1;
+  //   seletedDate = DateTime.now();
+  // }
 }

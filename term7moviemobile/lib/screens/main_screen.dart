@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -7,7 +6,6 @@ import 'package:term7moviemobile/screens/home_screen.dart';
 import 'package:term7moviemobile/screens/movie_list_screen.dart';
 import 'package:term7moviemobile/screens/profile_screen.dart';
 import 'package:term7moviemobile/screens/sale_tickets_screen.dart';
-import 'package:term7moviemobile/screens/showtime_screen.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 
 class MainScreen extends StatelessWidget {
