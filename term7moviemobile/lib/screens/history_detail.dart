@@ -61,19 +61,6 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                     bottom: 16,
                     child: Column(
                       children: [
-                        // Row(
-                        //   children: [
-                        //     ArrowBack(color: Colors.white),
-                        //     Expanded(
-                        //       child: Center(
-                        //         child: Container(child: Text(
-                        //           "My Ticket",
-                        //           style: TextStyle(color: Colors.white, fontSize: 18),
-                        //         ), margin: EdgeInsets.only(top: 36, right: 24),),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 24),
@@ -308,52 +295,6 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                                       ],
                                     ),
                                   ),
-                                  // Padding(
-                                  //   padding:
-                                  //       const EdgeInsets.symmetric(vertical: 8),
-                                  //   child: Row(
-                                  //     mainAxisAlignment:
-                                  //         MainAxisAlignment.spaceBetween,
-                                  //     children: [
-                                  // Column(
-                                  //   crossAxisAlignment:
-                                  //       CrossAxisAlignment.start,
-                                  //   children: [
-                                  //     Text(
-                                  //       "DWP42SX",
-                                  //       style: TextStyle(
-                                  //         fontWeight: FontWeight.bold,
-                                  //         fontSize: 16,
-                                  //       ),
-                                  //     ),
-                                  //     SizedBox(
-                                  //       height: 8,
-                                  //     ),
-                                  //     Text("Booking Code")
-                                  //   ],
-                                  // ),
-                                  // Column(
-                                  //   crossAxisAlignment:
-                                  //       CrossAxisAlignment.start,
-                                  //   children: [
-                                  //     SizedBox(
-                                  //       width: size.width - 80,
-                                  //       child: Text(
-                                  //       controller.transaction!.transactionId!,
-                                  //       style: TextStyle(
-                                  //         fontWeight: FontWeight.bold,
-                                  //         fontSize: 16,
-                                  //       ),
-                                  //     ),),
-                                  //     SizedBox(
-                                  //       height: 8,
-                                  //     ),
-                                  //     Text("Transaction ID")
-                                  //   ],
-                                  // )
-                                  //     ],
-                                  //   ),
-                                  // ),
                                   Padding(
                                     padding:
                                     const EdgeInsets.symmetric(vertical: 8),
@@ -466,7 +407,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                   Positioned(
                     left: 0,
                     right: 0,
-                    top: 180,
+                    top: 190,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,

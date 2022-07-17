@@ -6,12 +6,11 @@ class MovieDetailController extends GetxController {
   static MovieDetailController instance = Get.find();
   var isLoading = false.obs;
   MovieModel? movie;
-  String id = '';
+  String id = Get.parameters['id']!;
 
   void fetchMovieDetail() async {
     try {
       setIsLoading(true);
-      id = Get.parameters['id']!;
       movie = await MovieServices.getMovieDetail(
           {'Action': 'detail', 'MovieId': id});
     } finally {

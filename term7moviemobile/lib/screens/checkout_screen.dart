@@ -85,7 +85,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 64.0, right: 24.0),
                   child: Text(
-                    "02:00",
+                    "05:00",
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: MyTheme.warningColor),
@@ -120,17 +120,23 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               ),
             ),
             buildPriceTag('Cinema', controller.showtime?.theaterName ?? ''),
-            buildPriceTag('Room No', controller.showtime!.room!.no.toString()),
+            buildPriceTag('Room No', controller.showtime?.room?.no.toString() ?? ''),
             buildPriceTag(
                 'Date & Time',
-                controller.showtime!.startTime!.split('T')[0] +
-                    " " +
+                DateFormat.yMMMd()
+                    .format(DateTime.parse(
+                    controller.showtime!.startTime!.split('T')[0]))
+                    .toString()
+                 +
+                    "   " +
                     DateFormat.Hm().format(
                         DateTime.parse(controller.showtime!.startTime!)
                             .add(Duration(hours: 7)))),
             buildPriceTag('Seat Number',
-                controller.tickets!.map((e) => e.seat!.name!).toString()),
-            buildPriceTag('Total', controller.total.toString() + " VND"),
+                controller.tickets!.map((e) => e.seat!.name)
+                    .toList()
+                    .join(", ")),
+            buildPriceTag('Total', controller.total.toStringAsFixed(0) + " VND"),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               padding: const EdgeInsets.only(bottom: 24),
@@ -148,6 +154,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   child: Center(
                     child: GestureDetector(
                       onTap: () async {
+                        // controller.createPaymentSuccessNotification();
                         if (!controller.isLoading.value) {
                           controller.isLoading.value = true;
                           MomoPaymentInfo options = MomoPaymentInfo(

@@ -48,12 +48,20 @@ class _MovieListScreenState extends State<MovieListScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 36),
+                    child: Text(
+                      "Movies".toUpperCase(),
+                      style: TextStyle(
+                          color: MyTheme.primaryColor, fontWeight: FontWeight.w700),
+                    ),
+                  ),
                   Container(
                     margin: EdgeInsets.all(16),
                     child: TextFormField(
                       textInputAction: TextInputAction.search,
                       onFieldSubmitted: (value) {
-                        moviesController.searchMovie(value);
+                        moviesController.searchMovie(value, );
                       },
                       decoration: const InputDecoration(
                         labelText: 'Search Movie',
@@ -95,84 +103,88 @@ class _MovieListScreenState extends State<MovieListScreen>
                       itemBuilder: (_, index) {
                         return LayoutBuilder(
                           builder: (context, constraint) {
-                            return Obx(() => GridView.builder(
-                                  controller: scrollController,
-                                  shrinkWrap: true,
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        constraint.maxWidth > 480 ? 4 : 2,
-                                    childAspectRatio: 0.8,
-                                  ),
-                                  itemBuilder: (_, index) {
-                                    if (moviesController.movies.length <=
-                                        index) {
-                                      return MovieLoadingItem();
-                                    }
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, left: 20.0, right: 10),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Get.toNamed(
-                                              "/detail/${moviesController.movies[index].movieId}");
-                                        },
-                                        child: SingleChildScrollView(
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  moviesController.movies[index]
-                                                              .posterImgUrl
-                                                              ?.toString()
-                                                              .length ==
-                                                          0
-                                                      ? 'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png'
-                                                      : moviesController
-                                                          .movies[index]
-                                                          .posterImgUrl!,
-                                                  height: 180,
-                                                  width: 150,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 8,
-                                              ),
-                                              Container(
-                                                width: 150,
-                                                child: Text(
-                                                  moviesController.movies[index]
-                                                          .title ??
-                                                      '',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  softWrap: true,
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black
-                                                          .withOpacity(0.8),
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                              ),
-                                            ],
+                            return Obx(() => RefreshIndicator(child: GridView.builder(
+                              controller: scrollController,
+                              shrinkWrap: true,
+                              gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount:
+                                constraint.maxWidth > 480 ? 4 : 2,
+                                childAspectRatio: 0.8,
+                              ),
+                              itemBuilder: (_, index) {
+                                if (moviesController.movies.length <=
+                                    index) {
+                                  return MovieLoadingItem();
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10, left: 20.0, right: 10),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Get.toNamed(
+                                          "/detail/${moviesController.movies[index].movieId}");
+                                    },
+                                    child: SingleChildScrollView(
+                                      physics:
+                                      const NeverScrollableScrollPhysics(),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                            child: Image.network(
+                                              moviesController.movies[index]
+                                                  .posterImgUrl
+                                                  !.toString()
+                                                  .length ==
+                                                  0
+                                                  ? 'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png'
+                                                  : moviesController
+                                                  .movies[index]
+                                                  .posterImgUrl!,
+                                              height: 180,
+                                              width: 150,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                        ),
+                                          const SizedBox(
+                                            height: 8,
+                                          ),
+                                          Container(
+                                            width: 150,
+                                            child: Text(
+                                              moviesController.movies[index]
+                                                  .title ??
+                                                  '',
+                                              maxLines: 1,
+                                              overflow:
+                                              TextOverflow.ellipsis,
+                                              softWrap: true,
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black
+                                                      .withOpacity(0.8),
+                                                  fontWeight:
+                                                  FontWeight.w500),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    );
-                                  },
-                                  itemCount: moviesController.isAddLoading.value
-                                      ? moviesController.movies.length + 10
-                                      : moviesController.movies.length + 2,
-                                ));
+                                    ),
+                                  ),
+                                );
+                              },
+                              itemCount: moviesController.isAddLoading.value
+                                  ? moviesController.movies.length + 10
+                                  : moviesController.movies.length,
+                            ),color: MyTheme.primaryColor,
+                              onRefresh: () async {
+                              moviesController.page = 1;
+                                moviesController.fetchMovies(moviesController.types[index]);
+                              },));
                           },
                         );
                       },

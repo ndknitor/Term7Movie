@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +19,6 @@ class HomeScreen extends StatefulWidget {
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
-
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -28,14 +28,46 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then(
+      (isAllowed) {
+        if (!isAllowed) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Allow Notifications'),
+              content: Text('Our app would like to send you notifications'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Don\'t Allow',
+                    style: TextStyle(color: Colors.grey, fontSize: 18),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => AwesomeNotifications()
+                      .requestPermissionToSendNotifications()
+                      .then((_) => Navigator.pop(context)),
+                  child: Text(
+                    'Allow',
+                    style: TextStyle(
+                      color: MyTheme.primaryColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
     locationController.getMyLocation().then((value) {
       controller.fetchData();
     });
-  }
-
-  @override
-  void dispose() {
-
   }
 
   @override
@@ -83,11 +115,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       Icon(Icons.add_location_alt_rounded,
                           color: MyTheme.bottomBarColor, size: 16),
                       Obx(
-                            () => SizedBox(
+                        () => SizedBox(
                           width: 190,
                           child: Text(
-                            LocationController.instance.city.value, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: MyTheme.grayColor, inherit: true, fontSize: 10),
+                            LocationController.instance.city.value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: MyTheme.grayColor,
+                                inherit: true,
+                                fontSize: 10),
                           ),
                         ),
                       ),
@@ -111,54 +148,57 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: Container(
-            height: size.height,
-            width: size.width,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Obx(() => !controller.isLoading.value ? CarouselSliderDataFound(carouselList: controller.sliders) : CarouselLoading()),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, top: 10, right: 12, bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "recommended showtime".toUpperCase(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black.withOpacity(0.8)),
-                        ),
-                      ],
-                    ),
+          height: size.height,
+          width: size.width,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Obx(() => !controller.isLoading.value
+                    ? CarouselSliderDataFound(carouselList: controller.sliders)
+                    : CarouselLoading()),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 12, top: 10, right: 12, bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "recommended showtime".toUpperCase(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black.withOpacity(0.8)),
+                      ),
+                    ],
                   ),
-                  Container(
-                    height: 300,
-                    width: size.width,
-                    child: Obx(() => LoadingOverlay(
+                ),
+                Container(
+                  height: 300,
+                  width: size.width,
+                  child: Obx(
+                    () => LoadingOverlay(
                       isLoading: controller.isLoading.value,
                       color: MyTheme.backgroundColor,
                       opacity: 1,
                       progressIndicator: const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(MyTheme.primaryColor),
+                        valueColor:
+                            AlwaysStoppedAnimation(MyTheme.primaryColor),
                       ),
                       child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: controller.showtime.length,
-                          itemBuilder: (_, i) {
-                            return MovieItem(data: controller.showtime[i]);
-                          },
-                        ),
-                    ),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: controller.showtime.length,
+                        itemBuilder: (_, i) {
+                          return MovieItem(data: controller.showtime[i]);
+                        },
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
+        ),
       ),
     );
   }
 }
-
-

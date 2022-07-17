@@ -14,7 +14,7 @@ class MyDatePicker extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DatePicker(
-            DateTime.now(),
+            ShowtimeController.instance.seletedDate,
             initialSelectedDate: ShowtimeController.instance.seletedDate,
             height: 94,
             selectedTextColor: MyTheme.primaryColor,
