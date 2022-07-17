@@ -139,7 +139,7 @@ namespace Term7MovieRepository.Repositories.Implement
             }
         }
 
-        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        public async Task<TicketSoldDTO> GetTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -220,11 +220,9 @@ namespace Term7MovieRepository.Repositories.Implement
                 dto.PercentTicketSoldChange = 0.69F;
             }
             return dto;
-
-            
         }
 
-        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             //throw new NotImplementedException();
@@ -311,7 +309,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek,
+        public async Task<TicketSoldDTO> GetTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -382,7 +380,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek,
+        public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -455,6 +453,321 @@ namespace Term7MovieRepository.Repositories.Implement
             }
             return dto;
         }
+
+        public async Task<TicketSoldDTO> GetTicketSoldInTwoRecentMonth(long managerid, /*bool Comparable,*/
+            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new DbOperationException("DBCONNECTION");
+            var TotalShowtimeIds = await _context.Theaters
+                                .Include(a => a.Showtimes)
+                                .Where(a => a.ManagerId == managerid)
+                                .SelectMany(a => a.Showtimes)
+                                .Select(a => a.Id).ToListAsync();
+            var OldShowtimeIds = await _context.Theaters
+                                    .Include(a => a.Showtimes)
+                                    .Where(a => a.ManagerId == managerid)
+                                    .SelectMany(a => a.Showtimes)
+                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            var NewShowtimeIds = await _context.Theaters
+                                    .Include(a => a.Showtimes)
+                                    .Where(a => a.ManagerId == managerid)
+                                    .SelectMany(a => a.Showtimes)
+                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            //I can taste the tension like a cloud of smoke in the air
+            int TotalTicketSold = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(xxx => TotalShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Select(a => a.ShowtimeId).CountAsync();
+            int OldTicketSold = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(xxx => OldShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Select(a => a.ShowtimeId).CountAsync();
+            int NewTicketSold = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(xxx => NewShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Select(a => a.ShowtimeId).CountAsync();
+            if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
+            {
+                //free to play
+                TotalTicketSold = 1;
+                OldTicketSold = 1;
+                NewTicketSold = 1;
+            }
+            TicketSoldDTO dto = new TicketSoldDTO();
+            dto.TotalTicketSoldQuantity = TotalTicketSold;
+            dto.OldTicketSoldQuantity = OldTicketSold;
+            dto.NewTicketSoldQuantity = NewTicketSold;
+            if (NewTicketSold > OldTicketSold)
+            {
+                dto.IsTicketSoldUpOrDown = true;
+                dto.PercentTicketSoldChange = (float)100D - OldTicketSold * (float)100D / NewTicketSold;
+            }
+            else if (NewTicketSold < OldTicketSold)
+            {
+                dto.IsTicketSoldUpOrDown = false;
+                dto.PercentTicketSoldChange = (float)100D - NewTicketSold * (float)100D / OldTicketSold;
+            }
+            else if (NewTicketSold == OldTicketSold)
+            {
+                //be positive :D
+                dto.IsTicketSoldUpOrDown = true;
+                dto.PercentTicketSoldChange = 0.69F;
+            }
+            return dto;
+        }
+
+        public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentMonth(long managerid, /*bool Comparable,*/
+            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new DbOperationException("DBCONNECTION");
+            var TotalShowtimeIds = await _context.Theaters
+                                .Include(a => a.Showtimes)
+                                .Where(a => a.ManagerId == managerid)
+                                .SelectMany(a => a.Showtimes)
+                                .Select(a => a.Id).ToListAsync();
+            var OldShowtimeIds = await _context.Theaters
+                                    .Include(a => a.Showtimes)
+                                    .Where(a => a.ManagerId == managerid)
+                                    .SelectMany(a => a.Showtimes)
+                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            var NewShowtimeIds = await _context.Theaters
+                                    .Include(a => a.Showtimes)
+                                    .Where(a => a.CompanyId == managerid)
+                                    .SelectMany(a => a.Showtimes)
+                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            //I can taste the tension like a cloud of smoke in the air
+            decimal TotalIncome = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        Money = tic.ReceivePrice,
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(xxx => TotalShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Select(a => a.Money).SumAsync();
+            decimal OldIncome = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        Money = tic.ReceivePrice,
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(xxx => OldShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Select(a => a.Money).SumAsync();
+            decimal NewIncome = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        Money = tic.ReceivePrice,
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(xxx => NewShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Select(a => a.Money).SumAsync();
+            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
+            {
+                //free to play
+                TotalIncome = 1;
+                OldIncome = 1;
+                NewIncome = 1;
+            }
+            IncomeDTO dto = new IncomeDTO();
+            dto.TotalIncome = TotalIncome;
+            dto.OldIncome = OldIncome;
+            dto.NewIncome = NewIncome;
+            if (NewIncome > OldIncome)
+            {
+                dto.IsIncomeUpOrDown = true;
+                dto.PercentIncomeChange = (decimal)100D - OldIncome * (decimal)100D / NewIncome;
+            }
+            else if (NewIncome < OldIncome)
+            {
+                dto.IsIncomeUpOrDown = false;
+                dto.PercentIncomeChange = (decimal)100D - NewIncome * (decimal)100D / OldIncome;
+            }
+            else if (NewIncome == OldIncome)
+            {
+                //be positive :D
+                dto.IsIncomeUpOrDown = true;
+                dto.PercentIncomeChange = (decimal)0.69D;
+            }
+            return dto;
+        }
+
+        public async Task<TicketSoldDTO> GetTicketSoldInTwoRecentMonth(DateTime ThisFirstMonth,
+            DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new DbOperationException("DBCONNECTION");
+            //nhưng lời đàm tiếu qua loa linh tinh
+            var OldShowtimeIds = await _context.Showtimes
+                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            var NewShowtimeIds = await _context.Showtimes
+                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            int TotalTicketSold = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Select(a => a.ShowtimeId).CountAsync();
+            int OldTicketSold = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(a => OldShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Select(a => a.ShowtimeId).CountAsync();
+            int NewTicketSold = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(a => NewShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Select(a => a.ShowtimeId).CountAsync();
+            if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
+            {
+                //free to play
+                TotalTicketSold = 1;
+                OldTicketSold = 1;
+                NewTicketSold = 1;
+            }
+            TicketSoldDTO dto = new TicketSoldDTO();
+            dto.TotalTicketSoldQuantity = TotalTicketSold;
+            dto.OldTicketSoldQuantity = OldTicketSold;
+            dto.NewTicketSoldQuantity = NewTicketSold;
+            if (NewTicketSold > OldTicketSold)
+            {
+                dto.IsTicketSoldUpOrDown = true;
+                dto.PercentTicketSoldChange = (float)100D - OldTicketSold * (float)100D / NewTicketSold;
+            }
+            else if (NewTicketSold < OldTicketSold)
+            {
+                dto.IsTicketSoldUpOrDown = false;
+                dto.PercentTicketSoldChange = (float)100D - NewTicketSold * (float)100D / OldTicketSold;
+            }
+            else if (NewTicketSold == OldTicketSold)
+            {
+                //be positive :D
+                dto.IsTicketSoldUpOrDown = true;
+                dto.PercentTicketSoldChange = 0.69F;
+            }
+            return dto;
+        }
+
+        public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentMonth(DateTime ThisFirstMonth,
+            DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new DbOperationException("DBCONNECTION");
+            //Không thể nào mà cản được ma gaming
+            var OldShowtimeIds = await _context.Showtimes
+                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            var NewShowtimeIds = await _context.Showtimes
+                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
+                                    .Select(a => a.Id).ToListAsync();
+            decimal TotalIncome = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        Money = tic.ReceivePrice,
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Select(a => a.Money).SumAsync();
+            decimal OldIncome = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        Money = tic.ReceivePrice,
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(a => OldShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Select(a => a.Money).SumAsync();
+            decimal NewIncome = await _context.Tickets
+                                                    .Join(_context.TransactionHistories,
+                                                    tic => tic.Id,
+                                                    th => th.TicketId, (tic, th) =>
+                                                    new
+                                                    {
+                                                        Money = tic.ReceivePrice,
+                                                        ShowtimeId = tic.ShowTimeId
+                                                    })
+                                                    .Where(a => NewShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Select(a => a.Money).SumAsync();
+            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
+            {
+                //free to play
+                TotalIncome = 1;
+                OldIncome = 1;
+                NewIncome = 1;
+            }
+            IncomeDTO dto = new IncomeDTO();
+            dto.TotalIncome = TotalIncome;
+            dto.OldIncome = OldIncome;
+            dto.NewIncome = NewIncome;
+            if (NewIncome > OldIncome)
+            {
+                dto.IsIncomeUpOrDown = true;
+                dto.PercentIncomeChange = (decimal)100D - OldIncome * (decimal)100D / NewIncome;
+            }
+            else if (NewIncome < OldIncome)
+            {
+                dto.IsIncomeUpOrDown = false;
+                dto.PercentIncomeChange = (decimal)100D - NewIncome * (decimal)100D / OldIncome;
+            }
+            else if (NewIncome == OldIncome)
+            {
+                //be positive :D
+                dto.IsIncomeUpOrDown = true;
+                dto.PercentIncomeChange = (decimal)0.69D;
+            }
+            return dto;
+        }
+
 
         public async Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, long managerid)
         {

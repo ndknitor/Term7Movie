@@ -25,34 +25,68 @@ namespace Term7MovieService.Services.Implement
             companyRepository = _unitOfWork.CompanyRepository;
         }
 
-        public async Task<DashboardResponse> GetQuickAnalystDashboardForManager(long? managerid)
+        public async Task<DashboardResponse> GetDashboardManager(long? managerid, string time)
         {
             if (managerid == null)
                 throw new DbForbiddenException();
-            var result = await GettingAnalystForOneWeek(managerid.Value);
-            bool S1mple = IsItSundayYet(DateTime.UtcNow);
-            return new DashboardResponse
+            if(time.Equals(Constants.WEEK))
             {
-                ShowtimeDashboard = result.Item1,
-                TicketSoldDashboard = result.Item2,
-                IncomeDashboard = result.Item3,
-                IsItStatistical = S1mple,
-                Message = Constants.MESSAGE_SUCCESS
-            };
+                var result = await GettingAnalystForTwoWeek(managerid.Value);
+                bool S1mple = IsItSundayYet(DateTime.UtcNow);
+                return new DashboardResponse
+                {
+                    ShowtimeDashboard = result.Item1,
+                    TicketSoldDashboard = result.Item2,
+                    IncomeDashboard = result.Item3,
+                    IsItStatistical = S1mple,
+                    Message = Constants.MESSAGE_SUCCESS
+                };
+            }
+            else//eventually there will be another function for year calculation but we
+                //dont have time so i will put the code below
+                //like it was nothing :v
+            {
+                var result = await GettingAnalystForTwoMonth(managerid.Value);
+                bool S1mple = IsItSundayYet(DateTime.UtcNow);
+                return new DashboardResponse
+                {
+                    ShowtimeDashboard = result.Item1,
+                    TicketSoldDashboard = result.Item2,
+                    IncomeDashboard = result.Item3,
+                    IsItStatistical = S1mple,
+                    Message = Constants.MESSAGE_SUCCESS
+                };
+            }
         }
 
-        public async Task<DashboardResponse> GetQuickAnalystDashboardForAdmin()
+        public async Task<DashboardResponse> GetDashboardForAdmin(string time)
         {
-            var result = await GettingAnalystForOneWeek();
-            bool Analysable = IsItSundayYet(DateTime.UtcNow);
-            return new DashboardResponse
+            if(time.Equals(Constants.WEEK))
             {
-                ShowtimeDashboard = result.Item1,
-                TicketSoldDashboard = result.Item2,
-                IncomeDashboard = result.Item3,
-                IsItStatistical = Analysable,
-                Message = Constants.MESSAGE_SUCCESS
-            };
+                var result = await GettingAnalystForTwoWeek();
+                bool Analysable = IsItSundayYet(DateTime.UtcNow);
+                return new DashboardResponse
+                {
+                    ShowtimeDashboard = result.Item1,
+                    TicketSoldDashboard = result.Item2,
+                    IncomeDashboard = result.Item3,
+                    IsItStatistical = Analysable,
+                    Message = Constants.MESSAGE_SUCCESS
+                };
+            }
+            else
+            {
+                var result = await GettingAnalystForTwoMonth();
+                bool Analysable = IsItSundayYet(DateTime.UtcNow);
+                return new DashboardResponse
+                {
+                    ShowtimeDashboard = result.Item1,
+                    TicketSoldDashboard = result.Item2,
+                    IncomeDashboard = result.Item3,
+                    IsItStatistical = Analysable,
+                    Message = Constants.MESSAGE_SUCCESS
+                };
+            }
         }
 
         public async Task<YearlyIncomeResponse> GetYearlyIncomeForManager(int year, long? managerid)
@@ -87,33 +121,63 @@ namespace Term7MovieService.Services.Implement
         /* ------------------------------------- START PRIVATE FUNCTION --------------------------------- */
 
         //______ START GETTING QUICK ANALYST
-        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek(long managerid)
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoWeek(long managerid)
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(managerid
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(managerid
+            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
-            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(managerid
+            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentWeek(managerid
                 , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
         }
-        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForOneWeek()
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoWeek()
         {
             DateTime RightNow = DateTime.UtcNow;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
             DateTime SundayPreviousWeek = BiteTheDustPreviousWeekSunday(RightNow);
-            var showtimeQuanity = await showRepository.GetQuickShowtimeQuanity(MondayThisWeek, 
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(MondayThisWeek,
                 MondayPreviousWeek, SundayPreviousWeek);
-            var ticketSold = await tranHisRepository.GetQuickTicketSoldInTwoRecentWeek(MondayThisWeek, 
+            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(MondayThisWeek,
                 MondayPreviousWeek, SundayPreviousWeek);
-            var Income = await tranHisRepository.GetQuickTicketStonkOrStinkInTwoRecentWeek(MondayThisWeek, 
+            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentWeek(MondayThisWeek,
                 MondayPreviousWeek, SundayPreviousWeek);
+            //trả 404 nếu 1 trong những thứ trên có vấn đề hence
+            return Tuple.Create(showtimeQuanity, ticketSold, Income);
+        }
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoMonth(long managerid)
+        {
+            DateTime RightNow = DateTime.UtcNow;
+            DateTime MondayThisWeek = HowManyDaysUntilFirstMonth(RightNow);
+            DateTime MondayPreviousWeek = FirstPreviousMonthDate(RightNow);
+            DateTime SundayPreviousWeek = LastPreviousMonthDate(RightNow);
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(managerid
+                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(managerid
+                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentWeek(managerid
+                , MondayThisWeek, MondayPreviousWeek, SundayPreviousWeek);
+            //trả 404 nếu 1 trong những thứ trên có vấn đề hence
+            return Tuple.Create(showtimeQuanity, ticketSold, Income);
+        }
+        private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoMonth()
+        {
+            DateTime RightNow = DateTime.UtcNow;
+            DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
+            DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
+            DateTime LastDateOfPreviousMonth = LastPreviousMonthDate(RightNow);
+            var showtimeQuanity = await showRepository.GetShowtimeQuanityInTwoRecentWeek(FirstDateOfTheMonth,
+                FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
+            var ticketSold = await tranHisRepository.GetTicketSoldInTwoRecentWeek(FirstDateOfTheMonth,
+                FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
+            var Income = await tranHisRepository.GetTicketStonkOrStinkInTwoRecentWeek(FirstDateOfTheMonth,
+                FirstDateOfPreviousMonth, LastDateOfPreviousMonth);
             //trả 404 nếu 1 trong những thứ trên có vấn đề hence
             return Tuple.Create(showtimeQuanity, ticketSold, Income);
         }
@@ -171,9 +235,63 @@ namespace Term7MovieService.Services.Implement
                 default: throw new NotSupportedException();
             }
         }
+
+        private DateTime HowManyDaysUntilFirstMonth(DateTime InTheMeantime)
+        {
+            if (InTheMeantime.Day == 1) return InTheMeantime.Date;
+            return new DateTime(InTheMeantime.Year, InTheMeantime.Month, 1);
+        }
+        private DateTime FirstPreviousMonthDate(DateTime InTheMeantime)
+        {
+            if (InTheMeantime.Month == 1)
+                return new DateTime(InTheMeantime.Year - 1, 12, 1);
+            return new DateTime(InTheMeantime.Year, InTheMeantime.Month - 1, 1);
+        }
+        private DateTime LastPreviousMonthDate(DateTime InTheMeantime)
+        {
+            if (InTheMeantime.Month == 1)
+                return new DateTime(InTheMeantime.Year - 1, 12, 31);
+            DateTime firsttime = new DateTime(InTheMeantime.Year, InTheMeantime.Month - 1, 1);
+            return firsttime.AddMonths(1).AddDays(-1);
+        }
+
         private bool IsItSundayYet(DateTime WhichDayIsIt)
         {
             return (int)WhichDayIsIt.DayOfWeek == 0 ? true : false;
+        }
+
+        private bool IsItLastMonthYet(DateTime WhichMonthIsIt)
+        {
+            //my brain is limitation
+            switch(WhichMonthIsIt.Month)
+            {
+                case 1:
+                    return WhichMonthIsIt.Day == 31;
+                case 2:
+                    return WhichMonthIsIt.Day == 28 || WhichMonthIsIt.Day == 29;
+                case 3:
+                    return WhichMonthIsIt.Day == 31;
+                case 4:
+                    return WhichMonthIsIt.Day == 30;
+                case 5:
+                    return WhichMonthIsIt.Day == 31;
+                case 6:
+                    return WhichMonthIsIt.Day == 30;
+                case 7:
+                    return WhichMonthIsIt.Day == 31;
+                case 8:
+                    return WhichMonthIsIt.Day == 31;
+                case 9:
+                    return WhichMonthIsIt.Day == 30;
+                case 10:
+                    return WhichMonthIsIt.Day == 31;
+                case 11:
+                    return WhichMonthIsIt.Day == 30;
+                case 12:
+                    return WhichMonthIsIt.Day == 31;
+                default:
+                    return false;
+            }
         }
         /* ------------------------------------- END PRIVATE FUNCTION --------------------------------- */
     }

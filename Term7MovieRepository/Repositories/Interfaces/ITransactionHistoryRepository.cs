@@ -12,14 +12,22 @@ namespace Term7MovieRepository.Repositories.Interfaces
         Task<PagingList<TransactionHistory>> GetAllTransactionHistoryByCompanyId(ParentFilterRequest request, long managerId);
         TransactionHistory GetTransactionHistoryById(long id);
         Task CreateTransactionHistory(IEnumerable<long> idList);
-        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        Task<TicketSoldDTO> GetTicketSoldInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
+        Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentWeek(long managerid, /*bool Comparable,*/
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<TicketSoldDTO> GetQuickTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek, 
+        Task<TicketSoldDTO> GetTicketSoldInTwoRecentWeek(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
-        Task<IncomeDTO> GetQuickTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek, 
+        Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+        Task<TicketSoldDTO> GetTicketSoldInTwoRecentMonth(long managerid, /*bool Comparable,*/
+            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth);
+        Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentMonth(long managerid, /*bool Comparable,*/
+            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth);
+        Task<TicketSoldDTO> GetTicketSoldInTwoRecentMonth(DateTime ThisFirstMonth, 
+            DateTime FirstPreviousMonth, DateTime LastPreviousMonth);
+        Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentMonth(DateTime ThisFirstMonth,
+            DateTime FirstPreviousMonth, DateTime LastPreviousMonth);
         Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year, long managerid);
         Task<IEnumerable<YearlyIncomeDTO>> GetIncomeForAYear(int year);
     }
