@@ -26,10 +26,16 @@ namespace Term7MovieRepository.Repositories.Interfaces
 
         Task<IEnumerable<TheaterShowTimeDTO>> GetRecentlyShowTimeWithMinutesRemain(Coordinate UserLocation);
 
-        Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(long managerid, 
+        Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(long managerid, 
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
 
-        Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(DateTime ThisMondayWeek,
+        Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(DateTime ThisMondayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek);
+
+        Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(long managerid,
+            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth);
+
+        Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(DateTime ThisFirstMonth, 
+            DateTime FirstPreviousMonth, DateTime LastPreviousMonth);
     }
 }

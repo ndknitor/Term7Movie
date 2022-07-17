@@ -549,7 +549,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return valid;
         }
 
-        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(long managerid,
+        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(long managerid,
             DateTime ThisMondayWeek, DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -593,7 +593,7 @@ namespace Term7MovieRepository.Repositories.Implement
             return dto;
         }
 
-        public async Task<ShowtimeQuanityDTO> GetQuickShowtimeQuanity(DateTime ThisMondayWeek, 
+        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentWeek(DateTime ThisMondayWeek, 
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
             if (!await _context.Database.CanConnectAsync())
@@ -607,6 +607,95 @@ namespace Term7MovieRepository.Repositories.Implement
             int ShowtimeThisWeek = await _context.Showtimes
                                             .Where(xxx => xxx.StartTime <= DateTime.UtcNow 
                                                         && xxx.StartTime >= ThisMondayWeek)
+                                                        .CountAsync();
+            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
+            {
+                TotalShowtime = 1;
+                ShowtimePreviousWeek = 1;
+                ShowtimeThisWeek = 1;
+            }
+            ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
+            dto.TotalShowtimeQuantity = TotalShowtime;
+            dto.OldShowtimeQuantity = ShowtimePreviousWeek;
+            dto.NewShowtimeQuantity = ShowtimeThisWeek;
+            if (ShowtimeThisWeek > ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimePreviousWeek * (float)100F / (float)ShowtimeThisWeek);
+                dto.IsShowtimeUpOrDown = true;
+            }
+            else if (ShowtimeThisWeek < ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimeThisWeek * (float)100F / (float)ShowtimePreviousWeek);
+                dto.IsShowtimeUpOrDown = false;
+            }
+            else if (ShowtimeThisWeek == ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = 0.69F;
+                dto.IsShowtimeUpOrDown = true; //be positive, why not (:
+            }
+            return dto;
+        }
+
+        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(long managerid,
+            DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            int TotalShowtime = await _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid)
+                                            .CountAsync();
+            int ShowtimePreviousWeek = await _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid &&
+                                            xxx.StartTime <= LastPreviousMonth && xxx.StartTime >= FirstPreviousMonth)
+                                            .CountAsync();
+            int ShowtimeThisWeek = await _context.Showtimes.Include(a => a.Theater)
+                                            .Where(xxx => xxx.Theater.ManagerId == managerid &&
+                                            xxx.StartTime <= DateTime.UtcNow && xxx.StartTime >= ThisFirstMonth)
+                                            .CountAsync();
+            if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
+            {
+                TotalShowtime = 1;
+                ShowtimePreviousWeek = 1;
+                ShowtimeThisWeek = 1;
+            }
+            ShowtimeQuanityDTO dto = new ShowtimeQuanityDTO();
+            dto.TotalShowtimeQuantity = TotalShowtime;
+            dto.OldShowtimeQuantity = ShowtimePreviousWeek;
+            dto.NewShowtimeQuantity = ShowtimeThisWeek;
+            if (ShowtimeThisWeek > ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimePreviousWeek * (float)100F / (float)ShowtimeThisWeek);
+                dto.IsShowtimeUpOrDown = true;
+            }
+            else if (ShowtimeThisWeek < ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = (float)100F - ((float)ShowtimeThisWeek * (float)100F / (float)ShowtimePreviousWeek);
+                dto.IsShowtimeUpOrDown = false;
+            }
+            else if (ShowtimeThisWeek == ShowtimePreviousWeek)
+            {
+                dto.PercentShowtimeChange = 0.69F;
+                dto.IsShowtimeUpOrDown = true; //be positive, why not (:
+            }
+            return dto;
+        }
+
+        
+        
+        public async Task<ShowtimeQuanityDTO> GetShowtimeQuanityInTwoRecentMonth(DateTime ThisFirstMonth,
+            DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
+        {
+            if (!await _context.Database.CanConnectAsync())
+                throw new Exception("DBCONNECTION");
+            int TotalShowtime = await _context.Showtimes
+                                            .CountAsync();
+            int ShowtimePreviousWeek = await _context.Showtimes
+                                            .Where(xxx => xxx.StartTime <= LastPreviousMonth
+                                                        && xxx.StartTime >= FirstPreviousMonth)
+                                                        .CountAsync();
+            int ShowtimeThisWeek = await _context.Showtimes
+                                            .Where(xxx => xxx.StartTime <= DateTime.UtcNow
+                                                        && xxx.StartTime >= ThisFirstMonth)
                                                         .CountAsync();
             if (TotalShowtime == 0 && ShowtimePreviousWeek == 0 && ShowtimeThisWeek == 0)
             {

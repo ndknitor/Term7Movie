@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using Term7MovieCore.Data;
 using Term7MovieCore.Data.Extensions;
@@ -13,26 +17,27 @@ namespace Term7MovieApi.Controllers
     public class AnalystController : ControllerBase
     {
         private readonly IAnalystService _anaService;
-        //private readonly ILogger<AnalystController> _logger;
+        private readonly ILogger<AnalystController> _logger;
 
-        public AnalystController(IAnalystService anaService/*, ILogger<AnalystController> logger*/)
+        public AnalystController(IAnalystService anaService, ILogger<AnalystController> logger)
         {
             _anaService = anaService;
-            //_logger = logger;
+            _logger = logger;
         }
 
         [HttpGet("dashboard")]
         [Authorize(Roles = Constants.ROLE_MANAGER + "," +  Constants.ROLE_ADMIN)]
-        public async Task<IActionResult> QuickDashboard()
+        public async Task<IActionResult> QuickDashboard(string timetype)
         {
+            _logger.LogInformation(timetype);
             long? managerId = Convert.ToInt64(User.Claims.FindFirstValue(Constants.JWT_CLAIM_USER_ID));
             string role = User.Claims.FindFirstValue(Constants.JWT_CLAIM_ROLE);
             switch(role)
             {
                 case Constants.ROLE_MANAGER:
-                    return await QuickDashboardForManager(managerId);
+                    return await QuickDashboardForManager(managerId, timetype);
                 case Constants.ROLE_ADMIN:
-                    return await QuickDashboardForAdmin();
+                    return await QuickDashboardForAdmin(timetype);
                 default:
                     return Forbid();
             }
@@ -55,19 +60,17 @@ namespace Term7MovieApi.Controllers
             }
         }
 
-
-        private async Task<IActionResult> QuickDashboardForAdmin()
+        private async Task<IActionResult> QuickDashboardForAdmin(string timetype)
         {
-            var result = await _anaService.GetQuickAnalystDashboardForAdmin();
+            var result = await _anaService.GetDashboardForAdmin(timetype);
             return Ok(result);
         }
 
-        private async Task<IActionResult> QuickDashboardForManager(long? managerid)
+        private async Task<IActionResult> QuickDashboardForManager(long? managerid, string timetype)
         {
-            var result = await _anaService.GetQuickAnalystDashboardForManager(managerid);
+            var result = await _anaService.GetDashboardManager(managerid, timetype);
             return Ok(result);
         }
-
 
         private async Task<IActionResult> YearlyIncomeForManager(long? managerid, int year)
         {

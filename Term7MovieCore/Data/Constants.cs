@@ -110,5 +110,10 @@ namespace Term7MovieCore.Data
         public const string DATABASE_UNAVAILABLE_MESSAGE = "DBCONNECTION";
 
         public const string FLASH_SALE = "Flash Sale";
+
+        //time string
+        public const string WEEK = "week";
+        public const string MONTH = "month";
+        public const string YEAR = "year";
     }
 }
