@@ -211,13 +211,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         && xxx.PurchasedDate <= DateTime.UtcNow
                                                         && xxx.PurchasedDate >= ThisMondayWeek)
                                                     .Select(a => a.ManagerId).CountAsync();
-            if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
-            {
-                //free to play
-                TotalTicketSold = 1;
-                OldTicketSold = 1;
-                NewTicketSold = 1;
-            }
             TicketSoldDTO dto = new TicketSoldDTO();
             dto.TotalTicketSoldQuantity = TotalTicketSold;
             dto.OldTicketSoldQuantity = OldTicketSold;
@@ -236,7 +229,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsTicketSoldUpOrDown = true;
-                dto.PercentTicketSoldChange = 0.69F;
+                dto.PercentTicketSoldChange = 0;
             }
             return dto;
         }
@@ -313,13 +306,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                                 && xxx.PurchasedDate >= ThisMondayWeek
                                                                 && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
-            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
-            {
-                //free to play
-                TotalIncome = 1;
-                OldIncome = 1;
-                NewIncome = 1;
-            }
             IncomeDTO dto = new IncomeDTO();
             dto.TotalIncome = TotalIncome;
             dto.OldIncome = OldIncome;
@@ -338,7 +324,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsIncomeUpOrDown = true;
-                dto.PercentIncomeChange = (decimal)0.69D;
+                dto.PercentIncomeChange = 0;
             }
             return dto;
         }
@@ -379,13 +365,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     .Where(xxx => xxx.PurchasedDate <= DateTime.UtcNow
                                                                 && xxx.PurchasedDate >= ThisMondayWeek)
                                                     .Select(a => a.PurchasedDate).CountAsync();
-            if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
-            {
-                //free to play
-                TotalTicketSold = 1;
-                OldTicketSold = 1;
-                NewTicketSold = 1;
-            }
             TicketSoldDTO dto = new TicketSoldDTO();
             dto.TotalTicketSoldQuantity = TotalTicketSold;
             dto.OldTicketSoldQuantity = OldTicketSold;
@@ -404,7 +383,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsTicketSoldUpOrDown = true;
-                dto.PercentTicketSoldChange = 0.69F;
+                dto.PercentTicketSoldChange = 0;
             }
             return dto;
         }
@@ -478,13 +457,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     .Where(xxx => xxx.PurchasedDate >= ThisMondayWeek
                                                                 && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
-            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
-            {
-                //free to play
-                TotalIncome = 1;
-                OldIncome = 1;
-                NewIncome = 1;
-            }
             IncomeDTO dto = new IncomeDTO();
             dto.TotalIncome = TotalIncome;
             dto.OldIncome = OldIncome;
@@ -503,7 +475,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsIncomeUpOrDown = true;
-                dto.PercentIncomeChange = (decimal)0.69D;
+                dto.PercentIncomeChange = 0;
             }
             return dto;
         }
@@ -580,13 +552,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                         && xxx.PurchasedDate <= DateTime.UtcNow
                                                         && xxx.PurchasedDate >= ThisFirstMonth)
                                                     .Select(a => a.ManagerId).CountAsync();
-            if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
-            {
-                //free to play
-                TotalTicketSold = 1;
-                OldTicketSold = 1;
-                NewTicketSold = 1;
-            }
             TicketSoldDTO dto = new TicketSoldDTO();
             dto.TotalTicketSoldQuantity = TotalTicketSold;
             dto.OldTicketSoldQuantity = OldTicketSold;
@@ -605,7 +570,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsTicketSoldUpOrDown = true;
-                dto.PercentTicketSoldChange = 0.69F;
+                dto.PercentTicketSoldChange = 0;
             }
             return dto;
         }
@@ -682,13 +647,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                                 && xxx.PurchasedDate >= ThisFirstMonth
                                                                 && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
-            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
-            {
-                //free to play
-                TotalIncome = 1;
-                OldIncome = 1;
-                NewIncome = 1;
-            }
             IncomeDTO dto = new IncomeDTO();
             dto.TotalIncome = TotalIncome;
             dto.OldIncome = OldIncome;
@@ -707,7 +665,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsIncomeUpOrDown = true;
-                dto.PercentIncomeChange = (decimal)0.69D;
+                dto.PercentIncomeChange = 0;
             }
             return dto;
         }
@@ -748,13 +706,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     .Where(xxx => xxx.PurchasedDate <= DateTime.UtcNow
                                                                 && xxx.PurchasedDate >= ThisFirstMonth)
                                                     .Select(a => a.PurchasedDate).CountAsync();
-            if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
-            {
-                //free to play
-                TotalTicketSold = 1;
-                OldTicketSold = 1;
-                NewTicketSold = 1;
-            }
             TicketSoldDTO dto = new TicketSoldDTO();
             dto.TotalTicketSoldQuantity = TotalTicketSold;
             dto.OldTicketSoldQuantity = OldTicketSold;
@@ -773,7 +724,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsTicketSoldUpOrDown = true;
-                dto.PercentTicketSoldChange = 0.69F;
+                dto.PercentTicketSoldChange = 0;
             }
             return dto;
         }
@@ -847,13 +798,6 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     .Where(xxx => xxx.PurchasedDate >= ThisFirstMonth
                                                                 && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
-            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
-            {
-                //free to play
-                TotalIncome = 1;
-                OldIncome = 1;
-                NewIncome = 1;
-            }
             IncomeDTO dto = new IncomeDTO();
             dto.TotalIncome = TotalIncome;
             dto.OldIncome = OldIncome;
@@ -872,7 +816,7 @@ namespace Term7MovieRepository.Repositories.Implement
             {
                 //be positive :D
                 dto.IsIncomeUpOrDown = true;
-                dto.PercentIncomeChange = (decimal)0.69D;
+                dto.PercentIncomeChange = 0;
             }
             return dto;
         }
