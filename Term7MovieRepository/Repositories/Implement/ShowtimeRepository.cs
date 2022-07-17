@@ -340,11 +340,11 @@ namespace Term7MovieRepository.Repositories.Implement
                        SELECT 1
                        FROM Showtimes
                        WHERE RoomId = @RoomId AND TheaterId = @TheaterId 
-                                        AND @StartTime BETWEEN StartTime AND EndTime
+                                        AND ( @StartTime BETWEEN StartTime AND EndTime
                                         OR (
                                                 SELECT DATEADD(MINUTE, Duration, @StartTime)
                                                 FROM CTE_GETDURATION_BY_MOVIEID
-                                            ) BETWEEN StartTime AND EndTime ; ";
+                                            ) BETWEEN StartTime AND EndTime ) ; ";
 
                 int count = await con.QueryFirstOrDefaultAsync<int>(checkStartime, request);
 
@@ -371,11 +371,11 @@ namespace Term7MovieRepository.Repositories.Implement
                        SELECT 1
                        FROM Showtimes sh
                        WHERE Id = @Id 
-                              AND @StartTime BETWEEN StartTime AND EndTime
+                             ( AND @StartTime BETWEEN StartTime AND EndTime
                               OR (
                                       SELECT DATEADD(MINUTE, Duration, @StartTime)
                                       FROM CTE_GETDURATION_BY_MOVIEID
-                                  ) BETWEEN StartTime AND EndTime ; ";
+                                  ) BETWEEN StartTime AND EndTime ) ; ";
 
                 int count = await con.QueryFirstOrDefaultAsync<int>(sql, request);
 
