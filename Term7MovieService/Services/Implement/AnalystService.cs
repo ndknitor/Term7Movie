@@ -123,7 +123,7 @@ namespace Term7MovieService.Services.Implement
         //______ START GETTING QUICK ANALYST
         private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoWeek(long managerid)
         {
-            DateTime RightNow = DateTime.UtcNow;
+            DateTime RightNow = DateTime.UtcNow.Date;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime SundayThisWeek = ThisSunday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
@@ -139,7 +139,7 @@ namespace Term7MovieService.Services.Implement
         }
         private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoWeek()
         {
-            DateTime RightNow = DateTime.UtcNow;
+            DateTime RightNow = DateTime.UtcNow.Date;
             DateTime MondayThisWeek = HowManyDaysUntilMonday(RightNow);
             DateTime SundayThisWeek = ThisSunday(RightNow);
             DateTime MondayPreviousWeek = BiteTheDustPreviousWeekMonday(RightNow);
@@ -155,7 +155,7 @@ namespace Term7MovieService.Services.Implement
         }
         private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoMonth(long managerid)
         {
-            DateTime RightNow = DateTime.UtcNow;
+            DateTime RightNow = DateTime.UtcNow.Date;
             DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
             DateTime LastDateOfMonth = ThisLastMonth(RightNow);
             DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
@@ -171,7 +171,7 @@ namespace Term7MovieService.Services.Implement
         }
         private async Task<Tuple<ShowtimeQuanityDTO, TicketSoldDTO, IncomeDTO>> GettingAnalystForTwoMonth()
         {
-            DateTime RightNow = DateTime.UtcNow;
+            DateTime RightNow = DateTime.UtcNow.Date;
             DateTime FirstDateOfTheMonth = HowManyDaysUntilFirstMonth(RightNow);
             DateTime LastDateOfMonth = ThisLastMonth(RightNow);
             DateTime FirstDateOfPreviousMonth = FirstPreviousMonthDate(RightNow);
