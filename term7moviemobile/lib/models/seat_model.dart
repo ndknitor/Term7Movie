@@ -4,8 +4,9 @@ class SeatModel {
   String? name;
   int? roomId;
   int? rowPos;
+  int? seatTypeId;
 
-  SeatModel({this.columnPos, this.id, this.name, this.roomId, this.rowPos});
+  SeatModel({this.columnPos, this.id, this.name, this.roomId, this.rowPos, this.seatTypeId});
 
   SeatModel.fromJson(Map<String, dynamic> json) {
     columnPos = json['columnPos'];
@@ -13,6 +14,7 @@ class SeatModel {
     name = json['name'];
     roomId = json['roomId'];
     rowPos = json['rowPos'];
+    seatTypeId = json['seatTypeId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -22,6 +24,7 @@ class SeatModel {
     data['name'] = this.name;
     data['roomId'] = this.roomId;
     data['rowPos'] = this.rowPos;
+    data['seatTypeId'] = this.seatTypeId;
     return data;
   }
 }

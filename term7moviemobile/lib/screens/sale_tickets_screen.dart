@@ -26,21 +26,6 @@ class _SaleTicketsScreenState extends State<SaleTicketsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: AppBar(
-          title: Padding(
-            padding: const EdgeInsets.only(left: 12, top: 36),
-            child: Text(
-              "Flash sale".toUpperCase(),
-              style: TextStyle(
-                  color: MyTheme.primaryColor, fontWeight: FontWeight.w700),
-            ),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-      ),
       body: Obx(() => LoadingOverlay(
             isLoading: controller.isLoading.value,
             color: MyTheme.backgroundColor,
@@ -50,35 +35,40 @@ class _SaleTicketsScreenState extends State<SaleTicketsScreen> {
             ),
             child: SafeArea(
               child: Container(
-                // padding: EdgeInsets.only(top: 40),
-                child: LayoutBuilder(
-                  builder: (context, constraint) {
-                    return GridView.builder(
-                      controller: scrollController,
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: constraint.maxWidth > 480 ? 2 : 2,
-                        mainAxisExtent: 280,
-                        childAspectRatio: 0.8,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12, top: 36),
+                      child: Text(
+                        "Flash sale".toUpperCase(),
+                        style: TextStyle(
+                            color: MyTheme.primaryColor,
+                            fontWeight: FontWeight.w700),
                       ),
-                      itemBuilder: (_, index) {
-                        if (controller.tickets.length <= index) {
-                          return Container();
-                        }
-                        return Container(
-                          margin: const EdgeInsets.only(left: 16.0, right: 10),
+                    ),
+                    RefreshIndicator(
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(top: 20),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => Container(
+                          margin:
+                          const EdgeInsets.only(left: 16.0, right: 16),
                           alignment: Alignment.center,
                           child: GestureDetector(
                             onTap: () {
+                              List<TicketModel> list = [];
+                              list.add(controller.tickets[index]);
                               Get.toNamed("/checkout", arguments: {
-                                'showtime': controller.tickets[index].showtime,
-                                'tickets':  controller.tickets.take(index).toList(),
-                                'total': controller.tickets[index].sellingPrice
+                                'showtime':
+                                controller.tickets[index].showtime,
+                                'tickets': list,
+                                'total':
+                                controller.tickets[index].sellingPrice
                               });
                             },
                             child: Container(
-                              height: 240,
-                              // color: Colors.cyanAccent,
+                              height: 140,
                               child: Stack(
                                 children: [
                                   Positioned(
@@ -86,179 +76,167 @@ class _SaleTicketsScreenState extends State<SaleTicketsScreen> {
                                     left: 0,
                                     right: 0,
                                     child: Container(
-                                      height: 200,
+                                      height: 140,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius:
+                                        BorderRadius.circular(8),
                                         color: MyTheme.borderColor,
                                       ),
                                     ),
                                   ),
                                   Positioned(
-                                    left: -11,
-                                    right: -11,
-                                    bottom: 36,
-                                    child: Row(
+                                    top: -15,
+                                    bottom: -15,
+                                    right: 70,
+                                    child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      CrossAxisAlignment.center,
                                       children: [
                                         CircleAvatar(
                                           radius: 14,
-                                          backgroundColor: Colors.white,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            "---------------",
-                                            style: TextStyle(
-                                                color: MyTheme.grayColor),
-                                          ),
+                                          backgroundColor:
+                                          MyTheme.backgroundColor,
                                         ),
                                         CircleAvatar(
                                           radius: 14,
-                                          backgroundColor: Colors.white,
+                                          backgroundColor:
+                                          MyTheme.backgroundColor,
                                         )
                                       ],
                                     ),
                                   ),
                                   Positioned(
-                                    top: 0,
-                                    left: 0,
+                                    top: 3,
+                                    left: 5,
                                     right: 0,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                    child: Row(
                                       children: [
                                         ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(10),
+                                          BorderRadius.circular(6),
                                           child: Image.network(
-                                            // controller.tickets[index].showtime!.movie?.posterImgUrl?.length == 0 ?
-                                            'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png',
-                                            // : controller.tickets[index].showtime?.movie?.posterImgUrl,
-                                            height: 100,
-                                            width: 100,
+                                            controller
+                                                .tickets[index]
+                                                .showtime!
+                                                .movie!
+                                                .posterImgUrl!
+                                                .length ==
+                                                0
+                                                ? 'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png'
+                                                : controller
+                                                .tickets[index]
+                                                .showtime!
+                                                .movie!
+                                                .posterImgUrl!,
+                                            height: 130,
+                                            width: 90,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
-                                        const SizedBox(
-                                          height: 8,
-                                        ),
-                                        Container(
-                                            width: 130,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                // Icon(Icons.access_time, color: MyTheme.warningColor, size: 16,),
-                                                // const SizedBox(
-                                                //   width: 4,
-                                                // ),
-                                                Text(
-                                                  DateFormat.Hm().format(DateTime
-                                                              .parse(controller
-                                                                  .tickets[
-                                                                      index]
-                                                                  .showtime!
-                                                                  .startTime!)
-                                                          .add(Duration(
-                                                              hours: 7))) +
-                                                      ' - ' +
-                                                      DateFormat.yMMMd()
-                                                          .format(DateTime
-                                                              .parse(controller
-                                                                  .tickets[
-                                                                      index]
-                                                                  .showtime!
-                                                                  .startTime!))
-                                                          .toString(),
-                                                  textAlign: TextAlign.center,
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text("Name", style: TextStyle(color: Colors.black38, fontSize: 10),),
+                                              Container(
+                                                width: 130,
+                                                child: Text(
+                                                  controller
+                                                      .tickets[index]
+                                                      .showtime!
+                                                      .movie!
+                                                      .title ??
+                                                      '',
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  softWrap: true,
                                                   style: TextStyle(
-                                                      fontSize: 12,
-                                                      color:
-                                                          MyTheme.warningColor,
+                                                      fontSize: 16,
+                                                      color: Colors.black
+                                                          .withOpacity(0.8),
                                                       fontWeight:
-                                                          FontWeight.w500),
+                                                      FontWeight.w600),
                                                 ),
-                                              ],
-                                            )),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-                                        Container(
-                                          width: 130,
-                                          child: Text(
-                                            // moviesController.movies[index]
-                                            //     .title ??
-                                            'movie titlesádgshdfhfdhdhbsdb  đfsbdb gdbdb h',
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            softWrap: true,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black
-                                                    .withOpacity(0.8),
-                                                fontWeight: FontWeight.w600),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text("Date", style: TextStyle(color: Colors.black38, fontSize: 10),),
+                                              Text(
+                                                DateFormat.Hm().format(
+                                                    DateTime.parse(controller
+                                                        .tickets[
+                                                    index]
+                                                        .showtime!
+                                                        .startTime!)
+                                                        .add(Duration(
+                                                        hours:
+                                                        7))) +
+                                                    ' - ' +
+                                                    DateFormat.yMMMd()
+                                                        .format(DateTime
+                                                        .parse(controller
+                                                        .tickets[
+                                                    index]
+                                                        .showtime!
+                                                        .startTime!))
+                                                        .toString(),
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                    FontWeight.w500),
+                                              ),
+                                              const SizedBox(
+                                                height: 4,
+                                              ),
+                                              Text("Theater", style: TextStyle(color: Colors.black38, fontSize: 10),),
+                                              Text(
+                                                controller.tickets[index].showtime?.theaterName ?? '',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                    FontWeight.w500),
+                                              ),
+
+                                            ],
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 30,
-                                        ),
-                                        Container(
-                                            width: 130,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons
-                                                      .confirmation_num_outlined,
-                                                  color: MyTheme.grayColor,
-                                                  size: 18,
-                                                ),
-                                                Text(
-                                                  controller.tickets[index].seat!.name! + ' - ',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: MyTheme.grayColor,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                                const SizedBox(
-                                                  width: 2,
-                                                ),
-                                                Text(
-                                                  controller.tickets[index].sellingPrice!.toStringAsFixed(0) + ' VND',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: MyTheme.grayColor,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                              ],
-                                            )),
-                                        // Container(
-                                        //     width: 130,
-                                        //     child: Row(
-                                        //       mainAxisAlignment: MainAxisAlignment.center,
-                                        //       children: [
-                                        //         Icon(Icons.price_change, color: MyTheme.grayColor, size: 18,),
-                                        //         const SizedBox(
-                                        //           width: 2,
-                                        //         ),
-                                        //         Text(
-                                        //           '1000 VND',
-                                        //           textAlign: TextAlign.center,
-                                        //           style: TextStyle(
-                                        //               fontSize: 14,
-                                        //               color: MyTheme.grayColor,
-                                        //               fontWeight: FontWeight.w600),
-                                        //         ),
-                                        //       ],
-                                        //     )),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 10,
+                                    right: 0,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text("Seat", style: TextStyle(color: Colors.black38, fontSize: 10),),
+                                              Text(
+                                                  controller.tickets[index].seat!.name!,
+                                              ),
+                                              const SizedBox(
+                                                height: 40,
+                                              ),
+                                              Text("Price", style: TextStyle(color: Colors.black38, fontSize: 10),),
+                                              Text(
+                                                  controller.tickets[index]
+                                                                .sellingPrice!
+                                                                .toStringAsFixed(
+                                                                0) +
+                                                                ' VND',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                    FontWeight.w500),
+                                              ),
+                                            ],
+                                          ),
+                                        )
                                       ],
                                     ),
                                   ),
@@ -266,11 +244,15 @@ class _SaleTicketsScreenState extends State<SaleTicketsScreen> {
                               ),
                             ),
                           ),
-                        );
+                        ),
+                        itemCount: controller.tickets.length,
+                      ),
+                      color: MyTheme.primaryColor,
+                      onRefresh: () async {
+                        controller.fetchData();
                       },
-                      itemCount: controller.tickets.length,
-                    );
-                  },
+                    )
+                  ],
                 ),
               ),
             ),

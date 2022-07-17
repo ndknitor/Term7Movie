@@ -15,15 +15,11 @@ class CompanyList extends StatefulWidget {
 }
 
 class _CompanyListState extends State<CompanyList> {
-  late ShowtimeController controller;
-
   @override
+
   void initState() {
     super.initState();
-    controller = Get.put(ShowtimeController());
-    controller.fetchCompanies();
-    controller.theaterId.value = -1;
-    controller.showtimes = [];
+    ShowtimeController.instance.fetchCompanies();
   }
 
   @override
@@ -32,7 +28,7 @@ class _CompanyListState extends State<CompanyList> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Obx(() => LoadingOverlay(
-              isLoading: controller.isLoading.value,
+              isLoading: ShowtimeController.instance.isLoading.value,
               color: MyTheme.backgroundColor,
               progressIndicator: const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation(MyTheme.primaryColor),
@@ -55,10 +51,10 @@ class _CompanyListState extends State<CompanyList> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  if (controller.isSelected.value != i) {
-                                    controller.isSelected.value = i;
+                                  if (ShowtimeController.instance.isSelected.value != i) {
+                                    ShowtimeController.instance.isSelected.value = i;
                                   } else {
-                                    controller.isSelected.value = -1;
+                                    ShowtimeController.instance.isSelected.value = -1;
                                   }
                                 },
                                 child: Container(
@@ -77,7 +73,7 @@ class _CompanyListState extends State<CompanyList> {
                                             radius: 22,
                                             backgroundColor: Colors.transparent,
                                             backgroundImage: NetworkImage(
-                                                controller
+                                                ShowtimeController.instance
                                                         .companies[i].logoUrl ??
                                                     Constants.defaultImage),
                                           ),
@@ -87,7 +83,7 @@ class _CompanyListState extends State<CompanyList> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                controller.companies[i].name ??
+                                                ShowtimeController.instance.companies[i].name ??
                                                     '',
                                                 style: TextStyle(
                                                     color: MyTheme.textColor,
@@ -96,7 +92,7 @@ class _CompanyListState extends State<CompanyList> {
                                               ),
                                               SizedBox(height: 4),
                                               Text(
-                                                controller.companies[i]
+                                                ShowtimeController.instance.companies[i]
                                                         .theaters!.length
                                                         .toString() +
                                                     " theater",
@@ -116,7 +112,7 @@ class _CompanyListState extends State<CompanyList> {
                                   ),
                                 ),
                               ),
-                              Obx(() => controller.isSelected.value == i
+                              Obx(() => ShowtimeController.instance.isSelected.value == i
                                   ? Container(
                                       width: double.infinity,
                                       padding: EdgeInsets.symmetric(
@@ -124,7 +120,7 @@ class _CompanyListState extends State<CompanyList> {
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        children: controller
+                                        children: ShowtimeController.instance
                                             .companies[i].theaters!
                                             .map((e) => Column(
                                           crossAxisAlignment:
@@ -132,9 +128,9 @@ class _CompanyListState extends State<CompanyList> {
                                                   children: [
                                                     GestureDetector(
                                                         onTap: () {
-                                                          controller.theaterId.value = e.id!;
-                                                          controller.movieId = widget.movieId;
-                                                          controller.fetchShowtimes();
+                                                          ShowtimeController.instance.theaterId.value = e.id!;
+                                                          ShowtimeController.instance.movieId = widget.movieId;
+                                                          ShowtimeController.instance.fetchShowtimes();
                                                         },
                                                         child:Padding(
                                                           padding:
@@ -144,11 +140,11 @@ class _CompanyListState extends State<CompanyList> {
                                                           child: Text(e.name ?? ''),
                                                         ),
                                                     ),
-                                                    controller.theaterId.value == e.id! ?
+                                                    ShowtimeController.instance.theaterId.value == e.id! ?
                                                     Row(
                                                       children:
-                                                          controller.showtimes.length == 0 ? [Container()] :
-                                                          controller.showtimes.map((showtime) =>  GestureDetector(
+                                                      ShowtimeController.instance.showtimes.length == 0 ? [Container()] :
+                                                      ShowtimeController.instance.showtimes.map((showtime) =>  GestureDetector(
                                                             onTap: () {
                                                               Get.toNamed("/booking/${showtime.id}");
                                                             },
@@ -190,7 +186,7 @@ class _CompanyListState extends State<CompanyList> {
                     ],
                   );
                 },
-                itemCount: controller.companies.length,
+                itemCount: ShowtimeController.instance.companies.length,
               ),
             )),
       ),

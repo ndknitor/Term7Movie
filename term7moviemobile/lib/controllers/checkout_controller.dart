@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:term7moviemobile/models/showtime_model.dart';
@@ -48,8 +49,25 @@ class CheckOutController extends GetxController {
         borderRadius: 10,
         margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
       );
+      createPaymentSuccessNotification();
     } else {
       getErrorSnackBar();
     }
+  }
+
+  Future<void> createPaymentSuccessNotification() async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'basic_channel',
+        title:
+        '${Emojis.money_money_bag + Emojis.activites_ticket} Payment Success!!!',
+        body: 'Your payment is success scan your barcode and enjoy your movie',
+        bigPicture: 'asset://assets/images/map.png',
+        showWhen: true,
+        displayOnBackground: true,
+        notificationLayout: NotificationLayout.BigPicture,
+      ),
+    ).catchError((err) => print(err));
   }
 }

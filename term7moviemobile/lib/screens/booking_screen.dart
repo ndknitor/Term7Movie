@@ -1,182 +1,346 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:term7moviemobile/controllers/booking_controller.dart';
+import 'package:term7moviemobile/models/seat_model.dart';
 import 'package:term7moviemobile/models/ticket_model.dart';
+import 'package:term7moviemobile/utils/constants.dart';
 import 'package:term7moviemobile/utils/theme.dart';
 import 'package:term7moviemobile/widgets/arrow_back.dart';
 
-class BookingScreen extends StatelessWidget {
+class BookingScreen extends StatefulWidget {
   const BookingScreen({Key? key}) : super(key: key);
 
+  @override
+  State<BookingScreen> createState() => _BookingScreenState();
+}
+
+class _BookingScreenState extends State<BookingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    BookingController.instance.fetchData();
+  }
+
   Widget build(BuildContext context) {
-    final BookingController controller = Get.put(BookingController());
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Obx(
         () => LoadingOverlay(
-          isLoading: controller.isLoading.value,
+          isLoading: BookingController.instance.isLoading.value,
           color: MyTheme.backgroundColor,
           progressIndicator: const CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation(MyTheme.primaryColor),
           ),
           opacity: 1,
-          child: SingleChildScrollView(
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ArrowBack(
-                    color: MyTheme.bottomBarColor,
-                  ),
-                  Column(
+          child: RefreshIndicator(
+            color: MyTheme.primaryColor,
+            onRefresh: () async {
+              BookingController.instance.fetchData();
+            },
+            child: ListView(
+              children: [
+                SafeArea(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        margin: const EdgeInsets.only(left: 16, top: 8),
-                        child: Text(
-                          controller.showtime?.movie?.title ?? "",
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
+                      ArrowBack(
+                        color: MyTheme.bottomBarColor,
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 4, left: 16),
-                        child: Text(
-                          controller.showtime?.theaterName ?? '',
-                        ),
-                      ),
-                    ],
-                  ),
-                  // seat status bar
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Container(
-                      width: double.infinity,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildSeatStatusBar(
-                              color: MyTheme.grayColor, content: 'Disabled'),
-                          buildSeatStatusBar(
-                              color: MyTheme.infoColor, content: 'Available'),
-                          buildSeatStatusBar(
-                              color: MyTheme.errorColor, content: 'Booked'),
-                          buildSeatStatusBar(
-                              color: MyTheme.primaryColor, content: 'Selected'),
+                          Container(
+                            margin: const EdgeInsets.only(left: 16, top: 8),
+                            child: Text(
+                              BookingController
+                                      .instance.showtime?.movie?.title ??
+                                  "",
+                              style: TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 4, left: 16),
+                            child: Text(
+                              BookingController
+                                      .instance.showtime?.theaterName ??
+                                  '',
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                    child: Container(
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(
-                            controller.showtime?.room?.numberOfRow ?? 0,
-                            (int row) => Builder(builder: (context) {
-                                  return Container(
-                                    margin: EdgeInsets.only(top: 8),
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: List.generate(
-                                            controller.showtime?.room
-                                                    ?.numberOfColumn ??
-                                                0, (int column) {
-                                          var t = controller.tickets.where(
-                                              (ticket) =>
-                                                  ticket.seat!.rowPos ==
-                                                      row + 1 &&
-                                                  ticket.seat!.columnPos ==
-                                                      column + 1);
-                                          if (t.isNotEmpty) {
-                                            return ToggleButton(
-                                              child: Text(
-                                                String.fromCharCode(65 + row) +
-                                                    (column + 1).toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              isAvailable: true,
-                                              ticket: t.first,
-                                            );
-                                          } else {
-                                            return ToggleButton(
-                                              child: Text(
-                                                String.fromCharCode(65 + row) +
-                                                    (column + 1).toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              isAvailable: false,
-                                              ticket: null,
-                                            );
-                                          }
-                                        }).toList()),
-                                  );
-                                })).reversed.toList(),
+                      // seat status bar
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Container(
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              buildSeatStatusBar(
+                                  color: SvgPicture.string(Constants.svgSeatVip
+                                      .replaceAll('#FBFBFB', '#D8D8D8')),
+                                  content: 'Disabled'),
+                              buildSeatStatusBar(
+                                  color: SvgPicture.string(Constants.svgSeatVip),
+                                  content: 'Available'),
+                              buildSeatStatusBar(
+                                  color: SvgPicture.string(Constants.svgSeatVip
+                                      .replaceAll('#FBFBFB', '#FFBC99')
+                                      .replaceAll('#9A9FA5', '#FF4842')),
+                                  content: 'Booked'),
+                              buildSeatStatusBar(
+                                  color: SvgPicture.string(Constants.svgSeatVip
+                                      .replaceAll('#FBFBFB', '#CABDFF')
+                                      .replaceAll('#9A9FA5', '#6346FA')),
+                                  content: 'Selected'),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Screen',
-                    ),
-                  ),
-                  Image.asset("assets/images/screen.png"),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 24, right: 24, bottom: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Total Price',
+                      //seat type bar
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Container(
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              buildSeatStatusBar(
+                                  color: SvgPicture.string(Constants.svgSeatNormal),
+                                  content: 'Normal'),
+                              buildSeatStatusBar(
+                                  color: SvgPicture.string(Constants.svgSeatVip),
+                                  content: 'Vip'),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 8.0),
+                        child: SingleChildScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: List.generate(
+                                      BookingController.instance.showtime?.room
+                                          ?.numberOfRow ??
+                                          0,
+                                          (int row) => Builder(builder: (context) {
+                                        return Container(
+                                          height: 24,
+                                          width: 24,
+                                          margin: EdgeInsets.only(top: 8, bottom: 2),
+                                          child: Text(
+                                            String.fromCharCode(65 + row),
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        );
+                                      })).reversed.toList(),
+                                ),
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: List.generate(
+                                          BookingController.instance.showtime
+                                              ?.room?.numberOfColumn ??
+                                              0,
+                                              (int column) =>
+                                              Builder(builder: (context) {
+                                                return Container(
+                                                  height: 24,
+                                                  width: 24,
+                                                  margin: EdgeInsets.only(
+                                                      left: 6, right: 4, top: 8),
+                                                  child: Text(
+                                                    (column + 1).toString(),
+                                                    style:
+                                                    TextStyle(fontSize: 16),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                );
+                                              })).toList(),
+                                    ),
+                                    Column(
+                                      children: List.generate(
+                                          BookingController.instance.showtime
+                                              ?.room?.numberOfRow ??
+                                              0,
+                                              (int row) =>
+                                              Builder(builder: (context) {
+                                                return Container(
+                                                  child: Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                      children: List.generate(
+                                                          BookingController
+                                                              .instance
+                                                              .showtime
+                                                              ?.room
+                                                              ?.numberOfColumn ??
+                                                              0, (int column) {
+                                                        var s = BookingController
+                                                            .instance
+                                                            .showtime!
+                                                            .room!
+                                                            .seatList!
+                                                            .where((seat) =>
+                                                        seat.rowPos ==
+                                                            row + 1 &&
+                                                            seat.columnPos ==
+                                                                column + 1);
+                                                        if (s.isNotEmpty) {
+                                                          var t = BookingController
+                                                              .instance.tickets
+                                                              .where((ticket) =>
+                                                          ticket.seat!
+                                                              .rowPos ==
+                                                              s.first
+                                                                  .rowPos &&
+                                                              ticket.seat!
+                                                                  .columnPos ==
+                                                                  s.first
+                                                                      .columnPos);
+                                                          if (t.isNotEmpty) {
+                                                            if (t.first.lockedTime ==
+                                                                null ||
+                                                                (DateTime.parse(t
+                                                                    .first
+                                                                    .lockedTime!)
+                                                                    .add(Duration(
+                                                                    hours:
+                                                                    7))
+                                                                    .isBefore(
+                                                                    DateTime
+                                                                        .now()) &&
+                                                                    t.first.statusName !=
+                                                                        'Sold')) {
+                                                              return ToggleButton(
+                                                                isAvailable: true,
+                                                                ticket: t.first,
+                                                                isSold: false,
+                                                                seat: s.first,
+                                                              );
+                                                            } else {
+                                                              return ToggleButton(
+                                                                isAvailable: true,
+                                                                ticket: t.first,
+                                                                isSold: true,
+                                                                seat: s.first,
+                                                              );
+                                                            }
+                                                          } else {
+                                                            return ToggleButton(
+                                                              isAvailable: false,
+                                                              isSold: false,
+                                                              seat: s.first,
+                                                            );
+                                                          }
+                                                        } else {
+                                                          return Container(
+                                                            height: 24,
+                                                            width: 24,
+                                                            margin:
+                                                            const EdgeInsets
+                                                                .all(5.0),
+                                                          );
+                                                        }
+                                                      }).toList()),
+                                                );
+                                              })).reversed.toList(),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            Text(
-                              controller.total.value.toString() + " VND",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Screen',
+                        ),
+                      ),
+                      Image.asset("assets/images/screen.png"),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 24, right: 24, bottom: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Your Seats',
+                                ),
+                                Text(
+                                  BookingController.instance.selected.map((e) => e.seat!.name)
+                                      .toList()
+                                      .join(", "),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                SizedBox(height: 8,),
+                                Text(
+                                  'Total Price',
+                                ),
+                                Text(
+                                  BookingController.instance.total.value
+                                      .toStringAsFixed(0) +
+                                      " VND",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Get.toNamed("/checkout", arguments: {
+                                  'showtime':
+                                      BookingController.instance.showtime,
+                                  'tickets':
+                                      BookingController.instance.selected,
+                                  'total':
+                                      BookingController.instance.total.value
+                                });
+                              },
+                              child: Container(
+                                height: size.height / 16,
+                                width: size.width / 3,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    color: MyTheme.primaryColor,
+                                    borderRadius: BorderRadius.circular(16)),
+                                child: const Text(
+                                  'Book Ticket',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
+                              ),
                             )
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.toNamed("/checkout", arguments: {
-                              'showtime': controller.showtime,
-                              'tickets': controller.selected,
-                              'total': controller.total.value
-                            });
-                          },
-                          child: Container(
-                            height: size.height / 16,
-                            width: size.width / 3,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                color: MyTheme.primaryColor,
-                                borderRadius: BorderRadius.circular(16)),
-                            child: const Text(
-                              'Book Ticket',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -184,17 +348,20 @@ class BookingScreen extends StatelessWidget {
     );
   }
 
-  Row buildSeatStatusBar({required Color color, required String content}) {
+  Row buildSeatStatusBar({required var color, required String content}) {
     return Row(
       children: [
         Container(
-          height: 16,
-          width: 16,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: color, borderRadius: BorderRadius.circular(4)),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: color,
+          height: 20,
+          width: 20,
         ),
         Padding(
-          padding: EdgeInsets.only(left: 8.0),
+          padding: EdgeInsets.only(left: 2.0),
           child: Text(
             content,
             style: TextStyle(fontSize: 12),
@@ -205,44 +372,79 @@ class BookingScreen extends StatelessWidget {
   }
 }
 
-class ToggleButton extends StatefulWidget {
-  const ToggleButton(
-      {Key? key, required this.child, required this.isAvailable, this.ticket})
-      : super(key: key);
-  final Widget child;
+class ToggleButton extends StatelessWidget {
   final bool isAvailable;
+  final bool isSold;
   final TicketModel? ticket;
+  final SeatModel seat;
+  const ToggleButton(
+      {Key? key, required this.isAvailable, this.ticket, required this.isSold, required this.seat})
+      : super(key: key);
 
-  @override
-  State<ToggleButton> createState() => _ToggleButtonState();
-}
-
-class _ToggleButtonState extends State<ToggleButton> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        height: 32,
-        width: 32,
+    return Padding(
+        padding: const EdgeInsets.all(5.0),
         child: GestureDetector(
-          onTap: () {
-            if (widget.isAvailable) {
-              BookingController.instance.setSelected(widget.ticket);
-            }
-          },
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                color: !widget.isAvailable
-                    ? MyTheme.grayColor
-                    : widget.ticket!.statusName == 'Sold'
-                        ? MyTheme.errorColor
-                        : !BookingController.instance.selected
-                                .contains(widget.ticket)
-                            ? MyTheme.infoColor
-                            : MyTheme.primaryColor),
-            child: widget.child,
-          ),
-        ));
+            onTap: () {
+              BookingController.instance.setSelected(ticket);
+            },
+            child: !isAvailable
+                ? Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: seat.seatTypeId == 2 ?  SvgPicture.string(
+                      Constants.svgSeatVip.replaceAll('#FBFBFB', '#D8D8D8'),
+                      height: 24,
+                      width: 24,
+                    ) : SvgPicture.string(
+                      Constants.svgSeatNormal.replaceAll('#FBFBFB', '#D8D8D8'),
+                      height: 24,
+                      width: 24,
+                    ),
+                  )
+                : isSold
+                    ? Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: seat.seatTypeId == 2 ?  SvgPicture.string(
+                          Constants.svgSeatVip
+                              .replaceAll('#FBFBFB', '#FFBC99')
+                              .replaceAll('#9A9FA5', '#FF4842'),
+                          height: 24,
+                          width: 24,
+                        ) : SvgPicture.string(
+                          Constants.svgSeatNormal.replaceAll('#FBFBFB', '#FFBC99').replaceAll('#9A9FA5', '#FF4842'),
+                          height: 24,
+                          width: 24,
+                        ),
+                      )
+                    : Obx(() {
+                        var color = seat.seatTypeId == 2 ? Constants.svgSeatVip : Constants.svgSeatNormal;
+                        // if (!BookingController.instance.selected.contains(ticket)) {
+                        //   color = Constants.svgCode.replaceAll('#FBFBFB', '#74CAFF').replaceAll('#9A9FA5', '#0068FF');
+                        // }
+                        if (BookingController.instance.selected
+                            .contains(ticket)) {
+                          color = Constants.svgSeatVip
+                              .replaceAll('#FBFBFB', '#CABDFF')
+                              .replaceAll('#9A9FA5', '#6346FA');
+                        }
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4)),
+                          child: SvgPicture.string(
+                            color,
+                            height: 24,
+                            width: 24,
+                          ),
+                        );
+                      })));
   }
 }

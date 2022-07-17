@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:term7moviemobile/models/showtime_model.dart';
 import 'package:term7moviemobile/models/ticket_model.dart';
@@ -10,23 +11,16 @@ class BookingController extends GetxController {
   RxBool isLoading = false.obs;
   List<TicketModel> tickets = <TicketModel>[];
   ShowtimeModel? showtime;
-  List<TicketModel> selected = <TicketModel>[];
+  RxList<TicketModel> selected = <TicketModel>[].obs;
   RxDouble total = (0.0).obs;
   int pageSize = 0;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchData();
-    print(total.value);
-    print(selected);
-    // Get.delete<BookingController>();
-  }
 
   void fetchData() async {
     try{
       isLoading.value = true;
       id = Get.parameters['id']!;
+      total.value = 0;
+      selected.value = [];
       showtime = await ShowtimeServices.getShowtimeDetail(id);
       if (showtime?.room != null) {
         pageSize = showtime!.room!.numberOfColumn! * showtime!.room!.numberOfRow!;
