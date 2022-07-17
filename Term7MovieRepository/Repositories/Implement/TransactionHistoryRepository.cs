@@ -144,54 +144,73 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            var TotalShowtimeIds = await _context.Theaters
-                                .Include(a => a.Showtimes)
-                                .Where(a => a.ManagerId == managerid)
-                                .SelectMany(a => a.Showtimes)
-                                .Select(a => a.Id).ToListAsync();
-            var OldShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.ManagerId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.ManagerId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisMondayWeek)
-                                    .Select(a => a.Id).ToListAsync();
-            //I can taste the tension like a cloud of smoke in the air
             int TotalTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        Theaterid = th.TheaterId,
+                                                        Money = tic.ReceivePrice
                                                     })
-                                                    .Where(xxx => TotalShowtimeIds.Contains(xxx.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.Theaterid,
+                                                    th => th.Id, (pretable, th) =>
+                                                    new
+                                                    {
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                        ManagerId = th.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid)
+                                                    .Select(a => a.ManagerId).CountAsync();
             int OldTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        Theaterid = th.TheaterId,
+                                                        Money = tic.ReceivePrice
                                                     })
-                                                    .Where(xxx => OldShowtimeIds.Contains(xxx.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.Theaterid,
+                                                    th => th.Id, (pretable, th) =>
+                                                    new
+                                                    {
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                        ManagerId = th.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid 
+                                                        && xxx.PurchasedDate <= SundayPreviousWeek 
+                                                        && xxx.PurchasedDate >= MondayPreviousWeek)
+                                                    .Select(a => a.ManagerId).CountAsync();
             int NewTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        Theaterid = th.TheaterId,
+                                                        Money = tic.ReceivePrice
                                                     })
-                                                    .Where(xxx => NewShowtimeIds.Contains(xxx.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.Theaterid,
+                                                    th => th.Id, (pretable, th) =>
+                                                    new
+                                                    {
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                        ManagerId = th.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid
+                                                        && xxx.PurchasedDate <= DateTime.UtcNow
+                                                        && xxx.PurchasedDate >= ThisMondayWeek)
+                                                    .Select(a => a.ManagerId).CountAsync();
             if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
             {
                 //free to play
@@ -228,23 +247,6 @@ namespace Term7MovieRepository.Repositories.Implement
             //throw new NotImplementedException();
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            var TotalShowtimeIds = await _context.Theaters
-                                .Include(a => a.Showtimes)
-                                .Where(a => a.ManagerId == managerid)
-                                .SelectMany(a => a.Showtimes)
-                                .Select(a => a.Id).ToListAsync();
-            var OldShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.ManagerId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.CompanyId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisMondayWeek)
-                                    .Select(a => a.Id).ToListAsync();
             //I can taste the tension like a cloud of smoke in the air
             decimal TotalIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -253,9 +255,17 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(xxx => TotalShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid)
                                                     .Select(a => a.Money).SumAsync();
             decimal OldIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -264,9 +274,21 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(xxx => OldShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid 
+                                                                && xxx.PurchasedDate >= MondayPreviousWeek
+                                                                && xxx.PurchasedDate <= SundayPreviousWeek)
                                                     .Select(a => a.Money).SumAsync();
             decimal NewIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -275,11 +297,23 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(xxx => NewShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid
+                                                                && xxx.PurchasedDate >= ThisMondayWeek
+                                                                && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
-            if(TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
+            if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
             {
                 //free to play
                 TotalIncome = 1;
@@ -314,42 +348,37 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            //nhưng lời đàm tiếu qua loa linh tinh
-            var OldShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisMondayWeek)
-                                    .Select(a => a.Id).ToListAsync();
             int TotalTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
                                                     })
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Select(a => a.PurchasedDate).CountAsync();
             int OldTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
                                                     })
-                                                    .Where(a => OldShowtimeIds.Contains(a.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Where(xxx => xxx.PurchasedDate <= SundayPreviousWeek
+                                                                && xxx.PurchasedDate >= MondayPreviousWeek)
+                                                    .Select(a => a.PurchasedDate).CountAsync();
             int NewTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
                                                     })
-                                                    .Where(a => NewShowtimeIds.Contains(a.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Where(xxx => xxx.PurchasedDate <= DateTime.UtcNow
+                                                                && xxx.PurchasedDate >= ThisMondayWeek)
+                                                    .Select(a => a.PurchasedDate).CountAsync();
             if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
             {
                 //free to play
@@ -383,15 +412,10 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentWeek(DateTime ThisMondayWeek,
             DateTime MondayPreviousWeek, DateTime SundayPreviousWeek)
         {
+            //throw new NotImplementedException();
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            //Không thể nào mà cản được ma gaming
-            var OldShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= SundayPreviousWeek && a.StartTime >= MondayPreviousWeek)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisMondayWeek)
-                                    .Select(a => a.Id).ToListAsync();
+            //I can taste the tension like a cloud of smoke in the air
             decimal TotalIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
@@ -399,7 +423,15 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        TheaterId = th.TheaterId
+                                                    })
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money
                                                     })
                                                     .Select(a => a.Money).SumAsync();
             decimal OldIncome = await _context.Tickets
@@ -409,9 +441,20 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(a => OldShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.PurchasedDate >= MondayPreviousWeek
+                                                                && xxx.PurchasedDate <= SundayPreviousWeek)
                                                     .Select(a => a.Money).SumAsync();
             decimal NewIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -420,9 +463,20 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(a => NewShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.PurchasedDate >= ThisMondayWeek
+                                                                && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
             if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
             {
@@ -459,54 +513,73 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            var TotalShowtimeIds = await _context.Theaters
-                                .Include(a => a.Showtimes)
-                                .Where(a => a.ManagerId == managerid)
-                                .SelectMany(a => a.Showtimes)
-                                .Select(a => a.Id).ToListAsync();
-            var OldShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.ManagerId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.ManagerId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
-                                    .Select(a => a.Id).ToListAsync();
-            //I can taste the tension like a cloud of smoke in the air
             int TotalTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        Theaterid = th.TheaterId,
+                                                        Money = tic.ReceivePrice
                                                     })
-                                                    .Where(xxx => TotalShowtimeIds.Contains(xxx.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.Theaterid,
+                                                    th => th.Id, (pretable, th) =>
+                                                    new
+                                                    {
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                        ManagerId = th.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid)
+                                                    .Select(a => a.ManagerId).CountAsync();
             int OldTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        Theaterid = th.TheaterId,
+                                                        Money = tic.ReceivePrice
                                                     })
-                                                    .Where(xxx => OldShowtimeIds.Contains(xxx.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.Theaterid,
+                                                    th => th.Id, (pretable, th) =>
+                                                    new
+                                                    {
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                        ManagerId = th.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid
+                                                        && xxx.PurchasedDate <= LastPreviousMonth
+                                                        && xxx.PurchasedDate >= FirstPreviousMonth)
+                                                    .Select(a => a.ManagerId).CountAsync();
             int NewTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        Theaterid = th.TheaterId,
+                                                        Money = tic.ReceivePrice
                                                     })
-                                                    .Where(xxx => NewShowtimeIds.Contains(xxx.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.Theaterid,
+                                                    th => th.Id, (pretable, th) =>
+                                                    new
+                                                    {
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                        ManagerId = th.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid
+                                                        && xxx.PurchasedDate <= DateTime.UtcNow
+                                                        && xxx.PurchasedDate >= ThisFirstMonth)
+                                                    .Select(a => a.ManagerId).CountAsync();
             if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
             {
                 //free to play
@@ -540,25 +613,9 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentMonth(long managerid, /*bool Comparable,*/
             DateTime ThisFirstMonth, DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
         {
+            //throw new NotImplementedException();
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            var TotalShowtimeIds = await _context.Theaters
-                                .Include(a => a.Showtimes)
-                                .Where(a => a.ManagerId == managerid)
-                                .SelectMany(a => a.Showtimes)
-                                .Select(a => a.Id).ToListAsync();
-            var OldShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.ManagerId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Theaters
-                                    .Include(a => a.Showtimes)
-                                    .Where(a => a.CompanyId == managerid)
-                                    .SelectMany(a => a.Showtimes)
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
-                                    .Select(a => a.Id).ToListAsync();
             //I can taste the tension like a cloud of smoke in the air
             decimal TotalIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -567,9 +624,17 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(xxx => TotalShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid)
                                                     .Select(a => a.Money).SumAsync();
             decimal OldIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -578,9 +643,21 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(xxx => OldShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid
+                                                                && xxx.PurchasedDate >= FirstPreviousMonth
+                                                                && xxx.PurchasedDate <= LastPreviousMonth)
                                                     .Select(a => a.Money).SumAsync();
             decimal NewIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -589,9 +666,21 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(xxx => NewShowtimeIds.Contains(xxx.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.ManagerId == managerid
+                                                                && xxx.PurchasedDate >= ThisFirstMonth
+                                                                && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
             if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
             {
@@ -628,42 +717,37 @@ namespace Term7MovieRepository.Repositories.Implement
         {
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            //nhưng lời đàm tiếu qua loa linh tinh
-            var OldShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
-                                    .Select(a => a.Id).ToListAsync();
             int TotalTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
                                                     })
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Select(a => a.PurchasedDate).CountAsync();
             int OldTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
                                                     })
-                                                    .Where(a => OldShowtimeIds.Contains(a.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Where(xxx => xxx.PurchasedDate <= LastPreviousMonth
+                                                                && xxx.PurchasedDate >= FirstPreviousMonth)
+                                                    .Select(a => a.PurchasedDate).CountAsync();
             int NewTicketSold = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
                                                     th => th.TicketId, (tic, th) =>
                                                     new
                                                     {
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
                                                     })
-                                                    .Where(a => NewShowtimeIds.Contains(a.ShowtimeId))
-                                                    .Select(a => a.ShowtimeId).CountAsync();
+                                                    .Where(xxx => xxx.PurchasedDate <= DateTime.UtcNow
+                                                                && xxx.PurchasedDate >= ThisFirstMonth)
+                                                    .Select(a => a.PurchasedDate).CountAsync();
             if (TotalTicketSold == 0 && OldTicketSold == 0 && NewTicketSold == 0)
             {
                 //free to play
@@ -697,15 +781,10 @@ namespace Term7MovieRepository.Repositories.Implement
         public async Task<IncomeDTO> GetTicketStonkOrStinkInTwoRecentMonth(DateTime ThisFirstMonth,
             DateTime FirstPreviousMonth, DateTime LastPreviousMonth)
         {
+            //throw new NotImplementedException();
             if (!await _context.Database.CanConnectAsync())
                 throw new DbOperationException("DBCONNECTION");
-            //Không thể nào mà cản được ma gaming
-            var OldShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= LastPreviousMonth && a.StartTime >= FirstPreviousMonth)
-                                    .Select(a => a.Id).ToListAsync();
-            var NewShowtimeIds = await _context.Showtimes
-                                    .Where(a => a.StartTime <= DateTime.UtcNow && a.StartTime >= ThisFirstMonth)
-                                    .Select(a => a.Id).ToListAsync();
+            //I can taste the tension like a cloud of smoke in the air
             decimal TotalIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
                                                     tic => tic.Id,
@@ -713,7 +792,15 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        TheaterId = th.TheaterId
+                                                    })
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money
                                                     })
                                                     .Select(a => a.Money).SumAsync();
             decimal OldIncome = await _context.Tickets
@@ -723,9 +810,20 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(a => OldShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.PurchasedDate >= FirstPreviousMonth
+                                                                && xxx.PurchasedDate <= LastPreviousMonth)
                                                     .Select(a => a.Money).SumAsync();
             decimal NewIncome = await _context.Tickets
                                                     .Join(_context.TransactionHistories,
@@ -734,9 +832,20 @@ namespace Term7MovieRepository.Repositories.Implement
                                                     new
                                                     {
                                                         Money = tic.ReceivePrice,
-                                                        ShowtimeId = tic.ShowTimeId
+                                                        PurchasedDate = th.PurchasedDate,
+                                                        TheaterId = th.TheaterId
                                                     })
-                                                    .Where(a => NewShowtimeIds.Contains(a.ShowtimeId))
+                                                    .Join(_context.Theaters,
+                                                    pretable => pretable.TheaterId,
+                                                    theater => theater.Id, (pretable, theater) =>
+                                                    new
+                                                    {
+                                                        ManagerId = theater.ManagerId,
+                                                        Money = pretable.Money,
+                                                        PurchasedDate = pretable.PurchasedDate,
+                                                    })
+                                                    .Where(xxx => xxx.PurchasedDate >= ThisFirstMonth
+                                                                && xxx.PurchasedDate <= DateTime.UtcNow)
                                                     .Select(a => a.Money).SumAsync();
             if (TotalIncome == 0 && OldIncome == 0 && NewIncome == 0)
             {
