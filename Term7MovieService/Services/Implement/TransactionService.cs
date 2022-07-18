@@ -117,11 +117,16 @@ namespace Term7MovieService.Services.Implement
 
             if (transaction.ValidUntil < DateTime.UtcNow) throw new BadRequestException("Transaction Expired");
 
-            int statusId = await _paymentService.CheckMomoPayment(transaction);
+            int statusId = -1;
 
-            if (statusId != (int)TransactionStatusEnum.Successful)
+            if (!isUsingPoint)
             {
-                throw new BadRequestException("Transaction failed");
+                statusId = await _paymentService.CheckMomoPayment(transaction);
+
+                if (statusId != (int)TransactionStatusEnum.Successful)
+                {
+                    throw new BadRequestException("Transaction failed");
+                }
             }
 
             string showtimeTicketKey = Constants.REDIS_KEY_SHOWTIME_TICKET + "_" + transaction.ShowtimeId;
