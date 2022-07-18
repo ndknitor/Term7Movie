@@ -387,7 +387,9 @@ class ToggleButton extends StatelessWidget {
         padding: const EdgeInsets.all(5.0),
         child: GestureDetector(
             onTap: () {
-              BookingController.instance.setSelected(ticket);
+              if (ticket!.statusName != 'Sold') {
+                BookingController.instance.setSelected(ticket);
+              }
             },
             child: !isAvailable
                 ? Container(
